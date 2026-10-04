@@ -1,0 +1,23 @@
+{
+  "captured_at": "2026-10-04T18:42:17.7691578+02:00",
+  "capture_host": "X-PC",
+  "model": "SM-S948B",
+  "display": "1080x2340",
+  "results": [
+    {"name":"adb_shell_true","n":30,"failures":0,"p50_ms":63.3,"p90_ms":64.8,"p95_ms":65.1,"min_ms":59.8,"max_ms":99.1},
+    {"name":"resumed_activity","n":10,"failures":0,"p50_ms":84.1,"p90_ms":87.5,"p95_ms":87.5,"min_ms":70.7,"max_ms":111.9},
+    {"name":"uiautomator_dump","n":5,"failures":0,"p50_ms":2074.0,"p90_ms":2084.9,"p95_ms":2084.9,"min_ms":2055.4,"max_ms":2085.8},
+    {"name":"screencap_device","n":10,"failures":0,"p50_ms":300.7,"p90_ms":314.3,"p95_ms":314.3,"min_ms":279.7,"max_ms":319.2},
+    {"name":"screencap_pull","n":5,"failures":0,"p50_ms":58.0,"p90_ms":58.4,"p95_ms":58.4,"min_ms":55.1,"max_ms":84.9},
+    {"name":"home_key","n":10,"failures":0,"p50_ms":70.8,"p90_ms":71.6,"p95_ms":71.6,"min_ms":69.6,"max_ms":102.7},
+    {"name":"launch_settings","n":5,"failures":0,"p50_ms":70.1,"p90_ms":71.5,"p95_ms":71.5,"min_ms":67.6,"max_ms":292.4}
+  ],
+  "verified_round_trip": {
+    "source": "Settings accessibility XML",
+    "target": "Connections",
+    "resolved_clickable_bounds": "[28,1308][1052,1454]",
+    "tap_ms": 94.9,
+    "postcondition": ["Connections visible","Wi-Fi row visible","Bluetooth row visible"],
+    "result": "PASS"
+  }
+}

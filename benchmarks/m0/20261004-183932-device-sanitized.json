@@ -1,0 +1,58 @@
+{
+  "captured_at": "2026-10-04T18:39:32.7493534+02:00",
+  "capture_host": "X-PC",
+  "adb_transport": "usb_authorized",
+  "model": "SM-S948B",
+  "manufacturer": "samsung",
+  "device": "m3q",
+  "android_release": "17",
+  "sdk": 37,
+  "security_patch": "2026-10-05",
+  "build_display": "CP2A.260605.016.S948BXXS4BZIG",
+  "oneui_raw": 90000,
+  "sem_platform_int": 3701,
+  "sep_version": 180000,
+  "abi": "arm64-v8a",
+  "hardware": "qcom",
+  "board_platform": "canoe",
+  "soc_model": "SM8850",
+  "soc_manufacturer": "QTI",
+  "activatedid": "AFG",
+  "carrierid": "XSG",
+  "selinux": "Enforcing",
+  "memtotal_kb": 11350972,
+  "default_assistant": "com.google.android.googlequicksearchbox/com.google.android.voiceinteraction.GsaVoiceInteractionService",
+  "enabled_accessibility_services": [
+    "com.x8bit.bitwarden/com.x8bit.bitwarden.Accessibility.AccessibilityService",
+    "org.kde.kdeconnect_tp/org.kde.kdeconnect.KdeConnectAccessibilityService"
+  ],
+  "shizuku": {
+    "installed": true,
+    "process_running_at_capture": false
+  },
+  "control_packages_detected": ["com.termux"],
+  "fast_rpc_evidence": [
+    "fastrpc-adsp-secure",
+    "fastrpc-cdsp",
+    "fastrpc-cdsp-secure",
+    "fastrpc-lpass2000",
+    "fastrpc-nsp1000"
+  ],
+  "thermal_snapshot": {
+    "status": 1,
+    "ap_c": 41.2,
+    "battery_c": 38.3,
+    "pa_c": 43.3,
+    "skin_c": 39.0,
+    "usb_c": 35.5
+  },
+  "battery_snapshot": {
+    "level_percent": 76,
+    "usb_powered": true,
+    "temperature_c": 38.3
+  },
+  "notes": [
+    "Hardware serial intentionally omitted.",
+    "QNN file glob was not a conclusive runtime probe; fastrpc/CDSP nodes prove Qualcomm DSP transport presence but not GenieX/QAIRT app compatibility."
+  ]
+}
