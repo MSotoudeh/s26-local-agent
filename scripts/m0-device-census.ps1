@@ -1,8 +1,25 @@
 param(
-    [string]$AdbPath = "C:\Tools\Android\platform-tools\adb.exe"
+    [string]$AdbPath
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $AdbPath) {
+    $resolved = Get-Command adb.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+    $candidates = @(
+        $resolved,
+        "C:\Tools\Android\platform-tools\adb.exe",
+        (Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"),
+        (Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Packages\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\platform-tools\adb.exe"),
+        "C:\platform-tools\adb.exe"
+    )
+    $AdbPath = $candidates | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+}
+
+if (-not $AdbPath) {
+    throw "ADB executable not found. Supply -AdbPath explicitly."
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $outDir = Join-Path $repoRoot "benchmarks\m0"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
@@ -72,8 +89,7 @@ if (Test-Path $AdbPath) {
 
         $deviceResult = [ordered]@{
             captured_at = (Get-Date).ToString("o")
-            adb_line = $deviceLines[0]
-            serial = $serial
+            adb_transport = "authorized"
             manufacturer = Adb-Shell $serial @("getprop","ro.product.manufacturer")
             model = Adb-Shell $serial @("getprop","ro.product.model")
             device = Adb-Shell $serial @("getprop","ro.product.device")
@@ -118,8 +134,8 @@ $lines.Add("- ADB exists: $($hostResult.adb_exists)")
 $lines.Add("")
 $lines.Add("## ADB discovery")
 $lines.Add("")
-$lines.Add("ADB output:")
-$lines.Add($adbDevicesRaw)
+$deviceCount = @($adbDevicesRaw -split "\r?\n" | Where-Object { $_ -match "\sdevice(?:\s|$)" -and $_ -notmatch "^List of devices" }).Count
+$lines.Add("ADB device count: $deviceCount")
 $lines.Add("")
 $lines.Add("## Device")
 $lines.Add("")
