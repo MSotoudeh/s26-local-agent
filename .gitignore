@@ -1,0 +1,24 @@
+# Local/runtime evidence that may contain device-specific transient data
+.local/
+tmp/
+*.log
+
+# IDE/build
+.idea/
+.vscode/
+.gradle/
+build/
+out/
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Python
+__pycache__/
+.venv/
+
+# Keep benchmark JSON/MD evidence unless explicitly sensitive

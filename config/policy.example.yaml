@@ -1,0 +1,67 @@
+mode: smart
+
+activation:
+  primary: assistant_role
+  fallback: quick_settings_tile
+  wake_word: disabled
+
+speech:
+  asr:
+    primary: shenava
+    fallback: android_local
+    cloud_fallback: disabled
+  tts:
+    primary: android_local
+
+routing:
+  deterministic_first: true
+  bounded_actions: true
+  tiny_model: auto
+  jev:
+    enabled: false
+    required: false
+
+planner:
+  local:
+    enabled: true
+    runtime_order:
+      - qairt_geniex
+      - litert_qnn
+      - gpu
+  cloud:
+    enabled: true
+    providers:
+      - openai
+      - anthropic
+
+perception:
+  order:
+    - native_state
+    - accessibility_tree
+    - semantic_match
+    - screenshot_local_vision
+    - screenshot_cloud_vision
+
+execution:
+  order:
+    - android_native
+    - shizuku
+    - verified_workflow
+    - accessibility
+    - adb_lab_only
+  verify_mutations: true
+
+risk:
+  R0: auto
+  R1: auto_high_confidence
+  R2: verify_target
+  R3: explicit_confirmation
+
+privacy:
+  cloud_sensitive_data: deny
+  persist_screenshots: false
+  persist_audio: false
+
+telemetry:
+  local: true
+  cloud: false

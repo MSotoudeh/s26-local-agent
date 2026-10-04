@@ -1,0 +1,16 @@
+{
+    "captured_at":  "2026-10-04T14:58:20.6887695+02:00",
+    "computer_name":  "OPS",
+    "username":  "OPS$",
+    "os_caption":  "Microsoft Windows 11 Pro",
+    "os_version":  "10.0.26300",
+    "os_build":  "26300",
+    "total_physical_memory_bytes":  42619097088,
+    "powershell":  "5.1.26100.9549",
+    "git":  "git version 2.47.1.windows.1",
+    "python":  "Python 3.14.4",
+    "java":  "openjdk version \"25.0.4\" 2026-07-21 LTS\r\nOpenJDK Runtime Environment Microsoft-14670760 (build 25.0.4+7-LTS)\r\nOpenJDK 64-Bit Server VM Microsoft-14670760 (build 25.0.4+7-LTS, mixed mode, sharing)",
+    "adb_path":  "C:\\Tools\\Android\\platform-tools\\adb.exe",
+    "adb_exists":  true,
+    "adb_version":  "Android Debug Bridge version 1.0.41\r\nVersion 37.0.1-15733141\r\nInstalled as C:\\Tools\\Android\\platform-tools\\adb.exe\r\nRunning on Windows 10.0.26300"
+}
