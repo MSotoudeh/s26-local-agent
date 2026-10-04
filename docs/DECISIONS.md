@@ -71,3 +71,20 @@ No generic "local then cloud" chain is assumed optimal. Routing uses measured ta
 Status: accepted.
 
 This allows external independent testing/recovery similar to RDC while keeping normal local operation independent.
+
+
+## D012 — Direct Accessibility passes the latency gate
+
+Status: accepted experimentally.
+
+On the target S26 Ultra, Mobilerun over persistent HTTP via ADB forwarding produced:
+- a11y tree p50 4.88 ms / p95 5.71 ms;
+- combined state p50 5.92 ms / p95 7.36 ms.
+
+The same app through repeated `adb shell content` calls took ~1.13 s because Android's ContentProvider CLI startup dominated the measurement.
+
+Decision:
+- direct Accessibility is viable as the primary perception layer;
+- per-turn ContentProvider CLI is rejected;
+- stock Mobilerun remains lab-only because its permission/feature surface is broader than needed;
+- production work should use a stripped fork or minimal custom bridge.

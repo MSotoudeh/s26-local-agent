@@ -1,0 +1,20 @@
+{
+  "captured_at": "2026-10-04T19:06:11.5019398+02:00",
+  "target": "Connections",
+  "initial_state_read_ms": 594.06,
+  "target_bounds": "28, 0, 1052, 125",
+  "tap_http_ms": 388.54,
+  "tap_response_shape_note": "Response was HTTP-success but the initial checker looked for an {ok:true} shape; Mobilerun returns ApiResponse.Success instead.",
+  "verified": true,
+  "verify_polls": 1,
+  "verify_state_read_ms": 13.06,
+  "action_to_verified_state_ms": 83.57,
+  "steady_state_followup_observation": {
+    "state_read_ms": 10.05,
+    "tap_request_ms": 6.83,
+    "tap_to_verified_connections_ms": 86.01,
+    "back_request_ms": 6.77,
+    "back_to_verified_main_ms": 141.0,
+    "note": "Only one full warm cycle was valid before selector/layout state changed; these are latency observations, not a reliability sample."
+  }
+}
