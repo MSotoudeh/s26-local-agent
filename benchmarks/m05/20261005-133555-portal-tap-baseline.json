@@ -1,0 +1,13 @@
+﻿{
+    "captured_at":  "2026-10-05T13:35:55.8675321+02:00",
+    "action":  "tap_2_2_noop",
+    "iterations":  30,
+    "failures":  0,
+    "package_unchanged":  true,
+    "p50_ms":  26.12,
+    "p90_ms":  28.94,
+    "p95_ms":  29.65,
+    "p99_ms":  31.2,
+    "max_ms":  34.71,
+    "token_exposed":  false
+}

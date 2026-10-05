@@ -10,6 +10,8 @@ Every milestone is a falsifiable experiment. The output is not "feature implemen
 
 ## M0 — Device/runtime census
 
+Status: **COMPLETE / GO** (2026-10-05).
+
 Capture:
 - Android build and device identity;
 - SoC/ABI/RAM;
@@ -23,6 +25,8 @@ Capture:
 Output: machine-readable JSON plus a short report.
 
 ## M0.5 — Remote phone control plane
+
+Status: **feasibility GO / full acceptance HOLD**. Software reconnect after ADB-server restart passes; physical USB unplug/replug and repeated selector/settle reliability remain open.
 
 Goal: allow an external agent to inspect and actuate the phone independently.
 

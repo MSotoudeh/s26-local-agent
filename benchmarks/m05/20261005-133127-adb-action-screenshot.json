@@ -1,0 +1,28 @@
+﻿{
+    "captured_at":  "2026-10-05T13:31:27.0980604+02:00",
+    "model":  "SM-S948B",
+    "results":  [
+                    {
+                        "name":  "adb_screencap_binary",
+                        "iterations":  20,
+                        "failures":  0,
+                        "min_ms":  1004.11,
+                        "p50_ms":  1012.1,
+                        "p90_ms":  1018.32,
+                        "p95_ms":  1020.88,
+                        "p99_ms":  1020.88,
+                        "max_ms":  1035.15
+                    },
+                    {
+                        "name":  "adb_input_wakeup",
+                        "iterations":  30,
+                        "failures":  0,
+                        "min_ms":  37.52,
+                        "p50_ms":  46.26,
+                        "p90_ms":  52.25,
+                        "p95_ms":  52.8,
+                        "p99_ms":  53.94,
+                        "max_ms":  54.16
+                    }
+                ]
+}

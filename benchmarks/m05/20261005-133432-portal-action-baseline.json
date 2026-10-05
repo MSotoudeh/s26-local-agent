@@ -1,0 +1,27 @@
+﻿{
+    "captured_at":  "2026-10-05T13:34:32.2715666+02:00",
+    "model":  "SM-S948B",
+    "transport":  "usb_adb_forward_http",
+    "action":  "foreground_existing_app",
+    "iterations":  20,
+    "failures":  2,
+    "action_ms":  {
+                      "p50":  32.14,
+                      "p90":  1531.44,
+                      "p95":  1533.97,
+                      "max":  2593.97
+                  },
+    "verify_ms":  {
+                      "p50":  33.5,
+                      "p90":  1513.99,
+                      "p95":  3012.05,
+                      "max":  3018.45
+                  },
+    "verified_e2e_ms":  {
+                            "p50":  66.72,
+                            "p90":  2624.64,
+                            "p95":  4543.53,
+                            "max":  4552.45
+                        },
+    "token_exposed":  false
+}

@@ -13,6 +13,7 @@ No third-party Python packages are required.
 from __future__ import annotations
 
 import argparse
+import base64
 import http.client
 import json
 import math
@@ -21,6 +22,7 @@ import re
 import shutil
 import statistics
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -174,6 +176,12 @@ class MobilerunUsbSession:
             "--bind", "enabled:b:true",
             "--bind", f"port:i:{HTTP_PORT}",
         )
+        subprocess.run(
+            [self.adb, "forward", "--remove", f"tcp:{self.forward_port}"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
         self._adb("forward", f"tcp:{self.forward_port}", f"tcp:{HTTP_PORT}")
         raw = self._adb(
             "shell", "content", "query",
@@ -182,9 +190,22 @@ class MobilerunUsbSession:
         self.token = parse_provider_token(raw)
         self._open = True
 
-        # Warm the forwarded route without exposing auth material.
-        self._request("GET", "ping", auth=False)
-        return self
+        # The Android socket server can lag slightly behind the ContentProvider
+        # toggle. Treat that as a bounded startup race, not a hard failure.
+        deadline = time.monotonic() + 2.0
+        last_error: Exception | None = None
+        while time.monotonic() < deadline:
+            try:
+                self._request("GET", "ping", auth=False, timeout=0.4)
+                return self
+            except (OSError, TimeoutError, PhoneControlError) as exc:
+                last_error = exc
+                time.sleep(0.05)
+
+        self.close()
+        raise PhoneControlError(
+            f"Mobilerun HTTP server did not become ready: {last_error}"
+        )
 
     def close(self) -> None:
         if not self._open:
@@ -249,17 +270,125 @@ class MobilerunUsbSession:
         finally:
             conn.close()
 
+    def _get_with_retry(
+        self,
+        path: str,
+        *,
+        timeout: float,
+        attempts: int = 2,
+        retry_delay: float = 0.03,
+    ) -> Any:
+        last_error: Exception | None = None
+        for attempt in range(attempts):
+            try:
+                return unwrap_api(
+                    self._request("GET", path, timeout=timeout)
+                )
+            except (OSError, TimeoutError, PhoneControlError) as exc:
+                last_error = exc
+                if attempt + 1 < attempts:
+                    time.sleep(retry_delay)
+        raise PhoneControlError(
+            f"GET {path!r} failed after {attempts} attempts: {last_error}"
+        )
+
     def state(self) -> dict[str, Any]:
-        return unwrap_api(self._request("GET", "state"))
+        return self._get_with_retry("state", timeout=1.2)
 
     def phone_state(self) -> dict[str, Any]:
-        return unwrap_api(self._request("GET", "phone_state"))
+        return self._get_with_retry("phone_state", timeout=0.8)
 
     def tree(self) -> Any:
-        return unwrap_api(self._request("GET", "a11y_tree"))
+        return self._get_with_retry("a11y_tree", timeout=1.0)
 
     def tap(self, x: int, y: int) -> Any:
         return self._request("POST", "tap", form={"x": x, "y": y})
+
+    def swipe(
+        self,
+        start_x: int,
+        start_y: int,
+        end_x: int,
+        end_y: int,
+        duration_ms: int = 300,
+    ) -> Any:
+        return self._request(
+            "POST",
+            "swipe",
+            form={
+                "startX": start_x,
+                "startY": start_y,
+                "endX": end_x,
+                "endY": end_y,
+                "duration": duration_ms,
+            },
+        )
+
+    def input_text(self, text: str, *, clear: bool = True) -> Any:
+        encoded = base64.b64encode(text.encode("utf-8")).decode("ascii")
+        return self._request(
+            "POST",
+            "keyboard/input",
+            form={"base64_text": encoded, "clear": clear},
+        )
+
+    def launch_app(self, package: str, activity: str | None = None) -> Any:
+        form: dict[str, Any] = {"package": package}
+        if activity:
+            form["activity"] = activity
+        return self._request("POST", "app", form=form)
+
+    def wait_for_package(
+        self,
+        package: str,
+        *,
+        timeout: float = 2.0,
+        poll_interval: float = 0.02,
+    ) -> dict[str, Any]:
+        deadline = time.monotonic() + timeout
+        last: dict[str, Any] = {}
+        while time.monotonic() < deadline:
+            try:
+                state = self.phone_state()
+            except (OSError, TimeoutError, PhoneControlError):
+                time.sleep(poll_interval)
+                continue
+            if isinstance(state, dict):
+                last = state
+                if state.get("packageName") == package or state.get("package") == package:
+                    return state
+            time.sleep(poll_interval)
+        raise PhoneControlError(
+            f"Timed out waiting for package {package!r}; last state={last!r}"
+        )
+
+    def launch_app_verified(
+        self,
+        package: str,
+        activity: str | None = None,
+        *,
+        timeout: float = 2.0,
+    ) -> dict[str, Any]:
+        response = self.launch_app(package, activity)
+        state = self.wait_for_package(package, timeout=timeout)
+        return {"response": response, "phone_state": state}
+
+    def screenshot_png(self, *, timeout: float = 4.0) -> bytes:
+        cp = subprocess.run(
+            [self.adb, "exec-out", "screencap", "-p"],
+            check=False,
+            capture_output=True,
+            timeout=timeout,
+        )
+        if cp.returncode != 0:
+            stderr = cp.stderr.decode("utf-8", errors="replace").strip()
+            raise PhoneControlError(f"ADB screenshot failed ({cp.returncode}): {stderr}")
+        data = cp.stdout
+        if not data.startswith(b"\x89PNG\r\n\x1a\n"):
+            raise PhoneControlError(
+                f"ADB screenshot returned invalid PNG data ({len(data)} bytes)"
+            )
+        return data
 
     def global_action(self, action: int) -> Any:
         return self._request("POST", "global", form={"action": action})
@@ -321,6 +450,12 @@ def sanitized_state_view(state: dict[str, Any], limit: int = 25) -> dict[str, An
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
+
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor")

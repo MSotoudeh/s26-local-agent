@@ -39,9 +39,9 @@ On Ops, Android platform-tools exists at:
 C:\Tools\Android\platform-tools\adb.exe
 ```
 
-It is not currently on the SYSTEM PATH used by Remote Desktop Commander. Scripts therefore resolve this explicit path rather than assuming `adb` is globally available.
+The current Project IR session can resolve an ADB installation, but project scripts still resolve known explicit locations so behavior does not depend on the agent session's PATH.
 
-At the first M0 run, no Android device was attached according to `adb devices -l`. This is recorded as an environment state, not a project failure.
+Current device status (2026-10-05): the S26 Ultra is attached and authorized over USB ADB. Captured baseline: Samsung SM-S948B, Android 17 / API 37, arm64-v8a, QTI SM8850, SELinux Enforcing. Mobilerun Portal and Shizuku are installed; Shizuku was not running during the latest census.
 
 ## Output
 
@@ -52,14 +52,12 @@ At the first M0 run, no Android device was attached according to `adb devices -l
 
 ## M0 decision
 
-M0 is complete only when both host and device evidence have been captured at least once.
+M0 completion criterion: both host and device evidence must be captured at least once.
 
-Host-only result: PARTIAL / waiting for device transport.
+Current result: **COMPLETE / GO**.
+
+The device census is sufficient for control-plane work. NPU/runtime compatibility remains a later dedicated benchmark rather than an M0 blocker.
 
 ## Next
 
-Once device evidence exists:
-1. verify Shizuku package/state;
-2. record One UI/Android versions;
-3. inspect NPU/runtime compatibility;
-4. proceed to M0.5 control-plane baseline.
+M0.5 control-plane feasibility has also passed. Continue with stable selectors, event-driven settle/recovery, text input, scroll/dynamic UI reliability, and reconnect testing before moving to the minimal production on-device bridge.
