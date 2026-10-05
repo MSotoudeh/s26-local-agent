@@ -1,0 +1,93 @@
+﻿{
+    "captured_at":  "2026-10-05T13:27:43.9221554+02:00",
+    "model":  "SM-S948B",
+    "transport":  "usb_adb_forward_http",
+    "portal_version":  "0.7.25",
+    "token_exposed":  false,
+    "results":  [
+                    {
+                        "name":  "http_ping",
+                        "path":  "/ping",
+                        "iterations":  30,
+                        "failures":  0,
+                        "min_ms":  25.13,
+                        "p50_ms":  30.36,
+                        "p90_ms":  34.69,
+                        "p95_ms":  37.38,
+                        "p99_ms":  50.01,
+                        "max_ms":  62.37,
+                        "response_bytes_p50":  36,
+                        "response_bytes_max":  36
+                    },
+                    {
+                        "name":  "http_phone_state",
+                        "path":  "/phone_state",
+                        "iterations":  30,
+                        "failures":  0,
+                        "min_ms":  28.17,
+                        "p50_ms":  31.89,
+                        "p90_ms":  35.96,
+                        "p95_ms":  36.59,
+                        "p99_ms":  37.64,
+                        "max_ms":  40.48,
+                        "response_bytes_p50":  209,
+                        "response_bytes_max":  209
+                    },
+                    {
+                        "name":  "http_a11y_tree",
+                        "path":  "/a11y_tree",
+                        "iterations":  30,
+                        "failures":  0,
+                        "min_ms":  46.97,
+                        "p50_ms":  60.47,
+                        "p90_ms":  69.02,
+                        "p95_ms":  70.3,
+                        "p99_ms":  79.68,
+                        "max_ms":  241.09,
+                        "response_bytes_p50":  20165,
+                        "response_bytes_max":  20168
+                    },
+                    {
+                        "name":  "http_state",
+                        "path":  "/state",
+                        "iterations":  20,
+                        "failures":  0,
+                        "min_ms":  52.34,
+                        "p50_ms":  60.8,
+                        "p90_ms":  65.56,
+                        "p95_ms":  91.29,
+                        "p99_ms":  91.29,
+                        "max_ms":  259.78,
+                        "response_bytes_p50":  20375,
+                        "response_bytes_max":  20397
+                    },
+                    {
+                        "name":  "http_state_full",
+                        "path":  "/state_full",
+                        "iterations":  10,
+                        "failures":  0,
+                        "min_ms":  202.52,
+                        "p50_ms":  231.73,
+                        "p90_ms":  258.73,
+                        "p95_ms":  258.73,
+                        "p99_ms":  258.73,
+                        "max_ms":  315.32,
+                        "response_bytes_p50":  173986,
+                        "response_bytes_max":  173986
+                    },
+                    {
+                        "name":  "http_screenshot",
+                        "path":  "/screenshot",
+                        "iterations":  15,
+                        "failures":  5,
+                        "min_ms":  640.46,
+                        "p50_ms":  734.06,
+                        "p90_ms":  3010.28,
+                        "p95_ms":  3015.28,
+                        "p99_ms":  3015.28,
+                        "max_ms":  3016.99,
+                        "response_bytes_p50":  352954,
+                        "response_bytes_max":  355156
+                    }
+                ]
+}

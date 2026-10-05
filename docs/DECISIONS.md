@@ -88,3 +88,24 @@ Decision:
 - per-turn ContentProvider CLI is rejected;
 - stock Mobilerun remains lab-only because its permission/feature surface is broader than needed;
 - production work should use a stripped fork or minimal custom bridge.
+
+
+## D013 — Screenshot stays out of the primary perception loop
+
+Status: accepted experimentally.
+
+Follow-up measurements on the target S26 Ultra confirmed that structured Accessibility state is the fast path while screenshot capture has materially worse latency and reliability:
+
+- PhoneController Accessibility tree: p50 29.45 ms / p95 33.94 ms in the 2026-10-05 live follow-up;
+- Mobilerun HTTP screenshot: p50 734.06 ms with 5/15 timeouts and ~3.0 s p95;
+- raw ADB binary screenshot transfer: p50 1012.10 ms / p95 1020.88 ms.
+
+Decision: use screenshots only for visual-only/inaccessible surfaces or diagnostics. Do not include screenshots in the normal per-turn loop.
+
+## D014 — Separate base action latency from app-settle latency
+
+Status: accepted experimentally.
+
+A no-op-style Accessibility tap measured p50 26.12 ms / p95 29.65 ms with zero failures. Repeated app-foreground actions showed a multi-second tail and 2/20 failures.
+
+Decision: do not attribute app-launch tails to the transport. Each heavier action class needs its own settle condition, timeout, retry/recovery policy, and verification predicate.

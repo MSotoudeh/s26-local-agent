@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Allow an external agent to independently inspect, control, benchmark and recover the S26 Ultra, similar to Remote Desktop Commander on a PC.
+Allow ChatGPT, through Project IR, to independently inspect, control, benchmark and recover the S26 Ultra from the authorized `ops` host.
 
 This is separate from the local assistant runtime.
 
@@ -34,7 +34,7 @@ Act:
 
 ```text
 ChatGPT
-  → Remote Desktop Commander
+  → Project IR
   → Ops
   → USB ADB
   → S26 Ultra

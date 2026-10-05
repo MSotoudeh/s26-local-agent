@@ -35,9 +35,13 @@ function Command-Text {
 }
 
 function Adb-Shell {
-    param([string]$Serial, [string[]]$Args)
+    param(
+        [string]$Serial,
+        [Parameter(ValueFromRemainingArguments=$true)]
+        [string[]]$CommandArgs
+    )
     try {
-        return ((& $AdbPath -s $Serial shell @Args 2>&1 | Out-String).Trim())
+        return ((& $AdbPath -s $Serial shell @CommandArgs 2>&1 | Out-String).Trim())
     } catch {
         return "ERROR: $($_.Exception.Message)"
     }
@@ -85,7 +89,24 @@ if (Test-Path $AdbPath) {
         })
 
         $meminfo = Adb-Shell $serial @("cat","/proc/meminfo")
-        $memTotal = (($meminfo -split "\r?\n" | Where-Object { $_ -match "^MemTotal:" } | Select-Object -First 1) -replace "\s+"," ").Trim()
+        $memTotalLine = [string](($meminfo -split "\r?\n" | Where-Object { $_ -match "^MemTotal:" } | Select-Object -First 1))
+        $memTotal = (($memTotalLine -replace "\s+"," ").Trim())
+
+        $batteryRaw = Adb-Shell $serial @("dumpsys","battery")
+        function Battery-Field([string]$Name) {
+            $m = [regex]::Match($batteryRaw, "(?m)^\s*" + [regex]::Escape($Name) + ":\s*(.+)$")
+            if($m.Success) { return $m.Groups[1].Value.Trim() }
+            return $null
+        }
+        $batterySummary = [ordered]@{
+            ac_powered = Battery-Field "AC powered"
+            usb_powered = Battery-Field "USB powered"
+            wireless_powered = Battery-Field "Wireless powered"
+            level = Battery-Field "level"
+            status = Battery-Field "status"
+            health = Battery-Field "health"
+            temperature_tenths_c = Battery-Field "temperature"
+        }
 
         $deviceResult = [ordered]@{
             captured_at = (Get-Date).ToString("o")
@@ -106,7 +127,7 @@ if (Test-Path $AdbPath) {
             soc_manufacturer = Adb-Shell $serial @("getprop","ro.soc.manufacturer")
             mem_total = $memTotal
             selinux = Adb-Shell $serial @("getenforce")
-            battery = Adb-Shell $serial @("dumpsys","battery")
+            battery = $batterySummary
             enabled_accessibility_services = Adb-Shell $serial @("settings","get","secure","enabled_accessibility_services")
             interesting_packages = $interestingPackages
         }
