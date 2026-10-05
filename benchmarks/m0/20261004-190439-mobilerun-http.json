@@ -1,0 +1,11 @@
+{
+  "captured_at": "2026-10-04T19:04:39.8490700+02:00",
+  "transport": "adb-forward + persistent HTTP/1.1 HttpClient",
+  "device_model": "SM-S948B",
+  "results": [
+    {"name":"http_ping","n":40,"failures":0,"p50_ms":3.8,"p90_ms":4.4,"p95_ms":5.95,"p99_ms":31.19,"min_ms":2.83,"max_ms":79.25,"median_bytes":36},
+    {"name":"http_phone_state","n":40,"failures":0,"p50_ms":3.88,"p90_ms":4.14,"p95_ms":4.3,"p99_ms":4.43,"min_ms":3.55,"max_ms":8.06,"median_bytes":244},
+    {"name":"http_a11y_tree","n":40,"failures":0,"p50_ms":4.88,"p90_ms":5.46,"p95_ms":5.71,"p99_ms":5.89,"min_ms":4.45,"max_ms":6.21,"median_bytes":5656},
+    {"name":"http_state","n":40,"failures":0,"p50_ms":5.92,"p90_ms":6.93,"p95_ms":7.36,"p99_ms":8.39,"min_ms":5.4,"max_ms":10.29,"median_bytes":5901}
+  ]
+}
