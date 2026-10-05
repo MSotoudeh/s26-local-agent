@@ -1,0 +1,211 @@
+# Roadmap and Acceptance Gates
+
+## Philosophy
+
+Every milestone is a falsifiable experiment. The output is not "feature implemented"; it is a decision:
+
+- **GO** — integrate into the main architecture;
+- **HOLD** — useful but not yet reliable enough;
+- **KILL/REPLACE** — stop investing and test an alternative.
+
+## M0 — Device/runtime census
+
+Capture:
+- Android build and device identity;
+- SoC/ABI/RAM;
+- ADB availability and transport;
+- Shizuku state if observable;
+- Accessibility-related capabilities;
+- installed runtime/tooling;
+- host Android tooling;
+- candidate NPU runtime support.
+
+Output: machine-readable JSON plus a short report.
+
+## M0.5 — Remote phone control plane
+
+Goal: allow an external agent to inspect and actuate the phone independently.
+
+Start with:
+1. USB ADB from Ops;
+2. Mobilerun Portal or Android Use;
+3. unified PhoneController/MCP abstraction.
+
+Gate:
+- stable state/tree/screenshot acquisition;
+- stable tap/type/swipe/launch;
+- no hidden dependency on Wi-Fi for USB path;
+- recover cleanly from disconnect/reconnect.
+
+## M1 — Shizuku no-Wi-Fi runtime
+
+After Shizuku bootstrap:
+- disconnect USB;
+- Wi-Fi off;
+- test privileged operations repeatedly.
+
+Gate:
+- >= 99% success over 100 low-risk operations;
+- no runtime network dependency;
+- median bridge overhead low enough to be negligible relative to UI latency.
+
+## M2 — Accessibility primitives
+
+Implement/test:
+- dump tree;
+- click;
+- set text;
+- scroll;
+- back/home;
+- launch app;
+- screenshot fallback.
+
+Apps: One UI Settings, Samsung apps, Telegram, Chrome, YouTube.
+
+Gate:
+- primitive success >= 99% on supported test set;
+- typical tree extraction target < 50 ms;
+- no silent wrong target.
+
+## M2.5 — Bounded decision bake-off
+
+Compare:
+- deterministic selector;
+- semantic matcher;
+- Jev;
+- optional tiny local structured model.
+
+The model chooses only from controller-generated valid actions.
+
+Gate:
+- target-selection accuracy > 97% on representative states;
+- calibration good enough to support confidence thresholds.
+
+## M3 — Persian ASR
+
+Build user's command corpus:
+- short Persian commands;
+- names/entities;
+- Persian-English mixed phrases;
+- conversational tasks.
+
+Compare:
+- Shenava;
+- Android/Samsung local recognizer;
+- Whisper baseline.
+
+Gate targets:
+- simple command accuracy >= 98%;
+- entity preservation >= 97%;
+- mixed-language >= 95%;
+- p95 finalization latency < 500 ms if achievable.
+
+If no local ASR reaches usable quality, explicitly decide whether cloud ASR fallback is acceptable.
+
+## M4 — Deterministic router
+
+Domains:
+- app launch;
+- volume;
+- brightness;
+- flashlight;
+- navigation;
+- simple connectivity/system commands where platform permissions allow.
+
+Gate:
+- >= 99% interpretation accuracy on covered grammar;
+- routing latency effectively negligible (< 10 ms target).
+
+## M5 — Tiny local model
+
+Compare:
+- small classifier;
+- embeddings;
+- FunctionGemma-class structured model.
+
+Use only for requests not safely covered by deterministic routing.
+
+Gate: must improve coverage materially without unacceptable cold-start/latency.
+
+## M6 — NPU local LLM
+
+Benchmark raw, before integration:
+- model load;
+- warm/cold TTFT;
+- tokens/sec;
+- RAM;
+- sustained thermals;
+- battery;
+- crash rate;
+- task accuracy.
+
+Runtimes:
+- QAIRT/GenieX;
+- LiteRT/QNN;
+- GPU fallback.
+
+Only models that are genuinely interactive survive.
+
+## M7 — Samsung/app workflow framework
+
+Introduce app-specific knowledge only where generic control is materially worse.
+
+Initial candidates:
+- One UI Settings;
+- Samsung system surfaces;
+- Telegram.
+
+Gate: each workflow must improve latency/reliability enough to justify maintenance cost.
+
+## M8 — Semantic UI navigation
+
+Accessibility tree → target matcher → bounded action.
+
+Gate:
+- >97% target selection on test suite;
+- fallback path for uncertainty.
+
+## M9 — Generic agent loop
+
+20–50 real multi-step tasks across selected apps.
+
+Compare local 1B/4B and cloud references.
+
+## M10 — Local vs Jev vs cloud routing
+
+Blind evaluation over the same bounded decision and planning tasks.
+
+Measure accuracy, p50/p95, cost, connectivity dependence, confidence calibration.
+
+## M11 — Smart fallback
+
+A/B/C:
+- local only;
+- cloud only;
+- smart.
+
+Initial success target:
+- >96% task success;
+- simple p50 < 1 s;
+- cloud calls <20% if quality is preserved;
+- no duplicated side effects.
+
+## M12 — Persian end-to-end
+
+Voice → ASR → route/plan → action → verify → Persian response.
+
+## M13 — Assistant integration
+
+Assistant role / side-key invocation / overlay.
+
+## M14 — Wake word
+
+Only after the core agent is proven.
+
+Measure:
+- false accepts/day;
+- false rejects;
+- wake latency;
+- battery cost.
+
+If wake-word UX is worse than side-key invocation, do not ship it as default.
