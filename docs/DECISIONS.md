@@ -266,3 +266,16 @@ A Settings/Connections regression batch stopped after 3/5 because an ADB
 host call exceeded its 12-second timeout. The failing raw batch was preserved.
 The 30-second host timeout rerun passed 5/5. Both are disclosed; neither
 alone proves system reliability, and no silent test-data relabeling is allowed.
+
+## D034 — Explicit replay and Cancel require live device proof
+
+Status: source complete; device acceptance HOLD, 2026-10-13.
+
+An optional explicit Action ID allows duplicate-request tests while normal
+UI usage retains automatic UUIDs. A five-second benign local timer makes
+active cancellation observable without using privileged operations. Unit
+and build checks cannot substitute for a device-level Cancel/replay test.
+
+Deployment was blocked by Project IR's safety check. Decision: preserve
+the valid source/test harness and stop at a source-only checkpoint, without
+attempting to circumvent the block. Continue no-reboot policy.
