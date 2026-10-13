@@ -279,3 +279,33 @@ and build checks cannot substitute for a device-level Cancel/replay test.
 Deployment was blocked by Project IR's safety check. Decision: preserve
 the valid source/test harness and stop at a source-only checkpoint, without
 attempting to circumvent the block. Continue no-reboot policy.
+
+## D035 — Planner preview is separate from Android execution
+
+Status: source GO, live executor integration HOLD, 2026-10-13.
+
+A structured plan is declarative data, not a permission to drive UI.
+Registry IDs and step shapes are static, exact and versioned in source.
+The UI first exposes a preview-only boundary. Battery navigation remains
+unvalidated and cannot be run merely because it has a read-only risk tag.
+
+## D036 — Reject altered canonical plans and stale UI selection
+
+Status: host JVM tests GO, 2026-10-13.
+
+Risk R0 is insufficient authorization for arbitrary UI clicks. Plans must
+exactly match registered canonical steps, packages, labels, risk and timers.
+Semantic decisions require the current expected UI state, expected package,
+non-truncated nodes and one actionable exact label. Any ambiguity or
+unverified state fails closed. This conservative selector may initially
+refuse legitimate parent-clickable UI labels until that route is validated.
+
+## D037 — Separate evaluator correctness from speech/model performance
+
+Status: evaluator tests GO, actual model benchmarks HOLD, 2026-10-13.
+
+A synthetic text command corpus and tested CER/WER/entity-preservation and
+intent accuracy/F1 math are a measurement scaffold only. They do not prove
+offline Persian ASR, local LLM, NPU routing, task success, latency or battery
+performance. Obtain actual independent inference evidence before selecting
+a model or claiming a milestone GO.

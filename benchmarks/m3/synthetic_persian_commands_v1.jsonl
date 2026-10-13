@@ -1,0 +1,36 @@
+{"id":"p01","transcript":"تنظیمات را باز کن","intent":"OPEN_SETTINGS","entities":[]}
+{"id":"p02","transcript":"تنظيمات رو باز كن","intent":"OPEN_SETTINGS","entities":[]}
+{"id":"p03","transcript":"باز کردن تنظیمات","intent":"OPEN_SETTINGS","entities":[]}
+{"id":"p04","transcript":"open settings","intent":"OPEN_SETTINGS","entities":[]}
+{"id":"p05","transcript":"تنظیمات را باز کن و وارد Connections شو","intent":"OPEN_CONNECTIONS","entities":["Connections"]}
+{"id":"p06","transcript":"تنظیمات رو باز کن و وارد connections شو","intent":"OPEN_CONNECTIONS","entities":["connections"]}
+{"id":"p07","transcript":"open connections","intent":"OPEN_CONNECTIONS","entities":[]}
+{"id":"p08","transcript":"open settings connections","intent":"OPEN_CONNECTIONS","entities":[]}
+{"id":"p09","transcript":"ماشین حساب را باز کن","intent":"OPEN_CALCULATOR","entities":[]}
+{"id":"p10","transcript":"ماشین حساب رو باز کن","intent":"OPEN_CALCULATOR","entities":[]}
+{"id":"p11","transcript":"open calculator","intent":"OPEN_CALCULATOR","entities":[]}
+{"id":"p12","transcript":"ساعت را باز کن","intent":"OPEN_CLOCK","entities":[]}
+{"id":"p13","transcript":"ساعت رو باز کن","intent":"OPEN_CLOCK","entities":[]}
+{"id":"p14","transcript":"open clock","intent":"OPEN_CLOCK","entities":[]}
+{"id":"p15","transcript":"نقشه را باز کن","intent":"OPEN_MAPS","entities":[]}
+{"id":"p16","transcript":"open maps","intent":"OPEN_MAPS","entities":[]}
+{"id":"p17","transcript":"وضعیت گوشی","intent":"DEVICE_STATUS","entities":[]}
+{"id":"p18","transcript":"وضعیت را بگو","intent":"DEVICE_STATUS","entities":[]}
+{"id":"p19","transcript":"device status","intent":"DEVICE_STATUS","entities":[]}
+{"id":"p20","transcript":"پنج ثانیه صبر کن","intent":"WAIT_FIVE_SECONDS","entities":[]}
+{"id":"p21","transcript":"wait five seconds","intent":"WAIT_FIVE_SECONDS","entities":[]}
+{"id":"p22","transcript":"مصرف باتری را بررسی کن","intent":"BATTERY_PREVIEW_ONLY","entities":[]}
+{"id":"p23","transcript":"بررسی وضعیت باتری","intent":"BATTERY_PREVIEW_ONLY","entities":[]}
+{"id":"p24","transcript":"check battery usage","intent":"BATTERY_PREVIEW_ONLY","entities":[]}
+{"id":"p25","transcript":"سلام","intent":"UNSUPPORTED","entities":[]}
+{"id":"p26","transcript":"به علی پیام بده","intent":"UNSUPPORTED","entities":["علی"]}
+{"id":"p27","transcript":"پول واریز کن","intent":"UNSUPPORTED","entities":[]}
+{"id":"p28","transcript":"فایل‌ها را حذف کن","intent":"UNSUPPORTED","entities":[]}
+{"id":"p29","transcript":"open settings and send message","intent":"UNSUPPORTED","entities":[]}
+{"id":"p30","transcript":"open settings; rm -rf /","intent":"UNSUPPORTED","entities":[]}
+{"id":"p31","transcript":"برو توی تلگرام","intent":"UNSUPPORTED","entities":[]}
+{"id":"p32","transcript":"به اینترنت متصل شو","intent":"UNSUPPORTED","entities":[]}
+{"id":"p33","transcript":"میزان شارژ را بخوان و توضیح بده","intent":"UNSUPPORTED","entities":[]}
+{"id":"p34","transcript":"اجرا کن","intent":"UNSUPPORTED","entities":[]}
+{"id":"p35","transcript":"مسیر باتری و مصرف پس‌زمینه را بررسی کن","intent":"UNSUPPORTED","entities":[]}
+{"id":"p36","transcript":"open calculator then delete a file","intent":"UNSUPPORTED","entities":[]}
