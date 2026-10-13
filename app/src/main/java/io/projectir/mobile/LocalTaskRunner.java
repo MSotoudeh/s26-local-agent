@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,6 +36,14 @@ public final class LocalTaskRunner {
     private LocalTaskRunner(Context appContext) {
         context = appContext;
         preferences = appContext.getSharedPreferences("local_text_agent", Context.MODE_PRIVATE);
+        // Android may kill the process during an external activity transition.
+        // Do not present its old unfinished task as still executing.
+        String previousStatus = preferences.getString("status", "IDLE");
+        if ("RUNNING".equals(previousStatus) || "ACCEPTED".equals(previousStatus)) {
+            preferences.edit().putString("status", "INTERRUPTED")
+                    .putString("detail", "App process restarted; action may have completed")
+                    .commit();
+        }
     }
 
     public static synchronized LocalTaskRunner get(Context context) {
@@ -51,15 +60,26 @@ public final class LocalTaskRunner {
         return preferences.getString("status", "IDLE") + " | "
                 + preferences.getString("command", "none") + " | "
                 + preferences.getString("detail", "No local command yet") + " | "
-                + preferences.getLong("elapsed_ms", 0L) + "ms";
+                + preferences.getLong("elapsed_ms", 0L) + "ms"
+                + " | id=" + preferences.getString("last_action_id", "none");
     }
 
-    /** Call from the Activity UI only, with a user-entered allowlisted command. */
+    /** A UI submission creates a fresh identity for this explicit user action. */
     public boolean execute(String input) {
+        return execute(input, UUID.randomUUID().toString());
+    }
+
+    /**
+     * A valid caller-provided ID is never dispatched twice. The bounded journal
+     * survives process death; no raw text is persisted.
+     */
+    public boolean execute(String input, String actionId) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw new IllegalStateException("LocalTaskRunner must run on the UI loop");
         }
-        if (busy) return false;
+        if (busy || !LocalActionIdentity.valid(actionId)) return false;
+        if (LocalActionIdentity.seen(
+                preferences.getString("recent_action_ids", ""), actionId)) return false;
         LocalCommandRouter.Kind kind = LocalCommandRouter.parse(input);
         if (kind == LocalCommandRouter.Kind.UNSUPPORTED) {
             persist("REJECTED", "UNSUPPORTED", "Command is not in the offline allowlist", 0);
@@ -68,6 +88,21 @@ public final class LocalTaskRunner {
         if (kind != LocalCommandRouter.Kind.DEVICE_STATUS
                 && UiAccessibilityService.instance() == null) {
             persist("FAIL_CAPABILITY", kind.name(), "Enable Project IR Accessibility first", 0);
+            return false;
+        }
+        // Synchronous durable write before any activity launch. A failed write
+        // is fail-closed rather than permitting an untracked side effect.
+        String history = LocalActionIdentity.append(
+                preferences.getString("recent_action_ids", ""), actionId);
+        if (!preferences.edit().putString("recent_action_ids", history)
+                .putString("last_action_id", actionId)
+                .putString("status", "ACCEPTED")
+                .putString("command", kind.name())
+                .putString("detail", "Action identity accepted; dispatch pending")
+                .putLong("elapsed_ms", 0L)
+                .putLong("updated_at", System.currentTimeMillis())
+                .commit()) {
+            persist("FAIL_CAPABILITY", kind.name(), "Action identity persistence failed", 0L);
             return false;
         }
         active = kind;
@@ -91,6 +126,22 @@ public final class LocalTaskRunner {
         } catch (Exception e) {
             finish(false, "App launch failed: " + e.getClass().getSimpleName());
         }
+        return true;
+    }
+
+    /**
+     * Cancel future polls. A previously launched Android action cannot be
+     * undone; this is clearly represented in the result.
+     */
+    public boolean cancel() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            throw new IllegalStateException("Cancel must run on the UI loop");
+        }
+        if (!busy) return false;
+        generation.incrementAndGet();
+        busy = false;
+        persist("CANCELLED", active.name(),
+                "Stopped task; already-dispatched actions cannot be undone", elapsed());
         return true;
     }
 

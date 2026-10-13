@@ -146,6 +146,12 @@ public final class MainActivity extends Activity {
             if (!accepted) toast("Offline command rejected or another task is active");
         });
         box.addView(localRun);
+        Button localCancel = button("Cancel local task");
+        localCancel.setId(R.id.local_command_cancel);
+        localCancel.setOnClickListener(v -> {
+            if (!LocalTaskRunner.get(this).cancel()) toast("No active local task");
+        });
+        box.addView(localCancel);
         localStatus = new TextView(this);
         localStatus.setPadding(0, dp(6), 0, dp(12));
         localStatus.setText(LocalTaskRunner.get(this).currentStatus());

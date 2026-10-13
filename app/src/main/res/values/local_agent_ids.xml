@@ -2,4 +2,5 @@
 <resources>
     <item type="id" name="local_command_input"/>
     <item type="id" name="local_command_run"/>
+    <item type="id" name="local_command_cancel"/>
 </resources>
