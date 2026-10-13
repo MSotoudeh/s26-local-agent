@@ -6,6 +6,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
 
 import org.json.JSONObject;
 
@@ -21,6 +22,9 @@ public final class ShellBridge {
 
     private final Object lock = new Object();
     private final AtomicBoolean binding = new AtomicBoolean(false);
+    private static final long BIND_ATTEMPT_TIMEOUT_MS = 12000L;
+    private volatile long bindingStartedElapsedMs = 0L;
+    private volatile boolean previouslyBound = false;
     private final Shizuku.UserServiceArgs serviceArgs;
     private volatile IShellService service;
 
@@ -38,6 +42,22 @@ public final class ShellBridge {
         public void onServiceDisconnected(ComponentName name) {
             service = null;
             binding.set(false);
+            // A reconnection is attempted by the HubClient watchdog. Do not
+            // rebind from inside Shizuku's disconnect callback: old binding
+            // records may not yet be fully released.
+        }
+
+        @Override
+        public void onBindingDied(ComponentName name) {
+            service = null;
+            binding.set(false);
+        }
+
+        @Override
+        public void onNullBinding(ComponentName name) {
+            service = null;
+            binding.set(false);
+            // The periodic health check retries without busy-looping here.
         }
     };
 
@@ -45,6 +65,7 @@ public final class ShellBridge {
     private final Shizuku.OnBinderDeadListener binderDead = () -> {
         service = null;
         binding.set(false);
+        // Wait for OnBinderReceivedListenerSticky before attempting to rebind.
     };
 
     private ShellBridge(Context context) {
@@ -122,8 +143,26 @@ public final class ShellBridge {
             return;
         }
         if (isShellServiceReady() || !hasPermission()) return;
+        long now = SystemClock.elapsedRealtime();
+        if (binding.get()) {
+            if (now - bindingStartedElapsedMs < BIND_ATTEMPT_TIMEOUT_MS) return;
+            // A bind callback can be lost when only the UserService dies.
+            // Permit an explicit unbind/rebind after the bounded deadline.
+            binding.set(false);
+        }
         if (!binding.compareAndSet(false, true)) return;
+        bindingStartedElapsedMs = now;
         try {
+            if (previouslyBound) {
+                // remove=false only releases our connection; do not destroy
+                // the daemon or Shizuku server, and do not revoke permission.
+                try {
+                    Shizuku.unbindUserService(serviceArgs, connection, false);
+                } catch (Throwable ignored) {
+                    // The old binding may already be gone.
+                }
+            }
+            previouslyBound = true;
             Shizuku.bindUserService(serviceArgs, connection);
         } catch (Throwable t) {
             binding.set(false);

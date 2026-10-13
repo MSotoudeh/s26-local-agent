@@ -61,6 +61,13 @@ public final class HubClient {
 
     public void start() {
         scheduler.execute(this::connect);
+        // A lost UserService binder must recover without reopening the UI.
+        // Keep this check independent of WebSocket connectivity.
+        scheduler.scheduleWithFixedDelay(() -> {
+            if (!stopped.get() && shell.hasPermission() && !shell.isShellServiceReady()) {
+                shell.ensureBound();
+            }
+        }, 5, 10, TimeUnit.SECONDS);
         scheduler.scheduleWithFixedDelay(this::heartbeat, 20, 20, TimeUnit.SECONDS);
     }
 
@@ -135,6 +142,7 @@ public final class HubClient {
                     .put("shizuku_running", shell.isShizukuRunning())
                     .put("shizuku_uid", shell.shizukuUid())
                     .put("shizuku_permission", shell.hasPermission())
+                    .put("shizuku_user_service_ready", shell.isShellServiceReady())
                     .put("at", System.currentTimeMillis() / 1000.0));
         } catch (Exception e) {
             Log.e(TAG, "heartbeat failed", e);
