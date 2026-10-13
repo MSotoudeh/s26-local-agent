@@ -159,17 +159,21 @@ Useful as a benchmark/reference mode, not the desired default.
 
 ## 10. Transport separation
 
-The assistant runtime and the remote testing control plane are separate.
+The assistant runtime and the remote testing control plane remain logically separate, but the selected implementation reuses the existing Project IR Mobile Agent instead of running a second control daemon.
 
 ```text
-S26 Runtime
-  ├─ Local assistant
-  ├─ Accessibility
-  ├─ Shizuku
-  └─ Control bridge
-        ├─ USB ADB
-        ├─ local socket
-        └─ optional outbound WSS
+ChatGPT
+  -> Project IR Hub
+  -> S26 Mobile Agent
+       ├─ outbound authenticated Hub connection
+       ├─ Shizuku UserService / shell UID 2000
+       └─ native AccessibilityService
+            └─ own-UID / shell-UID ContentProvider bridge
+
+Ops + USB ADB
+  └─ bootstrap / APK install / diagnostics / recovery only
 ```
 
-This lets an external agent test the phone even when the assistant brain is disabled.
+The semantic UI bridge intentionally adds no HTTP listener and no second WebSocket service. This reduces lifecycle, authentication, network-exposure, and reconnect complexity.
+
+Mobilerun was a useful feasibility reference but was retired after repeated reliability tests failed. The native Project IR path passed 20/20 repeated Samsung Settings semantic cycles and Persian text-input parity.

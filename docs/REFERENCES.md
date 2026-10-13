@@ -4,10 +4,12 @@ These are implementation references and benchmark candidates, not permanent depe
 
 ## Android control
 
-### Mobilerun Portal
+### Mobilerun Portal — historical/rejected production dependency
 https://github.com/droidrun/mobilerun-portal
 
-Use for:
+Retained as a reference only. It was useful for early feasibility work but failed repeated production reliability gates and was removed from the phone.
+
+Use for historical/reference comparison:
 - Accessibility tree/state;
 - local HTTP/WebSocket;
 - ADB ContentProvider;

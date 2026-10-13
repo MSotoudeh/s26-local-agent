@@ -1,47 +1,22 @@
-# PhoneController host adapter
+# Historical PhoneController Adapter
 
-`host/phone_controller.py` is the first reusable M0.5 control-plane component.
+The Python `host/phone_controller.py` adapter was a **Mobilerun lab adapter**, not the final architecture.
 
-It is intentionally not an agent. It only normalizes the proven lab path:
+It was useful because it established several feasibility facts quickly:
+- Accessibility tree reads can be tens of milliseconds;
+- semantic/tap actions can be tens of milliseconds;
+- Persian UTF-8 text input is viable;
+- screenshots are much slower and should be fallback-only;
+- ADB transport itself is not the dominant latency source.
 
-```text
-Python PhoneController
-  -> USB ADB bootstrap
-  -> temporary adb forward
-  -> Mobilerun local HTTP
-  -> direct Accessibility state/actions
-```
+However, repeated Mobilerun workflows failed the project's reliability gate. The adapter and its runtime test scripts were therefore removed from the current tree after the native Project IR Mobile Agent bridge passed replacement parity.
 
-Properties:
+Historical raw measurements remain under `benchmarks/m05/`, and the complete reasoning is documented in `HISTORY.md`.
 
-- standard-library Python only;
-- auto-discovers ADB on Ops/X-pc-style Windows installs;
-- requires exactly one authorized ADB device;
-- obtains Mobilerun's documented local token at runtime;
-- never prints or persists the token;
-- turns the Mobilerun HTTP server off on exit;
-- removes the ADB forward on exit;
-- exposes state/tree/tap/global actions;
-- exposes swipe, UTF-8 text input, verified app launch, and ADB PNG screenshot fallback;
-- supports bounded `tap_text` by resolving coordinates from the current tree;
-- retries bounded local-server startup races and transient GET/read timeouts;
-- cleans stale ADB forwards before opening a new lab session;
-- emits UTF-8 CLI output on Windows;
-- includes a read-latency benchmark.
+Current implementation lives in the Project IR repository under:
 
-Examples:
+`android/mobile-agent/`
 
-```powershell
-python host\phone_controller.py doctor
-python host\phone_controller.py state
-python host\phone_controller.py benchmark -n 20
-python host\phone_controller.py tap-text Connections
-```
+Canonical path:
 
-This is a **lab adapter**. Stock Mobilerun is not accepted as the production phone service because its manifest and feature surface are broader than this project needs.
-
-Text is transported as UTF-8/Base64. A live integration test successfully wrote and re-read `سلام test 123` through Accessibility without switching the active IME. Search-entry workflow reliability is still under test and is tracked separately from the input actuator.
-
-Session bootstrap is intentionally separate from runtime-loop latency: ContentProvider setup/cleanup costs seconds, while the active HTTP Accessibility loop is typically tens of milliseconds. A long-running controller should therefore keep the session open rather than reopen it per agent turn.
-
-The production direction is a narrow on-device service that keeps the fast Accessibility core while removing unrelated SMS/contact/storage/install/cloud/streaming features.
+`Project IR Hub -> s26 -> Shizuku -> native Accessibility bridge`.

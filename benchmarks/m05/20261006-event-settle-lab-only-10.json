@@ -1,0 +1,150 @@
+{
+  "summary": {
+    "mode": "lab-ui-event-settle",
+    "iterations": 10,
+    "successes": 0,
+    "failures": 10,
+    "success_rate": 0.0,
+    "failure_stages": {
+      "verify_open": 1,
+      "exception": 9
+    },
+    "normalize_settle_ms": {
+      "n": 2,
+      "p50": 247.32,
+      "p95": 247.32,
+      "max": 307.06
+    },
+    "normalize_tree_ms": {
+      "n": 2,
+      "p50": 26.31,
+      "p95": 26.31,
+      "max": 28.94
+    },
+    "tap_ms": {
+      "n": 1,
+      "p50": 18.36,
+      "p95": 18.36,
+      "max": 18.36
+    },
+    "open_settle_ms": {
+      "n": 1,
+      "p50": 477.39,
+      "p95": 477.39,
+      "max": 477.39
+    },
+    "open_tree_ms": {
+      "n": 1,
+      "p50": 34.59,
+      "p95": 34.59,
+      "max": 34.59
+    },
+    "back_action_ms": {
+      "n": 0,
+      "p50": null,
+      "p95": null,
+      "max": null
+    },
+    "back_settle_ms": {
+      "n": 0,
+      "p50": null,
+      "p95": null,
+      "max": null
+    },
+    "back_tree_ms": {
+      "n": 0,
+      "p50": null,
+      "p95": null,
+      "max": null
+    },
+    "restore": {
+      "ok": false,
+      "error": "Remote end closed connection without response"
+    }
+  },
+  "rows": [
+    {
+      "iteration": 1,
+      "normalize_action_ms": 15.52,
+      "normalize_settle_ms": 247.32,
+      "normalize_tree_ms": 26.31,
+      "normalize_backs": 1,
+      "normalize_event_polls": 6,
+      "tap_ms": 18.36,
+      "open_settle_ms": 477.39,
+      "open_tree_ms": 34.59,
+      "open_event_polls": 11,
+      "open_verified": false,
+      "success": false,
+      "failure_stage": "verify_open"
+    },
+    {
+      "iteration": 2,
+      "normalize_action_ms": 66.38,
+      "normalize_settle_ms": 307.06,
+      "normalize_tree_ms": 28.94,
+      "normalize_backs": 0,
+      "normalize_event_polls": 7,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "Timed out waiting for UI settle (baseline=1271, last=1271, changed=False, polls=35)"
+    },
+    {
+      "iteration": 3,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "Timed out waiting for UI settle (baseline=1271, last=1271, changed=False, polls=45)"
+    },
+    {
+      "iteration": 4,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    },
+    {
+      "iteration": 5,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    },
+    {
+      "iteration": 6,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    },
+    {
+      "iteration": 7,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    },
+    {
+      "iteration": 8,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    },
+    {
+      "iteration": 9,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    },
+    {
+      "iteration": 10,
+      "success": false,
+      "failure_stage": "exception",
+      "error_type": "PhoneControlError",
+      "error": "GET 'ui_event' failed after 2 attempts: Remote end closed connection without response"
+    }
+  ]
+}

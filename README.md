@@ -21,6 +21,16 @@ The project is deliberately benchmark-driven. No subsystem becomes a production 
 
 ## Current architecture
 
+The canonical phone-control path is now:
+
+```text
+ChatGPT -> Project IR -> Project IR Hub -> S26 Mobile Agent
+                                      -> Shizuku shell
+                                      -> native Accessibility bridge
+```
+
+Mobilerun was used for feasibility experiments and then retired after repeated reliability failures. See [Experiment and decision history](docs/HISTORY.md).
+
 See:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Component options](docs/COMPONENT_OPTIONS.md)
@@ -32,6 +42,7 @@ See:
 - [Security and privacy](docs/SECURITY_PRIVACY.md)
 - [M0 device census](docs/M0_DEVICE_CENSUS.md)
 - [Decisions](docs/DECISIONS.md)
+- [Experiment and decision history](docs/HISTORY.md)
 
 ## Milestones
 
@@ -67,7 +78,8 @@ benchmarks/results/   summarized benchmark reports
 
 ## Reference projects
 
-- Mobilerun Portal / DroidRun — Android Accessibility control surface and local/reverse transports.
+- Project IR Mobile Agent — canonical Android remote execution and semantic Accessibility control.
+- Mobilerun Portal / DroidRun — historical feasibility reference; rejected as a production dependency.
 - A11yPilot — compact Accessibility tree + tool executor + agent loop.
 - Android Use — Android MCP/control-plane reference.
 - Jev Mobile / Jev Android — bounded structured decision loops for mobile control.
