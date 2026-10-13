@@ -1,0 +1,20 @@
+{
+    "date":  "2026-10-13",
+    "experiment":  "local-text-agent-v0-strict-offline",
+    "before":  {
+                   "airplane_mode_on":  "0",
+                   "wifi_on":  "1",
+                   "mobile_data":  "1"
+               },
+    "strict_offline":  true,
+    "commands":  [
+
+                 ],
+    "after":  {
+                  "airplane_mode_on":  "0",
+                  "wifi_on":  "1",
+                  "mobile_data":  "1"
+              },
+    "restored":  true,
+    "foreground_restored":  true
+}

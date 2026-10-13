@@ -207,3 +207,35 @@ Status: accepted, 2026-10-13.
 A build from the SYSTEM account produced a different debug signature and Android rejected updating the existing app. The desktop account's original debug keystore matched the installed package. The APK was re-signed and safely updated while preserving data.
 
 Decision: certificate-digest verification is a pre-install gate; never uninstall an authenticated phone agent to bypass signature mismatch. Keep keystores outside Git and use a process-local Gradle/JDK environment.
+
+## D027 — Move the decision loop onto the phone before benchmarking large LLMs
+
+Status: accepted experimentally, 2026-10-13.
+
+Direct Project IR/Shizuku control proved actuation feasibility, but the phone was not autonomously deciding what to do. Building Local Text Agent v0 inside the existing Android package separates a real on-device execution loop from the optional Hub management channel.
+
+Decision: local deterministic router + allowlisted Intents/Accessibility verifier is the first shipped execution path. Large LLM/NPU are optional later enhancements, not prerequisites.
+
+## D028 — No arbitrary commands or silent unverified actions
+
+Status: accepted, 2026-10-13.
+
+The local parser accepts a short, exact Persian/English grammar and rejects unknown input, including shell-like payloads. Each supported launched-app command requires foreground package verification; Settings/Connections requires unique semantic node click and destination text verification.
+
+Decision: extend the typed action vocabulary before introducing model-directed planning; risk and postcondition checks are mandatory.
+
+## D029 — Test UI controls with resource IDs and binary-safe Unicode
+
+Status: accepted, 2026-10-13.
+
+A coordinate harness failed after orientation changes, and multiple PowerShell test harnesses corrupted Persian command input/output. Stable UI resource IDs and a caller-restricted Base64 UTF-8 input method enabled reproducible external testing. A Python byte-oriented harness finally passed strict offline conditions.
+
+Decision: keep harness transport separately validated and retain unsuccessful diagnostic evidence without misclassifying it as an Android runtime failure.
+
+## D030 — Limited M4 GO is not full autonomous-agent acceptance
+
+Status: accepted, 2026-10-13.
+
+The Android-local status and Connections commands passed with radios off and no default IPv4 route; Calculator, Clock and Maps also passed single foreground-verification trials. USB remained attached for test/restore.
+
+Decision: call this an on-device **Local Text Agent v0** with a bounded offline gate, not a proven offline voice assistant or an independent multi-step planning system. Reboot remains deferred.

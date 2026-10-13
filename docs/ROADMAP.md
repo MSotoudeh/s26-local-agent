@@ -117,6 +117,8 @@ If no local ASR reaches usable quality, explicitly decide whether cloud ASR fall
 
 ## M4 — Deterministic router
 
+Status: **Local Text Agent v0 GO (limited)** — 2026-10-13. An on-device deterministic Persian/English router and task executor now run inside Project IR Mobile Agent without Hub, Shizuku or network dependencies on the local execution path. Strict offline DEVICE_STATUS and Settings → Connections commands passed; Calculator, Clock and Maps single launches were verified. Parser 15/15, Android build/lint PASS. Further task coverage, reliability and voice remain HOLD. See benchmarks/results/2026-10-13-m4-local-text-agent-v0.md.
+
 Domains:
 - app launch;
 - volume;

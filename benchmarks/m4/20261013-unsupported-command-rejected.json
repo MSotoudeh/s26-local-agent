@@ -1,0 +1,12 @@
+{
+  "experiment": "M4 Local Text Agent unsafe command rejection",
+  "date": "2026-10-13",
+  "device_model": "SM-S948B",
+  "input_class": "unsupported shell-like compound command",
+  "input_sample": "open settings; rm -rf /",
+  "test_path": "user-visible local Android input and Run Locally control via caller-restricted test bridge",
+  "observed_status": "REJECTED",
+  "observed_command_enum": "UNSUPPORTED",
+  "verified": true,
+  "scope": "single trial; no process/root shell dispatch in local task runtime"
+}
