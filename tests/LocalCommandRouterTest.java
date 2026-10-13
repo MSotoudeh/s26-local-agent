@@ -21,6 +21,8 @@ public final class LocalCommandRouterTest {
         check("نقشه را باز کن", LocalCommandRouter.Kind.OPEN_MAPS);
         check("وضعیت گوشی", LocalCommandRouter.Kind.DEVICE_STATUS);
         check("device status", LocalCommandRouter.Kind.DEVICE_STATUS);
+        check("پنج ثانیه صبر کن", LocalCommandRouter.Kind.WAIT_FIVE_SECONDS);
+        check("wait five seconds", LocalCommandRouter.Kind.WAIT_FIVE_SECONDS);
         check("", LocalCommandRouter.Kind.UNSUPPORTED);
         check("حذف همه پیام ها", LocalCommandRouter.Kind.UNSUPPORTED);
         check("open settings; rm -rf /", LocalCommandRouter.Kind.UNSUPPORTED);

@@ -79,13 +79,18 @@ public final class LocalTaskRunner {
         }
         if (busy || !LocalActionIdentity.valid(actionId)) return false;
         if (LocalActionIdentity.seen(
-                preferences.getString("recent_action_ids", ""), actionId)) return false;
+                preferences.getString("recent_action_ids", ""), actionId)) {
+            persist("REJECTED_DUPLICATE", "UNSUPPORTED",
+                    "The supplied action ID has already been accepted", 0);
+            return false;
+        }
         LocalCommandRouter.Kind kind = LocalCommandRouter.parse(input);
         if (kind == LocalCommandRouter.Kind.UNSUPPORTED) {
             persist("REJECTED", "UNSUPPORTED", "Command is not in the offline allowlist", 0);
             return false;
         }
         if (kind != LocalCommandRouter.Kind.DEVICE_STATUS
+                && kind != LocalCommandRouter.Kind.WAIT_FIVE_SECONDS
                 && UiAccessibilityService.instance() == null) {
             persist("FAIL_CAPABILITY", kind.name(), "Enable Project IR Accessibility first", 0);
             return false;
@@ -112,6 +117,15 @@ public final class LocalTaskRunner {
         persist("RUNNING", kind.name(), "Local execution started", 0);
         if (kind == LocalCommandRouter.Kind.DEVICE_STATUS) {
             finish(true, "Android API " + Build.VERSION.SDK_INT + " / " + Build.MODEL);
+            return true;
+        }
+        if (kind == LocalCommandRouter.Kind.WAIT_FIVE_SECONDS) {
+            phase = "WAIT_TIMER";
+            handler.postDelayed(() -> {
+                if (busy && generation.get() == token) {
+                    finish(true, "Five-second local wait completed");
+                }
+            }, 5000L);
             return true;
         }
         targetPackage = packageFor(kind);

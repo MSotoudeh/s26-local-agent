@@ -31,6 +31,7 @@ public final class MainActivity extends Activity {
     private CheckBox autostart;
     private TextView status;
     private EditText localCommand;
+    private EditText localActionId;
     private TextView localStatus;
 
     private final Shizuku.OnRequestPermissionResultListener permissionListener =
@@ -133,17 +134,24 @@ public final class MainActivity extends Activity {
         localTitle.setTextSize(18);
         box.addView(localTitle);
         TextView localHelp = new TextView(this);
-        localHelp.setText("Commands: تنظیمات را باز کن | تنظیمات را باز کن و وارد Connections شو | ماشین حساب را باز کن | ساعت را باز کن | نقشه را باز کن | وضعیت گوشی");
+        localHelp.setText("Commands: تنظیمات را باز کن | تنظیمات را باز کن و وارد Connections شو | ماشین حساب را باز کن | ساعت را باز کن | نقشه را باز کن | وضعیت گوشی | پنج ثانیه صبر کن (برای Cancel)");
         box.addView(localHelp);
         localCommand = field("Type Persian or English command");
         localCommand.setId(R.id.local_command_input);
         localCommand.setInputType(InputType.TYPE_CLASS_TEXT);
         box.addView(localCommand);
+        localActionId = field("Action ID (optional, for retry/deduplication)");
+        localActionId.setId(R.id.local_action_id_input);
+        localActionId.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        box.addView(localActionId);
         Button localRun = button("Run locally — no Hub");
         localRun.setId(R.id.local_command_run);
         localRun.setOnClickListener(v -> {
-            boolean accepted = LocalTaskRunner.get(this).execute(localCommand.getText().toString());
-            if (!accepted) toast("Offline command rejected or another task is active");
+            String id = localActionId.getText().toString().trim();
+            boolean accepted = id.isEmpty()
+                    ? LocalTaskRunner.get(this).execute(localCommand.getText().toString())
+                    : LocalTaskRunner.get(this).execute(localCommand.getText().toString(), id);
+            if (!accepted) toast("Offline command rejected, repeated, or another task is active");
         });
         box.addView(localRun);
         Button localCancel = button("Cancel local task");

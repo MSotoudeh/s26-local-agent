@@ -6,7 +6,7 @@ import java.util.Locale;
 public final class LocalCommandRouter {
     public enum Kind {
         OPEN_SETTINGS, OPEN_CONNECTIONS, OPEN_CALCULATOR, OPEN_CLOCK,
-        OPEN_MAPS, DEVICE_STATUS, UNSUPPORTED
+        OPEN_MAPS, DEVICE_STATUS, WAIT_FIVE_SECONDS, UNSUPPORTED
     }
 
     private LocalCommandRouter() {}
@@ -41,6 +41,9 @@ public final class LocalCommandRouter {
             case "نقشه رو باز کن":
             case "open maps":
                 return Kind.OPEN_MAPS;
+            case "پنج ثانیه صبر کن":
+            case "wait five seconds":
+                return Kind.WAIT_FIVE_SECONDS;
             case "وضعیت گوشی":
             case "وضعیت را بگو":
             case "device status":
