@@ -1,0 +1,21 @@
+plugins { id "com.android.application" }
+
+android {
+  namespace "io.s26.pstnlab"
+  compileSdk 37
+  defaultConfig {
+    applicationId "io.s26.pstnlab"
+    minSdk 33
+    targetSdk 37
+    versionCode 1
+    versionName "0.1.0-lab"
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+}
+dependencies {
+  implementation "dev.rikka.shizuku:api:13.1.5"
+  implementation "dev.rikka.shizuku:provider:13.1.5"
+}
