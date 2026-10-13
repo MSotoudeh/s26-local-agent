@@ -439,3 +439,23 @@ alternate installation method, reboot, uninstall or phone mutation followed.
 
 The change is **source-only validated** and live Cancel/replay remains HOLD.
 See `benchmarks/results/2026-10-13-m4-replay-cancel-source-hold.md`.
+
+## 2026-10-13 — Offline canonical skill planning and evaluation scaffold
+
+While user-mediated tests, reboot, and APK deployment remained deferred,
+added a pure on-device planner/skill-registry implementation on the Project IR
+Android feature branch. The new UI control previews rather than executes
+steps. Canonical skill identities, exact selector/package/time bounds and
+strict UI-state identity prevent external/mutated plans from auto-running.
+
+The first 45 planner assertions passed; after strengthening the
+canonical-shape policy, 48/48 passed. Existing Java command parser and
+identity tests each passed 17/17; Project IR Python suite passed 52/52.
+Android build/lint passed from the final hardened source.
+
+Created an offline-only Persian ASR/intent evaluator and a 36-row synthetic
+utterance reference set. Evaluation math passed 9/9 self-tests; no genuine
+ASR transcript, audio recording, LLM/NPU inference or speed claim resulted.
+
+No APK installation, phone reboot, user interaction or PSTN source changes
+occurred. See `benchmarks/results/2026-10-13-offline-planner-preview.md`.

@@ -232,3 +232,23 @@ Measure:
 - battery cost.
 
 If wake-word UX is worse than side-key invocation, do not ship it as default.
+
+## 2026-10-13 — Work that can proceed without manual phone testing
+
+M2.5/M7/M8: a canonical read-only Skill Registry, bounded Plan Policy and
+strict Semantic Selector now exist as **source-only preview components**.
+LocalPlanningTest 48/48, existing JVM suites 34/34, Android build/lint PASS.
+The newly built APK was not installed in this increment. New battery route
+is a HOLD candidate, not a verified navigation skill.
+
+M3/M5: local offline Persian ASR and intent evaluation scaffolds added with
+36 *synthetic* text-only cases and 9/9 metric-unit tests. No actual audio,
+runtime/model inference, ASR accuracy or NPU speed is measured.
+
+M9/M10/M11: the generic planning/execution loop, trust calibration and
+local/cloud arbitration are still not validated or complete. M12–M14 voice,
+Assistant role and Wake Word are deferred pending underlying task engine
+acceptance and device evidence. Phone reboot remains intentionally deferred.
+
+Source and acceptance boundaries:
+`benchmarks/results/2026-10-13-offline-planner-preview.md`.
