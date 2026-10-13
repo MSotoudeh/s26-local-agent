@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-13",
+  "model": "SM-S948B",
+  "android_sdk": 37,
+  "soc": {
+    "manufacturer": "QTI",
+    "model": "SM8850",
+    "platform": "canoe"
+  },
+  "recognition_services": [
+    "com.google.android.tts/com.google.android.apps.speech.tts.googletts.service.GoogleTTSRecognitionService",
+    "com.anthropic.claude/.bell.assist.ClaudeRecognitionService",
+    "com.vayunmathur.openassistant/.assist.StubRecognitionService"
+  ],
+  "vendor_system_file_glob_count": {
+    "qnn": 0,
+    "tflite_or_tensorflow": 9
+  },
+  "capability_status": "NOT_VERIFIED",
+  "privacy": "No microphone recording or screen content was persisted.",
+  "caveat": "Filename and service registry observations do not establish offline Persian ASR or NPU model acceleration."
+}

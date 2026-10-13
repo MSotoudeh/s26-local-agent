@@ -1,0 +1,97 @@
+{
+  "experiment": "M1-offline-airplane-isolated",
+  "date": "2026-10-13",
+  "model": "SM-S948B",
+  "before": {
+    "airplane_mode_on": "0",
+    "wifi_on": "1",
+    "mobile_data": "1"
+  },
+  "baseline": {
+    "bridge": {
+      "ok": true,
+      "ms": 1277.4
+    },
+    "shizuku": {
+      "server": true,
+      "user_service": true
+    }
+  },
+  "airplane_mode_verified": true,
+  "strict_offline_verified": true,
+  "network_during": {
+    "airplane_mode_on": "1",
+    "wifi_on": "0",
+    "mobile_data": "0",
+    "ipv4_default_route_present": false
+  },
+  "offline": [
+    {
+      "index": 1,
+      "bridge_ok": true,
+      "bridge_ms": 1834.3,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 2,
+      "bridge_ok": true,
+      "bridge_ms": 1679.8,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 3,
+      "bridge_ok": true,
+      "bridge_ms": 1035.8,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 4,
+      "bridge_ok": true,
+      "bridge_ms": 1023.7,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 5,
+      "bridge_ok": true,
+      "bridge_ms": 1020.3,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 6,
+      "bridge_ok": true,
+      "bridge_ms": 1013.9,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 7,
+      "bridge_ok": true,
+      "bridge_ms": 1560.1,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 8,
+      "bridge_ok": true,
+      "bridge_ms": 1043.0,
+      "shizuku_server": true,
+      "user_service": true
+    }
+  ],
+  "restored": true,
+  "after": {
+    "airplane_mode_on": "0",
+    "wifi_on": "1",
+    "mobile_data": "1"
+  },
+  "summary": {
+    "samples": 8,
+    "local_bridge_and_shizuku_pass": 8,
+    "network_restored": true
+  }
+}

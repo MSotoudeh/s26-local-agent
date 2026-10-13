@@ -1,0 +1,204 @@
+{
+  "experiment": "M2-multi-app-semantic-smoke",
+  "date": "2026-10-13",
+  "device_model": "SM-S948B",
+  "reads_per_app": 6,
+  "apps": [
+    {
+      "app": "settings",
+      "package": "com.android.settings",
+      "samples": [
+        {
+          "ok": true,
+          "latency_ms": 1004.89,
+          "node_count": 119,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 979.54,
+          "node_count": 119,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 976.24,
+          "node_count": 119,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 995.22,
+          "node_count": 119,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1015.41,
+          "node_count": 119,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1020.39,
+          "node_count": 119,
+          "truncated": false,
+          "package_match": true
+        }
+      ],
+      "launch_ok": true,
+      "launch_result": "launched",
+      "summary": {
+        "passed": 6,
+        "total": 6,
+        "p50_ms": 995.22,
+        "p95_ms": 1020.39,
+        "node_min": 119,
+        "node_max": 119
+      }
+    },
+    {
+      "app": "calculator",
+      "package": "com.sec.android.app.popupcalculator",
+      "samples": [
+        {
+          "ok": true,
+          "latency_ms": 1004.57,
+          "node_count": 36,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1003.72,
+          "node_count": 36,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1021.0,
+          "node_count": 36,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1015.66,
+          "node_count": 36,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1013.84,
+          "node_count": 36,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1008.0,
+          "node_count": 36,
+          "truncated": false,
+          "package_match": true
+        }
+      ],
+      "launch_ok": true,
+      "launch_result": "launched",
+      "summary": {
+        "passed": 6,
+        "total": 6,
+        "p50_ms": 1008.0,
+        "p95_ms": 1021.0,
+        "node_min": 36,
+        "node_max": 36
+      }
+    },
+    {
+      "app": "clock",
+      "package": "com.sec.android.app.clockpackage",
+      "samples": [],
+      "launch_ok": false,
+      "launch_result": "launch-failed"
+    },
+    {
+      "app": "maps",
+      "package": "com.google.android.apps.maps",
+      "samples": [
+        {
+          "ok": true,
+          "latency_ms": 1024.72,
+          "node_count": 140,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1028.93,
+          "node_count": 315,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1068.9,
+          "node_count": 315,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1221.28,
+          "node_count": 315,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1044.52,
+          "node_count": 315,
+          "truncated": false,
+          "package_match": true
+        },
+        {
+          "ok": true,
+          "latency_ms": 1048.38,
+          "node_count": 315,
+          "truncated": false,
+          "package_match": true
+        }
+      ],
+      "launch_ok": true,
+      "launch_result": "launched",
+      "summary": {
+        "passed": 6,
+        "total": 6,
+        "p50_ms": 1044.52,
+        "p95_ms": 1221.28,
+        "node_min": 140,
+        "node_max": 315
+      }
+    }
+  ],
+  "settings_semantic_cycles": {
+    "attempted": 10,
+    "passes": 10,
+    "failures": [],
+    "launch_ok": true,
+    "launch_reason": "launched"
+  },
+  "chatgpt_restored": true,
+  "summary": {
+    "apps_with_6_of_6": 3,
+    "apps_tested": 4,
+    "settings_cycles_pass": 10,
+    "settings_cycles_total": 10,
+    "foreground_restored": true
+  }
+}
