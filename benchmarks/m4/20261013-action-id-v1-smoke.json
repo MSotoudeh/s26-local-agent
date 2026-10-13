@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-13",
+  "experiment": "Local Text Agent v1 action identity / local status",
+  "trials_requested": 30,
+  "trials_completed": 30,
+  "unique_action_ids": true,
+  "all_verified": true,
+  "error_type": null,
+  "restored_launcher": true,
+  "elapsed_ms_min": 0,
+  "elapsed_ms_max": 2,
+  "pass": true
+}

@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-13",
+  "test": "Local Executor v1 Settings Connections",
+  "planned": 5,
+  "results": [
+    {
+      "passed": true,
+      "elapsed_ms": 529,
+      "verified_page": true,
+      "unique_id": true
+    },
+    {
+      "passed": true,
+      "elapsed_ms": 531,
+      "verified_page": true,
+      "unique_id": true
+    },
+    {
+      "passed": true,
+      "elapsed_ms": 538,
+      "verified_page": true,
+      "unique_id": true
+    },
+    {
+      "passed": true,
+      "elapsed_ms": 534,
+      "verified_page": true,
+      "unique_id": true
+    },
+    {
+      "passed": true,
+      "elapsed_ms": 460,
+      "verified_page": true,
+      "unique_id": true
+    }
+  ],
+  "unique_action_ids": true,
+  "restored_launcher": true,
+  "error_type": null
+}
