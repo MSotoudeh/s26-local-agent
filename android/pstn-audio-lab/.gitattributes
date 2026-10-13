@@ -1,0 +1,5 @@
+gradle/wrapper/*.jar -text -diff -eol
+gradlew.bat text eol=crlf
+*.java text eol=lf
+*.gradle text eol=lf
+*.md text eol=lf
