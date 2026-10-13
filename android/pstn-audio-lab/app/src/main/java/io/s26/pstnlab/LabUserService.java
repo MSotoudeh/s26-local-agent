@@ -15,6 +15,10 @@ public final class LabUserService extends ILabService.Stub {
     private final AtomicBoolean stopped = new AtomicBoolean(false);
     public LabUserService() { context = null; }
     public LabUserService(Context context) { this.context = context; }
+    @Override public String preflight() {
+        if (stopped.get()) throw new IllegalStateException("service already stopped");
+        return PstnReadOnlyPreflight.inspect(context);
+    }
     @Override public String status() {
         JSONObject o = new JSONObject();
         try {
@@ -66,10 +70,36 @@ public final class LabUserService extends ILabService.Stub {
                 result.put("tx", adapter.getTxFrames());
             } finally { adapter.close(); }
             result.put("cleanup", fake.closed);
+            // Regression: nonblocking Android downlink can deliver half-frames.
+            final class Partial implements PstnAndroidAdapter.Backend {
+                int reads; boolean closed;
+                @Override public void open() {}
+                @Override public int read(byte[] target) {
+                    Arrays.fill(target, 0, 320, (byte) 0x11);
+                    reads++;
+                    return 320;
+                }
+                @Override public int write(byte[] frame) { return frame.length; }
+                @Override public void close() { closed = true; }
+            }
+            Partial partial = new Partial();
+            PstnAndroidAdapter partialAdapter = new PstnAndroidAdapter(partial, () -> true,
+                    new PstnAndroidAdapter.Authorization(true, true, true));
+            boolean partialOk = false;
+            try {
+                partialAdapter.start();
+                byte[] assembled = new byte[PstnAndroidAdapter.FRAME_BYTES];
+                int firstRead = partialAdapter.readDownlink(assembled);
+                int secondRead = partialAdapter.readDownlink(assembled);
+                partialOk = firstRead == 0 && secondRead == 640
+                        && partialAdapter.getRxFrames() == 1 && partial.reads == 2
+                        && assembled[0] == 0x11 && assembled[639] == 0x11;
+            } finally { partialAdapter.close(); }
+            result.put("partial_pcm_assembled", partialOk && partial.closed);
             result.put("uid", Process.myUid());
             result.put("backend", "FAKE_ONLY");
             result.put("real_call", "NOT_USED");
-            result.put("pass", fake.rx == 100 && fake.tx == 100 && fake.closed);
+            result.put("pass", fake.rx == 100 && fake.tx == 100 && fake.closed && partialOk && partial.closed);
         } catch (Throwable e) {
             try { result.put("pass", false); result.put("error", e.getClass().getSimpleName()); }
             catch (Exception ignored) { }

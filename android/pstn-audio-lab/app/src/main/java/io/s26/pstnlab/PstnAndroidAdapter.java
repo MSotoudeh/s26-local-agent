@@ -68,6 +68,8 @@ public final class PstnAndroidAdapter implements AutoCloseable {
     private long heartbeatMs = -1L;
     private long rxFrames = 0;
     private long txFrames = 0;
+    private final byte[] rxPending = new byte[FRAME_BYTES];
+    private int rxPendingCount = 0;
 
     public PstnAndroidAdapter(Backend backend, PhoneGate gate, Authorization approval) {
         if (backend == null || gate == null || approval == null) throw new IllegalArgumentException("null dependency");
@@ -133,12 +135,23 @@ public final class PstnAndroidAdapter implements AutoCloseable {
         enforceLive();
         if (dst == null || dst.length != FRAME_BYTES) throw new IllegalArgumentException("bad RX frame size");
         try {
-            int read = backend.read(dst);
+            // Android's READ_NON_BLOCKING may return fewer than 20ms of PCM.
+            // Assemble complete frames without leaking incomplete samples to STT.
+            byte[] temp = new byte[FRAME_BYTES];
+            int read = backend.read(temp);
             if (read < 0 || read > FRAME_BYTES) throw new IllegalStateException("bad read length: " + read);
-            if (read == FRAME_BYTES) rxFrames++;
-            // Short frames are rejected; a later real adapter must preserve
-            // partial PCM in a bounded staging buffer, not drop partial samples.
-            return read;
+            if (read == 0) return 0;
+            int needed = FRAME_BYTES - rxPendingCount;
+            int first = Math.min(read, needed);
+            System.arraycopy(temp, 0, rxPending, rxPendingCount, first);
+            rxPendingCount += first;
+            if (rxPendingCount < FRAME_BYTES) return 0;
+            System.arraycopy(rxPending, 0, dst, 0, FRAME_BYTES);
+            rxFrames++;
+            rxPendingCount = read - first;
+            if (rxPendingCount > 0)
+                System.arraycopy(temp, first, rxPending, 0, rxPendingCount);
+            return FRAME_BYTES;
         } catch (Exception | Error e) {
             close();
             throw e;
@@ -162,6 +175,8 @@ public final class PstnAndroidAdapter implements AutoCloseable {
         if (state == State.CLOSED) return;
         state = State.CLOSED;
         heartbeatMs = -1L;
+        rxPendingCount = 0;
+        Arrays.fill(rxPending, (byte) 0);
         backend.close();
     }
 

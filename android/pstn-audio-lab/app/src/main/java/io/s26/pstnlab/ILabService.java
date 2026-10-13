@@ -9,6 +9,7 @@ import android.os.RemoteException;
 /** Explicit allowlist of fake-only operations exposed through Shizuku. */
 public interface ILabService extends IInterface {
     String status() throws RemoteException;
+    String preflight() throws RemoteException;
     String fakePcmTest() throws RemoteException;
     byte[] fakePcmFrame(byte[] frame) throws RemoteException;
     void destroy() throws RemoteException;
@@ -18,6 +19,7 @@ public interface ILabService extends IInterface {
         private static final int STATUS = IBinder.FIRST_CALL_TRANSACTION;
         private static final int FAKE_PCM = IBinder.FIRST_CALL_TRANSACTION + 1;
         private static final int FAKE_FRAME = IBinder.FIRST_CALL_TRANSACTION + 2;
+        private static final int PREFLIGHT = IBinder.FIRST_CALL_TRANSACTION + 3;
         // Shizuku UserService destroy transaction (reserved number).
         private static final int DESTROY = 16777115;
         protected Stub() { attachInterface(this, DESC); }
@@ -33,6 +35,11 @@ public interface ILabService extends IInterface {
             if (code == STATUS) {
                 data.enforceInterface(DESC);
                 String result = status();
+                reply.writeNoException(); reply.writeString(result); return true;
+            }
+            if (code == PREFLIGHT) {
+                data.enforceInterface(DESC);
+                String result = preflight();
                 reply.writeNoException(); reply.writeString(result); return true;
             }
             if (code == FAKE_PCM) {
@@ -65,6 +72,7 @@ public interface ILabService extends IInterface {
                 } finally { in.recycle(); out.recycle(); }
             }
             @Override public String status() throws RemoteException { return call(STATUS); }
+            @Override public String preflight() throws RemoteException { return call(PREFLIGHT); }
             @Override public String fakePcmTest() throws RemoteException { return call(FAKE_PCM); }
             @Override public byte[] fakePcmFrame(byte[] frame) throws RemoteException {
                 Parcel in = Parcel.obtain(); Parcel out = Parcel.obtain();
