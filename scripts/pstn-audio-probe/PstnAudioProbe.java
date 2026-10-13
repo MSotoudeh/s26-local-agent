@@ -30,9 +30,28 @@ public class PstnAudioProbe {
             } else {
                 System.out.println("PSTN_CALL_AUDIO_INTERCEPTABLE=unknown_method_parameters");
             }
+            probeMethod("REDIRECT_HELPER_DOWNLINK", "android.media.AudioManager",
+                        "getCallDownlinkExtractionAudioRecord", "android.media.AudioFormat");
+            probeMethod("REDIRECT_HELPER_UPLINK", "android.media.AudioManager",
+                        "getCallUplinkInjectionAudioTrack", "android.media.AudioFormat");
+            probeMethod("REDIRECT_BUILDER_RECORD", "android.media.AudioRecord$Builder",
+                        "setCallRedirectionMode", "int");
+            probeMethod("REDIRECT_BUILDER_TRACK", "android.media.AudioTrack$Builder",
+                        "setCallRedirectionMode", "int");
         } catch (Throwable error) {
             Throwable cause = error.getCause() == null ? error : error.getCause();
             System.out.println("PROBE_ERROR_TYPE=" + cause.getClass().getName());
+        }
+    }
+
+    // Reflection only. Do not instantiate AudioRecord/AudioTrack and do not alter routing.
+    private static void probeMethod(String label, String owner, String method, String argument) {
+        try {
+            Class<?> parameter = "int".equals(argument) ? int.class : Class.forName(argument);
+            Class.forName(owner).getMethod(method, parameter);
+            System.out.println(label + "=present");
+        } catch (Throwable e) {
+            System.out.println(label + "=unavailable_" + e.getClass().getSimpleName());
         }
     }
 }
