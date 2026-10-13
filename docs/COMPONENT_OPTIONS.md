@@ -21,8 +21,9 @@ Known S26 behavior from user test: Shizuku needs Wi-Fi only for bootstrap and re
 
 ## Android control / Accessibility
 
-**Primary evaluation:** Mobilerun Portal primitives + our adapter
-**Alternative:** A11yPilot-style native Accessibility service
+**Primary:** native AccessibilityService inside Project IR Mobile Agent
+**Alternative reference:** A11yPilot-style Accessibility executor
+**Historical reference:** Mobilerun Portal (tested and rejected as a production dependency)
 **Reference:** Android Use MCP surface
 
 Selection criteria:
@@ -35,11 +36,13 @@ Selection criteria:
 
 ## Remote control plane
 
-**Primary lab path:** USB ADB from Ops
-**Primary future independent path:** Mobilerun-style local/reverse bridge exposed through our MCP
-**Alternative:** Android Use companion/server model
+**Primary:** Project IR Hub -> native S26 Mobile Agent
+**Privileged local layer:** Shizuku UserService / shell UID 2000
+**Semantic UI layer:** Project IR native Accessibility bridge
+**Bootstrap/recovery fallback:** USB ADB from Ops
+**Alternative reference:** Android Use companion/server model
 
-Remote control plane is for testing and administration, not a requirement for local assistant use.
+The canonical remote path is phone-native and outbound; Ops/ADB are not required for normal remote execution once the agent and Shizuku are running.
 
 ## Persian ASR
 

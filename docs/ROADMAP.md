@@ -26,20 +26,23 @@ Output: machine-readable JSON plus a short report.
 
 ## M0.5 — Remote phone control plane
 
-Status: **feasibility GO / full acceptance HOLD**. Software reconnect after ADB-server restart passes; physical USB unplug/replug and repeated selector/settle reliability remain open.
+Status: **GO / canonical architecture selected** (2026-10-07).
 
-Goal: allow an external agent to inspect and actuate the phone independently.
+Goal: allow Project IR to inspect and actuate the phone independently of an always-connected PC.
 
-Start with:
-1. USB ADB from Ops;
-2. Mobilerun Portal or Android Use;
-3. unified PhoneController/MCP abstraction.
+Selected path:
+1. Project IR Mobile Agent maintains the outbound Hub connection;
+2. Shizuku provides privileged local shell execution;
+3. Project IR's native Accessibility bridge provides structured state and semantic UI actions;
+4. USB ADB remains bootstrap/recovery only.
 
-Gate:
-- stable state/tree/screenshot acquisition;
-- stable tap/type/swipe/launch;
-- no hidden dependency on Wi-Fi for USB path;
-- recover cleanly from disconnect/reconnect.
+Acceptance evidence:
+- direct `device_id=s26` execution through Project IR;
+- Settings semantic workflow: 20/20 successful repeated cycles;
+- Persian mixed text `سلام test 123` written and verified through the native bridge;
+- Mobilerun retired and removed after replacement parity.
+
+Remaining connectivity/offline endurance belongs to M1, not M0.5.
 
 ## M1 — Shizuku no-Wi-Fi runtime
 

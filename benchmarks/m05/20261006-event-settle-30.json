@@ -1,0 +1,599 @@
+{
+  "summary": {
+    "iterations": 30,
+    "successes": 3,
+    "failures": 27,
+    "success_rate": 0.1,
+    "failure_stages": {
+      "verify_open": 4,
+      "open_action_or_settle": 23
+    },
+    "quiet_window_ms": 160.0,
+    "restore": {
+      "ok": true,
+      "package": "com.openai.chatgpt"
+    },
+    "open_settle_ms": {
+      "p50": 434.42,
+      "p95": 1288.78,
+      "max": 1337.25
+    },
+    "open_tree_ms": {
+      "p50": 33.66,
+      "p95": 36.25,
+      "max": 36.66
+    },
+    "open_total_ms": {
+      "p50": 490.94,
+      "p95": 1331.03,
+      "max": 1376.71
+    },
+    "back_settle_ms": {
+      "p50": 294.48,
+      "p95": 294.48,
+      "max": 294.93
+    },
+    "back_tree_ms": {
+      "p50": 34.07,
+      "p95": 34.07,
+      "max": 34.92
+    },
+    "back_total_ms": {
+      "p50": 340.34,
+      "p95": 340.34,
+      "max": 346.37
+    },
+    "tree_reads": {
+      "p50": 2.0,
+      "p95": 4.0,
+      "max": 4.0
+    },
+    "normalize_ms": {
+      "p50": 283.47,
+      "p95": 407.96,
+      "max": 819.44
+    }
+  },
+  "rows": [
+    {
+      "iteration": 1,
+      "tree_reads": 3,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 714.35,
+        "launch_tree_ms": 28.25,
+        "elapsed_ms": 819.44
+      },
+      "target_tree_ms": 21.1,
+      "tap_status": "success",
+      "open_settle_ms": 483.65,
+      "open_settle_polls": 11,
+      "open_event_changes": 3,
+      "open_tree_ms": 36.25,
+      "open_total_ms": 537.83,
+      "open_verified": false,
+      "success": false,
+      "failure_stage": "verify_open"
+    },
+    {
+      "iteration": 2,
+      "tree_reads": 4,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 237.34,
+        "launch_tree_ms": 32.64,
+        "elapsed_ms": 327.9
+      },
+      "target_tree_ms": 17.57,
+      "tap_status": "success",
+      "open_settle_ms": 1337.25,
+      "open_settle_polls": 30,
+      "open_event_changes": 1,
+      "open_tree_ms": 22.95,
+      "open_total_ms": 1376.71,
+      "open_verified": true,
+      "back_status": "success",
+      "back_settle_ms": 294.48,
+      "back_settle_polls": 7,
+      "back_event_changes": 2,
+      "back_tree_ms": 28.83,
+      "back_total_ms": 340.34,
+      "back_verified": true,
+      "success": true
+    },
+    {
+      "iteration": 3,
+      "tree_reads": 3,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 305.96,
+        "launch_tree_ms": 35.5,
+        "elapsed_ms": 407.96
+      },
+      "target_tree_ms": 33.57,
+      "tap_status": "success",
+      "open_settle_ms": 432.75,
+      "open_settle_polls": 10,
+      "open_event_changes": 3,
+      "open_tree_ms": 36.66,
+      "open_total_ms": 486.19,
+      "open_verified": false,
+      "success": false,
+      "failure_stage": "verify_open"
+    },
+    {
+      "iteration": 4,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 250.66,
+        "launch_tree_ms": 30.21,
+        "elapsed_ms": 337.75
+      },
+      "target_tree_ms": 19.57,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=73, last=73, changed=False, polls=36)"
+    },
+    {
+      "iteration": 5,
+      "tree_reads": 4,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 201.18,
+        "launch_tree_ms": 22.83,
+        "elapsed_ms": 286.5
+      },
+      "target_tree_ms": 27.68,
+      "tap_status": "success",
+      "open_settle_ms": 393.9,
+      "open_settle_polls": 9,
+      "open_event_changes": 1,
+      "open_tree_ms": 22.28,
+      "open_total_ms": 433.5,
+      "open_verified": true,
+      "back_status": "success",
+      "back_settle_ms": 246.62,
+      "back_settle_polls": 6,
+      "back_event_changes": 1,
+      "back_tree_ms": 34.92,
+      "back_total_ms": 297.73,
+      "back_verified": true,
+      "success": true
+    },
+    {
+      "iteration": 6,
+      "tree_reads": 3,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 350.88,
+        "launch_tree_ms": 31.48,
+        "elapsed_ms": 453.58
+      },
+      "target_tree_ms": 18.9,
+      "tap_status": "success",
+      "open_settle_ms": 404.92,
+      "open_settle_polls": 9,
+      "open_event_changes": 3,
+      "open_tree_ms": 34.29,
+      "open_total_ms": 456.69,
+      "open_verified": false,
+      "success": false,
+      "failure_stage": "verify_open"
+    },
+    {
+      "iteration": 7,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 297.85,
+        "launch_tree_ms": 30.53,
+        "elapsed_ms": 389.73
+      },
+      "target_tree_ms": 17.7,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=101, last=101, changed=False, polls=36)"
+    },
+    {
+      "iteration": 8,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 163.38,
+        "launch_tree_ms": 19.58,
+        "elapsed_ms": 240.28
+      },
+      "target_tree_ms": 31.4,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=101, last=101, changed=False, polls=37)"
+    },
+    {
+      "iteration": 9,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 202.87,
+        "launch_tree_ms": 20.13,
+        "elapsed_ms": 286.4
+      },
+      "target_tree_ms": 33.11,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=101, last=101, changed=False, polls=38)"
+    },
+    {
+      "iteration": 10,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 306.9,
+        "launch_tree_ms": 24.04,
+        "elapsed_ms": 398.65
+      },
+      "target_tree_ms": 30.92,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=37)"
+    },
+    {
+      "iteration": 11,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 162.18,
+        "launch_tree_ms": 19.64,
+        "elapsed_ms": 254.01
+      },
+      "target_tree_ms": 29.78,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=36)"
+    },
+    {
+      "iteration": 12,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 165.51,
+        "launch_tree_ms": 20.08,
+        "elapsed_ms": 253.16
+      },
+      "target_tree_ms": 30.28,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 13,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 161.28,
+        "launch_tree_ms": 21.12,
+        "elapsed_ms": 256.43
+      },
+      "target_tree_ms": 33.9,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 14,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 169.49,
+        "launch_tree_ms": 18.67,
+        "elapsed_ms": 253.22
+      },
+      "target_tree_ms": 7.3,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=37)"
+    },
+    {
+      "iteration": 15,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 160.23,
+        "launch_tree_ms": 18.98,
+        "elapsed_ms": 252.96
+      },
+      "target_tree_ms": 30.79,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=36)"
+    },
+    {
+      "iteration": 16,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 201.17,
+        "launch_tree_ms": 20.47,
+        "elapsed_ms": 287.26
+      },
+      "target_tree_ms": 29.7,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=37)"
+    },
+    {
+      "iteration": 17,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 164.78,
+        "launch_tree_ms": 19.17,
+        "elapsed_ms": 254.24
+      },
+      "target_tree_ms": 29.7,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 18,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 202.88,
+        "launch_tree_ms": 18.89,
+        "elapsed_ms": 283.47
+      },
+      "target_tree_ms": 29.87,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=36)"
+    },
+    {
+      "iteration": 19,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 161.89,
+        "launch_tree_ms": 8.79,
+        "elapsed_ms": 241.1
+      },
+      "target_tree_ms": 30.18,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 20,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 172.96,
+        "launch_tree_ms": 23.77,
+        "elapsed_ms": 243.97
+      },
+      "target_tree_ms": 26.71,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 21,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 166.68,
+        "launch_tree_ms": 23.76,
+        "elapsed_ms": 260.36
+      },
+      "target_tree_ms": 7.1,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 22,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 161.71,
+        "launch_tree_ms": 20.0,
+        "elapsed_ms": 239.25
+      },
+      "target_tree_ms": 29.69,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=36)"
+    },
+    {
+      "iteration": 23,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 166.22,
+        "launch_tree_ms": 18.8,
+        "elapsed_ms": 254.04
+      },
+      "target_tree_ms": 32.68,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=36)"
+    },
+    {
+      "iteration": 24,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 185.54,
+        "launch_tree_ms": 27.63,
+        "elapsed_ms": 272.79
+      },
+      "target_tree_ms": 24.9,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=35)"
+    },
+    {
+      "iteration": 25,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 206.04,
+        "launch_tree_ms": 19.03,
+        "elapsed_ms": 298.14
+      },
+      "target_tree_ms": 30.3,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=104, last=104, changed=False, polls=36)"
+    },
+    {
+      "iteration": 26,
+      "tree_reads": 4,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 203.21,
+        "launch_tree_ms": 23.66,
+        "elapsed_ms": 286.32
+      },
+      "target_tree_ms": 29.26,
+      "tap_status": "success",
+      "open_settle_ms": 1288.78,
+      "open_settle_polls": 29,
+      "open_event_changes": 1,
+      "open_tree_ms": 24.91,
+      "open_total_ms": 1331.03,
+      "open_verified": true,
+      "back_status": "success",
+      "back_settle_ms": 294.93,
+      "back_settle_polls": 7,
+      "back_event_changes": 2,
+      "back_tree_ms": 34.07,
+      "back_total_ms": 346.37,
+      "back_verified": true,
+      "success": true
+    },
+    {
+      "iteration": 27,
+      "tree_reads": 3,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 301.01,
+        "launch_tree_ms": 30.72,
+        "elapsed_ms": 402.95
+      },
+      "target_tree_ms": 21.15,
+      "tap_status": "success",
+      "open_settle_ms": 434.42,
+      "open_settle_polls": 10,
+      "open_event_changes": 3,
+      "open_tree_ms": 33.66,
+      "open_total_ms": 490.94,
+      "open_verified": false,
+      "success": false,
+      "failure_stage": "verify_open"
+    },
+    {
+      "iteration": 28,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 247.77,
+        "launch_tree_ms": 29.12,
+        "elapsed_ms": 341.99
+      },
+      "target_tree_ms": 22.86,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=132, last=132, changed=False, polls=36)"
+    },
+    {
+      "iteration": 29,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 206.63,
+        "launch_tree_ms": 19.99,
+        "elapsed_ms": 285.6
+      },
+      "target_tree_ms": 29.61,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=132, last=132, changed=False, polls=36)"
+    },
+    {
+      "iteration": 30,
+      "tree_reads": 2,
+      "root_ok": true,
+      "normalize": {
+        "tree_reads": 1,
+        "swipes": 0,
+        "launch_settle_ms": 167.6,
+        "launch_tree_ms": 11.58,
+        "elapsed_ms": 244.81
+      },
+      "target_tree_ms": 21.86,
+      "success": false,
+      "failure_stage": "open_action_or_settle",
+      "error": "PhoneControlError: Timed out waiting for UI settle (baseline=132, last=132, changed=False, polls=36)"
+    }
+  ]
+}

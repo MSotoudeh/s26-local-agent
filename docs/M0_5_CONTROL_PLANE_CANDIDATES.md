@@ -1,6 +1,6 @@
 # M0.5 Control Plane Candidates
 
-Status: prepared while X-pc RDC transport was temporarily unresponsive.
+Status: **ARCHIVED EVALUATION**. This document records the candidate set before testing. Final decision on 2026-10-07: Project IR Mobile Agent + native Accessibility bridge selected; Mobilerun KILL/REPLACE and removed. See `HISTORY.md`.
 
 ## First baseline: raw USB ADB
 

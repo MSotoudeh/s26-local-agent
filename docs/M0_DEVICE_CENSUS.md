@@ -41,7 +41,7 @@ C:\Tools\Android\platform-tools\adb.exe
 
 The current Project IR session can resolve an ADB installation, but project scripts still resolve known explicit locations so behavior does not depend on the agent session's PATH.
 
-Current device status (2026-10-05): the S26 Ultra is attached and authorized over USB ADB. Captured baseline: Samsung SM-S948B, Android 17 / API 37, arm64-v8a, QTI SM8850, SELinux Enforcing. Mobilerun Portal and Shizuku are installed; Shizuku was not running during the latest census.
+Census status on 2026-10-05: the S26 Ultra was attached and authorized over USB ADB. Captured baseline: Samsung SM-S948B, Android 17 / API 37, arm64-v8a, QTI SM8850, SELinux Enforcing. At census time Mobilerun Portal and Shizuku were installed and Shizuku was not running. This is historical evidence; Mobilerun was later removed and the canonical runtime became Project IR Mobile Agent + Shizuku + native Accessibility.
 
 ## Output
 

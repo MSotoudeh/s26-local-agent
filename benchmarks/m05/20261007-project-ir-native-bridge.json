@@ -1,0 +1,32 @@
+{
+  "captured_at": "2026-10-07",
+  "path": "project-ir-hub->s26->shizuku->native-accessibility",
+  "settings_workflow": {
+    "batches": 4,
+    "iterations_per_batch": 5,
+    "total": 20,
+    "successes": 20,
+    "failures": 0,
+    "success_rate": 1
+  },
+  "persian_input": {
+    "text": "سلام test 123",
+    "verified": true
+  },
+  "tree": {
+    "settings_root_node_count": 119,
+    "max_nodes": 500
+  },
+  "build": {
+    "assemble_debug": "PASS",
+    "lint_debug": "PASS"
+  },
+  "retired": [
+    "com.mobilerun.portal",
+    "com.mobilerun.portal.lab"
+  ],
+  "retained_runtime_dependencies": [
+    "io.projectir.mobile",
+    "moe.shizuku.privileged.api"
+  ]
+}

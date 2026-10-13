@@ -1,118 +1,110 @@
 # Phone Control Plane
 
-## Purpose
+## Canonical architecture
 
-Allow ChatGPT, through Project IR, to independently inspect, control, benchmark and recover the S26 Ultra from the authorized `ops` host.
-
-This is separate from the local assistant runtime.
-
-## Desired tool surface
-
-Read:
-- device state;
-- current package/activity;
-- Accessibility tree;
-- screenshot;
-- packages;
-- selected system state;
-- benchmark/log files.
-
-Act:
-- launch/stop app;
-- click structured node;
-- tap coordinates as fallback;
-- set text;
-- press key;
-- swipe/scroll;
-- global back/home/recents;
-- run approved diagnostic commands;
-- start/stop benchmark jobs.
-
-## Transport options
-
-### A. USB ADB — first lab transport
+The production control plane is now Project IR-native.
 
 ```text
 ChatGPT
-  → Project IR
-  → Ops
-  → USB ADB
-  → S26 Ultra
+  -> Project IR
+  -> Project IR Hub
+  -> S26 Mobile Agent (outbound connection)
+       -> Shizuku UserService / shell UID 2000
+       -> native AccessibilityService
+       -> restricted ContentProvider semantic bridge
 ```
 
-Advantages:
-- available without Wi-Fi;
-- transparent debugging;
-- low complexity;
-- ideal for initial independent testing.
+Normal remote operation does **not** require the phone to be connected to Ops or Wi-Fi after the mobile agent and Shizuku are already running. The agent initiates the Hub connection outbound.
 
-Disadvantage:
-- phone must be physically attached to Ops.
+## Roles
 
-### B. Local Android control server
+### Project IR Mobile Agent
 
-Mobilerun Portal-style HTTP/WebSocket or our own Binder/socket bridge.
+Package: `io.projectir.mobile`.
 
-Use when the external controller is on the same host/network.
+Responsibilities:
+- authenticated outbound Hub connection;
+- durable Android device identity (`s26`);
+- Shizuku-backed shell execution;
+- foreground/autostart lifecycle;
+- semantic UI state and actions through the native Accessibility bridge.
 
-### C. Outbound reverse WSS
+### Shizuku
 
-```text
-S26 → outbound WSS → relay/control service → MCP → agent
-```
+Canonical privileged local execution layer.
 
-Useful for remote independent tests over Wi-Fi or cellular without inbound reachability.
+Observed execution identity:
+- shell UID 2000.
 
-Must be authenticated, encrypted, revocable, and disabled by default until security review.
+Shizuku remains a runtime dependency. A reboot still requires whatever bootstrap procedure Shizuku itself needs on the device.
 
-## Candidate implementations
+### Native semantic UI bridge
 
-### Mobilerun Portal
-Strong candidate actuator:
-- Accessibility tree;
-- state;
-- screenshot;
-- local HTTP/WS;
-- ADB ContentProvider;
-- reverse transport concepts.
+The Project IR app contains an AccessibilityService plus a deliberately narrow ContentProvider API.
 
-### Android Use
-Strong reference for:
-- MCP-facing Android tools;
-- ADB backend;
-- companion-app backend.
+Read primitives:
+- status;
+- current structured Accessibility tree.
 
-### A11yPilot
-Useful reference for:
-- compact screen serialization;
-- settle detection;
-- native Accessibility executor.
+Action primitives:
+- click exact visible text;
+- click a resource ID;
+- set text on the focused editable node;
+- Android global Accessibility actions.
 
-## Unified adapter
+The provider accepts only:
+- the app's own UID;
+- shell UID 2000.
 
-The rest of the project talks only to:
+There is no extra HTTP listener or second WebSocket service for UI automation.
 
-```text
-PhoneController
-  getState()
-  getTree()
-  screenshot()
-  launchApp()
-  click(node)
-  setText(node,text)
-  tap(x,y)
-  swipe(...)
-  global(action)
-  runDiagnostic(approvedCommand)
-```
+## Lab/bootstrap transport
 
-Transport-specific details stay behind adapters.
+USB ADB remains useful for:
+- APK installation/update;
+- Shizuku bootstrap/recovery;
+- diagnostics when the native path is unavailable;
+- development profiling.
 
-## M0.5 acceptance
+It is not part of the normal agent execution path.
 
-- USB path works with Wi-Fi disabled.
-- Controller can detect reconnect without reinstall/reconfigure.
-- Read operations are reliable.
-- Actions are verifiable.
-- No command allows arbitrary destructive shell execution by default.
-- Tool latency is measured separately from device/UI latency.
+## Retired Mobilerun path
+
+Mobilerun Portal was used as a feasibility reference because it rapidly demonstrated low-latency Accessibility actions. It was later rejected as a production dependency after repeated state/settle reliability tests.
+
+Retired packages:
+- `com.mobilerun.portal`;
+- `com.mobilerun.portal.lab`.
+
+Both were removed from the S26 after the Project IR bridge achieved 20/20 repeated semantic workflow success and Persian text-input parity.
+
+Raw evidence is retained in `benchmarks/m05/`; runtime Mobilerun adapter code has been removed from the current tree.
+
+## Acceptance evidence
+
+Direct path:
+`Project IR -> s26 -> native bridge`.
+
+Samsung Settings workflow:
+- 20/20 successful cycles;
+- semantic Connections click;
+- Wi-Fi/Bluetooth postcondition verification;
+- semantic/global Back;
+- root-page verification.
+
+Persian text:
+- `سلام test 123`;
+- exact write/read verification;
+- PASS.
+
+## Next control-plane gates
+
+The control plane is sufficiently proven to stop investing in alternative actuator transports.
+
+Remaining hardening:
+1. dedicated no-Wi-Fi/cellular/offline runtime matrix;
+2. Shizuku restart/reboot recovery;
+3. larger app/task corpus;
+4. stable bounded node/action identifiers;
+5. scroll/list/input reliability across multiple apps;
+6. screenshot only for surfaces unavailable to Accessibility.

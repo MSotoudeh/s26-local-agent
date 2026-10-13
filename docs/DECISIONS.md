@@ -109,3 +109,43 @@ Status: accepted experimentally.
 A no-op-style Accessibility tap measured p50 26.12 ms / p95 29.65 ms with zero failures. Repeated app-foreground actions showed a multi-second tail and 2/20 failures.
 
 Decision: do not attribute app-launch tails to the transport. Each heavier action class needs its own settle condition, timeout, retry/recovery policy, and verification predicate.
+
+## D015 — Retire Mobilerun as a production dependency
+
+Status: accepted, completed 2026-10-07.
+
+Mobilerun proved that Accessibility actions and structured state can be low-latency, but repeated workflow reliability failed the acceptance gate. A 30-cycle selector/settle baseline reached only 60%, and event-sequence experiments degraded to 13.3% and 3.3%.
+
+Decision: keep raw evidence and reference value; remove Mobilerun runtime packages, source/build temp artifacts, and active adapter code.
+
+## D016 — Project IR Mobile Agent is the canonical remote phone control plane
+
+Status: accepted.
+
+Project IR already had an Android agent with an outbound Hub connection and Shizuku UserService. Extending that app avoids another daemon, credential surface, network listener, and lifecycle manager.
+
+Decision: remote phone control runs through `device_id=s26` directly. Ops/ADB are bootstrap and recovery paths only.
+
+## D017 — Native Accessibility semantics replace coordinate-first control
+
+Status: accepted experimentally.
+
+The Project IR bridge performs exact-text/resource semantic actions using Accessibility nodes and clickable ancestors. A Samsung Settings workflow passed 20/20 direct on-phone cycles.
+
+Decision: structured semantic actions are the default UI actuator. Raw coordinates remain an escape hatch outside the bridge, not a normal model output.
+
+## D018 — The UI bridge exposes no additional network server
+
+Status: accepted.
+
+The bridge uses a ContentProvider restricted in code to the app UID and shell UID 2000. Hub transport remains owned by the existing Project IR Mobile Agent.
+
+Decision: no Mobilerun-style extra HTTP/WebSocket service for semantic UI control.
+
+## D019 — Event sequence is a hint, not a correctness oracle
+
+Status: accepted.
+
+Mobilerun Lab event/quiet-window experiments did not improve reliability. Accessibility events are noisy, can be absent for idempotent actions, and do not prove that the expected postcondition holds.
+
+Decision: correctness comes from explicit postcondition verification against structured state. Event signals may later accelerate settling but cannot replace verification.
