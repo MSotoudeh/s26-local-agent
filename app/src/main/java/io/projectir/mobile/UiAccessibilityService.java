@@ -117,6 +117,63 @@ public final class UiAccessibilityService extends AccessibilityService {
         return out;
     }
 
+    /** Current package, obtained locally without the Hub or Shizuku. */
+    public String activePackageName() {
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null) return "";
+        return root.getPackageName().toString();
+    }
+
+    /** Bounded, read-only postcondition check; never stores screen content. */
+    public boolean hasExactTexts(String expectedPackage, String... labels) {
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null
+                || !expectedPackage.contentEquals(root.getPackageName())) return false;
+        boolean[] found = new boolean[labels.length];
+        ArrayDeque<AccessibilityNodeInfo> queue = new ArrayDeque<>();
+        queue.add(root);
+        int checked = 0;
+        while (!queue.isEmpty() && checked++ < DEFAULT_MAX_NODES) {
+            AccessibilityNodeInfo node = queue.removeFirst();
+            CharSequence content = node.getText();
+            for (int i = 0; i < labels.length; i++) {
+                if (content != null && labels[i].contentEquals(content)) found[i] = true;
+            }
+            for (int i = 0; i < node.getChildCount(); i++) {
+                AccessibilityNodeInfo child = node.getChild(i);
+                if (child != null) queue.addLast(child);
+            }
+        }
+        for (boolean hit : found) if (!hit) return false;
+        return true;
+    }
+
+    /** Click only one exact semantic match in the expected foreground package. */
+    public boolean clickUniqueTextInPackage(String expectedPackage, String text) {
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null
+                || !expectedPackage.contentEquals(root.getPackageName())) return false;
+        ArrayDeque<AccessibilityNodeInfo> queue = new ArrayDeque<>();
+        queue.add(root);
+        AccessibilityNodeInfo candidate = null;
+        int hits = 0;
+        int checked = 0;
+        while (!queue.isEmpty() && checked++ < DEFAULT_MAX_NODES) {
+            AccessibilityNodeInfo node = queue.removeFirst();
+            CharSequence value = node.getText();
+            if (value != null && text.contentEquals(value)) {
+                candidate = node;
+                hits++;
+                if (hits > 1) return false;
+            }
+            for (int i = 0; i < node.getChildCount(); i++) {
+                AccessibilityNodeInfo child = node.getChild(i);
+                if (child != null) queue.addLast(child);
+            }
+        }
+        return hits == 1 && queue.isEmpty() && clickNodeOrAncestor(candidate);
+    }
+
     public boolean clickExactText(String text) {
         if (text == null || text.isEmpty()) return false;
         AccessibilityNodeInfo root = getRootInActiveWindow();

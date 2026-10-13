@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Process;
+import android.util.Base64;
+
+import java.nio.charset.StandardCharsets;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,6 +75,21 @@ public final class UiBridgeProvider extends ContentProvider {
                 result = action(service.clickResource(arg), "click_resource");
             } else if ("input_focused".equals(method)) {
                 result = action(service.inputFocused(arg), "input_focused");
+            } else if ("input_focused_base64".equals(method)) {
+                // Binary-safe local UTF-8 transport for ADB/PowerShell test
+                // harnesses. The same app/shell caller allowlist applies.
+                if (arg == null || arg.length() > 6000) {
+                    result = unavailable("invalid-input-length");
+                } else {
+                    byte[] encoded = Base64.decode(arg, Base64.NO_WRAP);
+                    if (encoded.length > 4096) {
+                        result = unavailable("input-too-large");
+                    } else {
+                        result = action(service.inputFocused(
+                                new String(encoded, StandardCharsets.UTF_8)),
+                                "input_focused_base64");
+                    }
+                }
             } else if ("global".equals(method)) {
                 int globalAction = Integer.parseInt(arg == null ? "0" : arg);
                 result = action(service.performGlobalAction(globalAction), "global");
