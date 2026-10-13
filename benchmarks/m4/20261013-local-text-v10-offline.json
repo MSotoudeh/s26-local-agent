@@ -1,0 +1,40 @@
+{
+  "experiment": "Local Text Agent v0 strict offline / UTF8 transport",
+  "date": "2026-10-13",
+  "initial_network": {
+    "airplane_mode_on": "0",
+    "wifi_on": "1",
+    "mobile_data": "1"
+  },
+  "strict_offline_verified": true,
+  "commands": [
+    {
+      "command": "DEVICE_STATUS",
+      "observed_command_matches": true,
+      "status": "PASS_VERIFIED",
+      "detail": "Android API 37 / SM-S948B",
+      "elapsed_ms": 1,
+      "pass": true
+    },
+    {
+      "command": "OPEN_CONNECTIONS",
+      "observed_command_matches": true,
+      "status": "PASS_VERIFIED",
+      "detail": "Connections page verified after click",
+      "elapsed_ms": 349,
+      "pass": true,
+      "page_verified": true
+    }
+  ],
+  "restore": {
+    "settings": {
+      "airplane_mode_on": "0",
+      "wifi_on": "1",
+      "mobile_data": "1"
+    },
+    "match": true,
+    "restore_error_types": []
+  },
+  "foreground_restored": true,
+  "failure_type": null
+}

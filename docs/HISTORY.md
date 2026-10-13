@@ -381,3 +381,21 @@ The app's AgentService is intentionally non-exported; a direct ADB `am start-for
 **Gate:** bounded UserService Binder automatic recovery: GO (2/2 end-to-end checks); reboot startup, extended unattended persistence, and disconnect under active jobs: HOLD. Do not treat `shizuku_server` process presence or a new UserService PID as sufficient evidence of ability to execute commands.
 
 Raw evidence: `benchmarks/m1/20261013-shizuku-user-service-rebind.json` (failed v1) and `...-v2.json`, `...-v2-repeat.json` (verified successful v2).
+
+## 2026-10-13 — First real on-device Local Text Agent (M4, limited v0)
+
+The next architectural goal shifted from externally controlling S26 through Project IR to giving the phone a locally executing task loop, independent of Hub availability.
+
+`LocalCommandRouter` and `LocalTaskRunner` were added inside the existing Project IR Mobile Agent (no second app). A text box and Run Locally button allow explicit allowlisted Persian/English commands. Android Intents launch known apps; the in-process AccessibilityService verifies foreground package or a specific Settings/Connections destination. Unknown commands are rejected. The system stores only enum/status/elapsed metadata; no user text, message content or screen tree is persisted.
+
+Initial direct UI test: `تنظیمات را باز کن و وارد Connections شو` completed in 495 ms with `PASS_VERIFIED`. Pure-Java parser tests passed 15/15, and Android build/lint passed.
+
+Offline verification initially failed for **host harness reasons**: a hard-coded tap was invalid after orientation changes; the PowerShell automatic `$input` variable swallowed a command argument; Windows PowerShell script/codepage and ADB stdout conversions corrupted Persian string comparisons. Stable view resource IDs, UTF-8 Base64 transport on the caller-restricted bridge, and a Python subprocess harness that decodes bytes as UTF-8 resolved these artifacts. Both strict-offline local tasks then passed: DEVICE_STATUS 1 ms, Settings/Connections 349 ms. Airplane Mode was enabled with Wi-Fi and cellular data off and no default IPv4 route; network state was restored afterward. USB was retained only as the test harness/rollback path.
+
+Three more real local app launches passed with verified foreground packages: Calculator 160 ms, Clock 158 ms and Maps 182 ms. Previous foreground application restored.
+
+**Decision:** local deterministic text execution can be integrated as a limited v0. This is the first runtime component that performs task interpretation and action on the phone itself, unlike remote Project IR control. It is not yet a general planning agent or voice assistant. More real-app tasks, statistical stress, local models, TTS/ASR, and no-USB runtime still remain.
+
+See `benchmarks/results/2026-10-13-m4-local-text-agent-v0.md` and `project-ir/android-mobile-agent docs/local-text-agent-v0.md`.
+
+An additional real on-device safety check submitted a shell-like unsupported compound command through the Local Text Agent UI. The task runner returned `REJECTED / UNSUPPORTED`. The historical PowerShell harness was retired after the Python UTF-8-byte-decoding benchmark succeeded, while failed JSON evidence was retained. The Project IR Python suite passed 52/52 with the Android-only changes in the feature worktree.

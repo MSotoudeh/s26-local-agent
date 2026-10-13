@@ -1,0 +1,35 @@
+{
+  "experiment": "Local Text Agent v0 app launcher smoke",
+  "date": "2026-10-13",
+  "radio_changes": false,
+  "commands": [
+    {
+      "command": "OPEN_CALCULATOR",
+      "observed_command_matches": true,
+      "status": "PASS_VERIFIED",
+      "detail": "Foreground package verified",
+      "elapsed_ms": 160,
+      "pass": true,
+      "foreground_verified": true
+    },
+    {
+      "command": "OPEN_CLOCK",
+      "observed_command_matches": true,
+      "status": "PASS_VERIFIED",
+      "detail": "Foreground package verified",
+      "elapsed_ms": 158,
+      "pass": true,
+      "foreground_verified": true
+    },
+    {
+      "command": "OPEN_MAPS",
+      "observed_command_matches": true,
+      "status": "PASS_VERIFIED",
+      "detail": "Foreground package verified",
+      "elapsed_ms": 182,
+      "pass": true,
+      "foreground_verified": true
+    }
+  ],
+  "foreground_restored": true
+}
