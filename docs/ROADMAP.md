@@ -119,6 +119,14 @@ If no local ASR reaches usable quality, explicitly decide whether cloud ASR fall
 
 Status: **Local Text Agent v0 GO (limited)** — 2026-10-13. An on-device deterministic Persian/English router and task executor now run inside Project IR Mobile Agent without Hub, Shizuku or network dependencies on the local execution path. Strict offline DEVICE_STATUS and Settings → Connections commands passed; Calculator, Clock and Maps single launches were verified. Parser 15/15, Android build/lint PASS. Further task coverage, reliability and voice remain HOLD. See benchmarks/results/2026-10-13-m4-local-text-agent-v0.md.
 
+Reliable Executor v1 update (2026-10-13): bounded device GO for on-phone
+Action IDs (30/30 unique successful low-risk commands) and the Settings ->
+Connections regression (5/5 verified retry after an initial 3/5 host timeout
+batch). Cancel button and process-interruption handling are implemented and
+built, but live active-task cancellation is not yet accepted. Scroll, multi-step
+stress and USB-detached endurance remain HOLD. See
+benchmarks/results/2026-10-13-m4-reliable-executor-v1.md.
+
 Domains:
 - app launch;
 - volume;

@@ -399,3 +399,28 @@ Three more real local app launches passed with verified foreground packages: Cal
 See `benchmarks/results/2026-10-13-m4-local-text-agent-v0.md` and `project-ir/android-mobile-agent docs/local-text-agent-v0.md`.
 
 An additional real on-device safety check submitted a shell-like unsupported compound command through the Local Text Agent UI. The task runner returned `REJECTED / UNSUPPORTED`. The historical PowerShell harness was retired after the Python UTF-8-byte-decoding benchmark succeeded, while failed JSON evidence was retained. The Project IR Python suite passed 52/52 with the Android-only changes in the feature worktree.
+## 2026-10-13 — Reliable Local Executor v1, bounded device verification
+
+The existing S26 Local Text Agent gained a durable action-identity journal (64
+recent IDs), a synchronous pre-dispatch status/identity record, a UI Cancel
+control invalidating future poll callbacks, and recovery of stale ACCEPTED or
+RUNNING state as INTERRUPTED. No network dependency or arbitrary shell surface
+was added to the local command path.
+
+Host validation: 17/17 Action ID JVM assertions (including 1000 journal
+insertions), 15/15 router assertions, 52/52 Project IR Python tests, and
+Android assembleDebug/lintDebug PASS. The matching-signer APK was installed
+without erasing app data.
+
+Real device: 30/30 local status commands passed with distinct IDs, and the
+three local UI controls were visible. An initial Settings/Connections batch
+passed 3/5 before an ADB host timeout; the raw failure remains recorded. The
+repeat with a longer ADB host timeout passed 5/5 page assertions and distinct
+IDs. The launcher was restored after the tests.
+
+Cancel *during an active action* and Scroll are NOT validated. Scroll source
+changes were not integrated after a Project IR edit safety block; reboot and
+physical USB disconnection are postponed. This is a bounded v1 GO, not a
+general autonomous-agent acceptance.
+
+Evidence: benchmarks/results/2026-10-13-m4-reliable-executor-v1.md.

@@ -239,3 +239,30 @@ Status: accepted, 2026-10-13.
 The Android-local status and Connections commands passed with radios off and no default IPv4 route; Calculator, Clock and Maps also passed single foreground-verification trials. USB remained attached for test/restore.
 
 Decision: call this an on-device **Local Text Agent v0** with a bounded offline gate, not a proven offline voice assistant or an independent multi-step planning system. Reboot remains deferred.
+## D031 — Durable bounded identity before Android task dispatch
+
+Status: implemented and boundedly validated, 2026-10-13.
+
+Action identity and ACCEPTED status are synchronously persisted before the
+local runner launches an Android activity. Duplicate caller IDs in the last
+64 accepted actions are rejected. This prevents accidental immediate replay,
+but not replay of evicted IDs after enough intervening actions.
+
+## D032 — Cancellation is a task-state boundary, not an undo operation
+
+Status: source implementation/build validated, active-cancel live test HOLD.
+
+Cancel invalidates queued polling callbacks and marks the active task as
+CANCELLED. A prior Intent launch or Accessibility action can remain in effect.
+An old ACCEPTED or RUNNING state after process restart is explicitly marked
+INTERRUPTED rather than interpreted as success. A physical active-task Cancel
+trial remains an acceptance requirement.
+
+## D033 — Keep host timeout noise separate from on-device reliability
+
+Status: accepted, 2026-10-13.
+
+A Settings/Connections regression batch stopped after 3/5 because an ADB
+host call exceeded its 12-second timeout. The failing raw batch was preserved.
+The 30-second host timeout rerun passed 5/5. Both are disclosed; neither
+alone proves system reliability, and no silent test-data relabeling is allowed.

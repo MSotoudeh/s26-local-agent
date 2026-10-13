@@ -16,7 +16,7 @@ COMMANDS = [("وضعیت گوشی", "DEVICE_STATUS"),
             ("تنظیمات را باز کن و وارد Connections شو", "OPEN_CONNECTIONS")]
 
 
-def shell(command: str, timeout: float = 12) -> str:
+def shell(command: str, timeout: float = 30) -> str:
     cp = subprocess.run([ADB, "shell", command], capture_output=True, timeout=timeout)
     if cp.returncode != 0:
         raise RuntimeError(f"ADB_FAILURE command={command.split()[0]} code={cp.returncode}")
