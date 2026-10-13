@@ -335,3 +335,15 @@ The initial Python test attempts failed during collection because they used the 
 For the independent `s26-local-agent` repository, retired runtime adapter code and test scripts were deleted from the current tree, while benchmark JSON artifacts were deliberately retained as decision evidence. All retained M0.5 JSON files parsed successfully; a scan of text sources found no common credential/token patterns. Documentation was reconciled so the native Project IR Mobile Agent, not Mobilerun, is the active control-plane implementation.
 
 The next open work is M1 offline/Shizuku endurance and M2 multi-app Accessibility reliability; the 20/20 Settings proof is a feasibility gate, not a claim that all apps or every offline mode work. Shizuku recovery after reboot remains a known limitation on the unrooted phone.
+
+## 2026-10-13 — Live Shizuku binding recovery after publication
+
+A read-only Hub status check after Git publication reported the S26 agent connected but Shizuku unavailable (`shizuku_running=false`, UID -1, permission false). This was investigated rather than assuming that Shizuku itself had stopped.
+
+On Ops, USB ADB still identified the S26. Android process inspection showed that `shizuku_server` **was already running**. No Shizuku reinstall or system permission reset was required.
+
+Opening `io.projectir.mobile/.MainActivity` caused Project IR Mobile Agent to rebind its Shizuku UserService. The user service appeared as `io.projectir.mobile:project_ir_shell`, and a direct `remote_exec(device_id="s26")` call again returned UID 2000 plus a successful Accessibility provider status. The Hub status initially retained the previous false values, then refreshed to `connected=true`, `shizuku_running=true`, `shizuku_uid=2000` and `shizuku_permission=true` on the next telemetry update.
+
+The phone package inventory continued to show only Project IR Mobile Agent and Shizuku, not Mobilerun. Enabled Accessibility services remained Bitwarden, KDE Connect and Project IR. The foreground UI was returned to ChatGPT after verification.
+
+**Lesson / next hardening task:** distinguish Shizuku server process availability from the app's Binder binding state and from last-reported Hub telemetry. If the server is running but shell execution is unavailable, attempt an idempotent rebind and verify with a real direct command before prompting for a new Shizuku bootstrap. Hub status can temporarily lag behind the true recovered state.
