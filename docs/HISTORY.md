@@ -347,3 +347,17 @@ Opening `io.projectir.mobile/.MainActivity` caused Project IR Mobile Agent to re
 The phone package inventory continued to show only Project IR Mobile Agent and Shizuku, not Mobilerun. Enabled Accessibility services remained Bitwarden, KDE Connect and Project IR. The foreground UI was returned to ChatGPT after verification.
 
 **Lesson / next hardening task:** distinguish Shizuku server process availability from the app's Binder binding state and from last-reported Hub telemetry. If the server is running but shell execution is unavailable, attempt an idempotent rebind and verify with a real direct command before prompting for a new Shizuku bootstrap. Hub status can temporarily lag behind the true recovered state.
+
+## 2026-10-13 — M1 isolated offline operation and M2 four-app perception
+
+Initial Airplane Mode maintained the native UI provider and Shizuku processes for 12/12 observations, but was deliberately not classified as strict offline because Wi-Fi can stay enabled in Airplane Mode. A stricter trial enforced Wi-Fi=0, mobile data=0, airplane=1 and no IPv4 default route. Local provider and process persistence passed 8/8 samples, with complete radio-settings restoration.
+
+The first four-app M2 run passed Settings, Calculator and Maps but failed to launch Samsung Clock with an implicit launcher Intent. A separate inspection resolved Clock's explicit launcher activity. After correcting launch routing, the second run passed all 24/24 structured snapshots across four apps and 10/10 repeated Settings semantic click/verify/back cycles.
+
+No device-screen contents were persisted. Live Hub, Shizuku, network restoration and ChatGPT foreground were verified afterward.
+
+A read-only speech/NPU inventory was captured, but neither offline Persian ASR accuracy nor actual NPU model acceleration is proven yet.
+
+Reboot was intentionally deferred without a validated unattended Shizuku restart procedure. This is a safety HOLD, not a passing reboot test.
+
+Evidence and interpretation: benchmarks/results/2026-10-13-m1-m2.md and raw benchmarks/m1, benchmarks/m2 and benchmarks/m3.

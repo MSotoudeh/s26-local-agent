@@ -1,0 +1,118 @@
+{
+  "experiment": "M1-offline-airplane-isolated",
+  "date": "2026-10-13",
+  "model": "SM-S948B",
+  "before": {
+    "airplane_mode_on": "0",
+    "wifi_on": "1",
+    "mobile_data": "1"
+  },
+  "baseline": {
+    "bridge": {
+      "ok": true,
+      "ms": 1007.9
+    },
+    "shizuku": {
+      "server": true,
+      "user_service": true
+    }
+  },
+  "airplane_mode_verified": true,
+  "offline": [
+    {
+      "index": 1,
+      "bridge_ok": true,
+      "bridge_ms": 1011.6,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 2,
+      "bridge_ok": true,
+      "bridge_ms": 1014.0,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 3,
+      "bridge_ok": true,
+      "bridge_ms": 1001.5,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 4,
+      "bridge_ok": true,
+      "bridge_ms": 1000.8,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 5,
+      "bridge_ok": true,
+      "bridge_ms": 1009.1,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 6,
+      "bridge_ok": true,
+      "bridge_ms": 1005.6,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 7,
+      "bridge_ok": true,
+      "bridge_ms": 997.5,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 8,
+      "bridge_ok": true,
+      "bridge_ms": 993.5,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 9,
+      "bridge_ok": true,
+      "bridge_ms": 1002.9,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 10,
+      "bridge_ok": true,
+      "bridge_ms": 1005.8,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 11,
+      "bridge_ok": true,
+      "bridge_ms": 1008.3,
+      "shizuku_server": true,
+      "user_service": true
+    },
+    {
+      "index": 12,
+      "bridge_ok": true,
+      "bridge_ms": 1015.9,
+      "shizuku_server": true,
+      "user_service": true
+    }
+  ],
+  "restored": true,
+  "after": {
+    "airplane_mode_on": "0",
+    "wifi_on": "1",
+    "mobile_data": "1"
+  },
+  "summary": {
+    "samples": 12,
+    "local_bridge_and_shizuku_pass": 12,
+    "network_restored": true
+  }
+}

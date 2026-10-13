@@ -46,6 +46,8 @@ Remaining connectivity/offline endurance belongs to M1, not M0.5.
 
 ## M1 — Shizuku no-Wi-Fi runtime
 
+Status: **bounded offline persistence GO / full acceptance HOLD** (2026-10-13). Initial Airplane Mode check 12/12 PASS; strict Airplane Mode + Wi-Fi off + mobile data off + no IPv4 default route check 8/8 PASS. USB remained attached for recovery; long-run, physically unplugged and post-reboot operation are still unverified. See benchmarks/results/2026-10-13-m1-m2.md.
+
 After Shizuku bootstrap:
 - disconnect USB;
 - Wi-Fi off;
@@ -57,6 +59,8 @@ Gate:
 - median bridge overhead low enough to be negligible relative to UI latency.
 
 ## M2 — Accessibility primitives
+
+Status: **four-app structured perception GO / full action reliability HOLD** (2026-10-13). Samsung Settings, Calculator, Clock and Google Maps each passed 6/6 snapshots (24/24 total); 10/10 Settings semantic Connections/Back workflows passed. The initial Clock launcher failure was fixed using a resolved explicit activity, without changing Accessibility. Scroll, dynamic UI and cross-app side-effecting tasks remain untested. See benchmarks/results/2026-10-13-m1-m2.md.
 
 Implement/test:
 - dump tree;
@@ -89,6 +93,8 @@ Gate:
 - calibration good enough to support confidence thresholds.
 
 ## M3 — Persian ASR
+
+Status: **read-only service inventory complete; model accuracy/latency NOT TESTED** (2026-10-13). Existing Android RecognitionService registrations do not prove local Persian support. A real evaluation corpus and candidate model installation/verification are still needed. See benchmarks/m3/20261013-speech-npu-census.json.
 
 Build user's command corpus:
 - short Persian commands;

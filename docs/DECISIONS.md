@@ -149,3 +149,35 @@ Status: accepted.
 Mobilerun Lab event/quiet-window experiments did not improve reliability. Accessibility events are noisy, can be absent for idempotent actions, and do not prove that the expected postcondition holds.
 
 Decision: correctness comes from explicit postcondition verification against structured state. Event signals may later accelerate settling but cannot replace verification.
+
+## D020 — Distinguish local offline control from Hub reachability
+
+Status: accepted experimentally, 2026-10-13.
+
+Airplane Mode alone was insufficient to guarantee no network. A stricter test disabled Wi-Fi and mobile data and verified that no IPv4 default route existed. Native local provider and Shizuku processes survived 8/8 samples.
+
+Decision: track offline local control and external Hub transport separately.
+
+## D021 — Resolve OEM app launcher failures before blaming Accessibility
+
+Status: accepted experimentally, 2026-10-13.
+
+Samsung Clock initially failed to launch via an implicit launcher Intent. The resolved explicit launcher activity worked, and subsequent state snapshots passed 6/6.
+
+Decision: classify launcher, tree, semantic-action and postcondition failures separately.
+
+## D022 — Small positive smoke tests do not establish product readiness
+
+Status: accepted, 2026-10-13.
+
+M2 passed 24/24 snapshots across four apps and 10/10 Settings semantic workflows. This is an encouraging feasibility signal, not reliable statistical proof of greater than 98% success across apps and scenarios.
+
+Decision: retain full M2 acceptance as HOLD until broader repeated and side-effect-safe tests pass.
+
+## D023 — Reboot requires a proven recovery path
+
+Status: accepted, 2026-10-13.
+
+An unrooted device may not restore Shizuku automatically after restart and the unattended bootstrap mechanism is not yet verified.
+
+Decision: do not deliberately reboot during remote automation until a tested recoverable procedure exists.
