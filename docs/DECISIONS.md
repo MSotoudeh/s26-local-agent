@@ -181,3 +181,29 @@ Status: accepted, 2026-10-13.
 An unrooted device may not restore Shizuku automatically after restart and the unattended bootstrap mechanism is not yet verified.
 
 Decision: do not deliberately reboot during remote automation until a tested recoverable procedure exists.
+
+## D024 — Shizuku health requires Binder and execution verification
+
+Status: accepted experimentally, 2026-10-13.
+
+A terminated Shizuku UserService process was recreated in ~2.4 s without recovering the app's Binder. The Hub remained connected but direct shell execution failed. A new PID was insufficient for success.
+
+Decision: distinguish Shizuku server, Shizuku permission, live UserService Binder and a verified shell command as separate health dimensions. A process-only test remains pending until the Hub reports ready and a direct command succeeds.
+
+## D025 — Bounded rebind must retire the stale Shizuku connection
+
+Status: accepted experimentally, 2026-10-13.
+
+Version 13.1.5 of the installed Shizuku API supports `unbindUserService(..., false)`. Stale connection records are now unbound before retry, with a 12-second pending-bind expiry and a watchdog independent of Hub connectivity.
+
+Two controlled UserService SIGTERM trials passed full recovery: UserService process reappeared in 11.1 s and 6.6 s, then the Hub reported Binder ready and direct shell execution as UID 2000 succeeded. No phone reboot or Shizuku server restart was performed.
+
+Decision: retain minimal recovery logic; do not install a second phone-control app or require foreground interaction to recover a single lost UserService Binder.
+
+## D026 — Android app updates must use the existing signing identity
+
+Status: accepted, 2026-10-13.
+
+A build from the SYSTEM account produced a different debug signature and Android rejected updating the existing app. The desktop account's original debug keystore matched the installed package. The APK was re-signed and safely updated while preserving data.
+
+Decision: certificate-digest verification is a pre-install gate; never uninstall an authenticated phone agent to bypass signature mismatch. Keep keystores outside Git and use a process-local Gradle/JDK environment.

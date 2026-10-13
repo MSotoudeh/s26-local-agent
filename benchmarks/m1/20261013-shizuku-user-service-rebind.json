@@ -1,0 +1,21 @@
+{
+  "experiment": "M1-user-service-binder-rebind",
+  "date": "2026-10-13",
+  "preconditions": {
+    "server_running": true,
+    "user_service_running": true,
+    "app_running": true
+  },
+  "signal": "SIGTERM",
+  "user_service_recreated": true,
+  "server_pid_unchanged": true,
+  "app_pid_unchanged": true,
+  "observed_recovery_ms": 2444.0,
+  "observed_samples": 1,
+  "foreground_untouched": true,
+  "recovered_without_ui": true,
+  "hub_binder_ready_after_restart": false,
+  "direct_remote_exec_verified": false,
+  "final_verdict": "FAIL_END_TO_END_PROCESS_ONLY",
+  "discovery": "UserService process recreated, but existing Mobile Agent binder remained disconnected and direct Hub calls returned HTTP 502."
+}
