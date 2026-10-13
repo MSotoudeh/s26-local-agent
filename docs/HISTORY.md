@@ -361,3 +361,23 @@ A read-only speech/NPU inventory was captured, but neither offline Persian ASR a
 Reboot was intentionally deferred without a validated unattended Shizuku restart procedure. This is a safety HOLD, not a passing reboot test.
 
 Evidence and interpretation: benchmarks/results/2026-10-13-m1-m2.md and raw benchmarks/m1, benchmarks/m2 and benchmarks/m3.
+
+## 2026-10-13 — Automatic Shizuku UserService Binder recovery (M1 hardening)
+
+The Project IR phone agent initially had a lifecycle gap: `ShellBridge` detected a disconnected Shizuku UserService Binder, but did not reliably detach/rebind its stale service connection until the app Activity was reopened. A separate `shizuku_user_service_ready` heartbeat signal was added to distinguish the local UserService Binder from the Shizuku server process.
+
+**Attempt 1 (failed acceptance):** a controlled SIGTERM was sent only to the Project IR shell UserService process. Its process restarted in about 2.4 seconds; the Shizuku server and app processes remained unchanged. The initial test incorrectly regarded process resurrection as recovery. The Hub still reported `shizuku_user_service_ready=false`, and direct `remote_exec(device_id="s26")` failed with 502. The raw evidence was explicitly reclassified `FAIL_END_TO_END_PROCESS_ONLY` rather than discarded.
+
+**Decision/pivot:** lifecycle recovery must clear old Shizuku connection records, not only retry `bindUserService`. The installed Shizuku API 13.1.5 was inspected: it provides `unbindUserService(args, connection, remove)`. The agent now unbinds with `remove=false` before a subsequent rebind (so Shizuku/UserService is not deliberately destroyed), delays retry out of the disconnection callback, and resets a stuck pending bind after a bounded 12-second deadline. A scheduled health check runs every ten seconds independently of the Hub WebSocket.
+
+**Attempt 2 (two separate successful end-to-end tests):** the same single UserService process was terminated without touching the Shizuku server or bringing Project IR to the foreground. In test 1, the process returned in about 11.1 seconds; in test 2, about 6.6 seconds. In both, the Hub later reported `shizuku_user_service_ready=true`; a direct Project IR command executed as UID 2000 and exited zero. Shizuku server and main app process identities remained stable. The original foreground app remained untouched.
+
+Android `assembleDebug` and `lintDebug` passed. The Python suite passed 52/52 tests after the first lifecycle patch; the follow-on patch was Android-only and passed a full Android build/lint.
+
+**Signing/toolchain issue:** Ops Project IR executes as Windows SYSTEM, which uses a different Android debug keystore and an initially empty Gradle cache. The first installation attempt was correctly rejected by Android as `INSTALL_FAILED_UPDATE_INCOMPATIBLE`; no uninstall was attempted and app data was preserved. The existing user-profile debug keystore was compared by certificate digest and exactly matched the installed APK. The debug APK was re-signed with that existing keystore, verified, then installed with `adb install -r`. The build was run with the desktop user's existing Gradle cache and explicit JDK/SDK paths, without changing system-wide environment variables or publishing keys.
+
+The app's AgentService is intentionally non-exported; a direct ADB `am start-foreground-service` request was rejected. After an APK update, MainActivity was briefly opened to resume its internal service and the previously focused application was immediately restored. This is an *update/bootstrap concern*, not the recovery mechanism demonstrated by the two controlled UserService process tests.
+
+**Gate:** bounded UserService Binder automatic recovery: GO (2/2 end-to-end checks); reboot startup, extended unattended persistence, and disconnect under active jobs: HOLD. Do not treat `shizuku_server` process presence or a new UserService PID as sufficient evidence of ability to execute commands.
+
+Raw evidence: `benchmarks/m1/20261013-shizuku-user-service-rebind.json` (failed v1) and `...-v2.json`, `...-v2-repeat.json` (verified successful v2).
