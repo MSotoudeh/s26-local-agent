@@ -6,7 +6,9 @@ This is a **separate Android debug application**, `io.s26.pstnlab`, which does *
 
 - Android 17 / API 37 / SM-S948B
 - Standard app binds a real Shizuku UserService, process suffix `s26_pstn_lab`, Linux UID **2000 (shell)**
-- The phone app invokes `status()`, `fakePcmTest()`, and `fakePcmFrame(byte[])` over Binder. The last method validates **640-byte PCM16 mono 16kHz / 20ms** frames, then echoes the input in memory. On test, 100 frames cross the actual app ↔ privileged process boundary.
+- The phone app invokes `status()`, `preflight()` (read-only API/permission discovery), `fakePcmTest()`, and `fakePcmFrame(byte[])` over Binder. The last method validates **640-byte PCM16 mono 16kHz / 20ms** frames, then echoes the input in memory. On test, 100 frames cross the actual app ↔ privileged process boundary.
+- The separate **Inspect Persian speech engines** button inventories TTS voices and generic on-device recognition service presence without recording, speaking, installing models or contacting an LLM; the result is saved as `persian-speech-status.json` in app-private storage.
+- In-call AudioRecord/AudioTrack are NOT opened by this app. The preflight result `prerequisite_gate=true` only proves permissions and method visibility, not usable live PCM.
 - `PstnAndroidAdapter` is packaged in the UserService, but its `AndroidRedirectBackend` is **not opened or exposed**. No live telephony, microphone, recording or injection is possible through this app's current Binder allowlist.
 - Explicit Stop button calls Shizuku's teardown and releases the lab process; Bind restarts it.
 - This is **not** a persistent system service after a reboot. Shizuku itself must first be started, then the lab app launched/bound. The UserService can remain alive if only the UI is backgrounded.

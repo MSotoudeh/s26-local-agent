@@ -83,6 +83,10 @@ public final class MainActivity extends Activity {
         testButton.setText("Run FAKE PCM (100 frames)");
         testButton.setOnClickListener(v -> runDryRun());
         column.addView(testButton);
+        Button speechButton = new Button(this);
+        speechButton.setText("Inspect Persian speech engines (NO microphone)");
+        speechButton.setOnClickListener(v -> probeSpeech());
+        column.addView(speechButton);
         Button stopButton = new Button(this);
         stopButton.setText("Stop this lab UserService");
         stopButton.setOnClickListener(v -> stopLab());
@@ -95,7 +99,7 @@ public final class MainActivity extends Activity {
         scroll.addView(column);
         setContentView(scroll);
         args = new Shizuku.UserServiceArgs(new ComponentName(this, LabUserService.class))
-                .processNameSuffix("s26_pstn_lab").daemon(true).version(2);
+                .processNameSuffix("s26_pstn_lab").daemon(true).version(3);
         Shizuku.addRequestPermissionResultListener(permissionListener);
         Shizuku.addBinderReceivedListenerSticky(binderReceived);
         Shizuku.addBinderDeadListener(binderDead);
@@ -127,6 +131,7 @@ public final class MainActivity extends Activity {
         if (service == null) { publish("NO_SERVICE_FOR_TEST"); return; }
         try {
             JSONObject state = new JSONObject(service.status());
+            JSONObject preflight = new JSONObject(service.preflight());
             JSONObject fake = new JSONObject(service.fakePcmTest());
             int binderFrames = 0;
             for (int index = 0; index < 100; index++) {
@@ -140,10 +145,13 @@ public final class MainActivity extends Activity {
             report.put("binder_pcm_20ms_frames", binderFrames);
             report.put("scope", "NO_CALL_NO_REAL_AUDIO");
             report.put("service", state);
+            report.put("read_only_preflight", preflight);
             report.put("fake_pcm", fake);
             report.put("pass", state.optBoolean("shell") && fake.optBoolean("pass")
                     && "FAKE_ONLY".equals(fake.optString("backend")) && binderFrames == 100);
             writeReport(report);
+            publish("NO_CALL_PREFLIGHT=" + preflight.optBoolean("prerequisite_gate")
+                    + " INTERCEPTABLE=" + preflight.optString("pstn_interceptable"));
             publish("TEST_RESULT=" + (report.getBoolean("pass") ? "PASS" : "FAIL")
                     + " RX=" + fake.optInt("rx") + " TX=" + fake.optInt("tx") + " BINDER=" + binderFrames
                     + " UID=" + state.optInt("uid"));
@@ -151,6 +159,20 @@ public final class MainActivity extends Activity {
             publish("TEST_ERROR=" + e.getClass().getSimpleName());
         }
     }
+    private void probeSpeech() {
+        publish("PERSIAN_SPEECH_INVENTORY_REQUESTED");
+        PersianSpeechInventory.inspect(this, result -> {
+            try (FileOutputStream file = openFileOutput("persian-speech-status.json",
+                    Context.MODE_PRIVATE)) {
+                file.write(result.toString(2).getBytes(StandardCharsets.UTF_8));
+                publish("PERSIAN_TTS_CANDIDATES=" + result.optInt("offline_persian_voice_candidates")
+                        + " ON_DEVICE_ASR_SERVICE=" + result.optBoolean("on_device_recognition_service"));
+            } catch (Exception e) {
+                publish("SPEECH_INVENTORY_ERROR=" + e.getClass().getSimpleName());
+            }
+        });
+    }
+
     private void writeReport(JSONObject report) throws Exception {
         try (FileOutputStream out = openFileOutput("lab-status.json", Context.MODE_PRIVATE)) {
             out.write(report.toString(2).getBytes(StandardCharsets.UTF_8));

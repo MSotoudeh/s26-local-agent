@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Android 11+ package visibility for installed speech/TTS engines. -->
+    <queries>
+        <intent><action android:name="android.intent.action.TTS_SERVICE"/></intent>
+        <intent><action android:name="android.speech.RecognitionService"/></intent>
+    </queries>
     <!-- Shizuku provider dependency adds the dangerous API_V23 permission. -->
     <application android:label="S26 PSTN Audio Lab" android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:allowBackup="false" android:usesCleartextTraffic="false">
