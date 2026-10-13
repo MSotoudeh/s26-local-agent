@@ -424,3 +424,18 @@ physical USB disconnection are postponed. This is a bounded v1 GO, not a
 general autonomous-agent acceptance.
 
 Evidence: benchmarks/results/2026-10-13-m4-reliable-executor-v1.md.
+
+## 2026-10-13 — Replay and Cancel v1b source extension, installation blocked
+
+On top of v1 commit `47575d7`, added an optional explicit Action ID UI
+field, duplicate-ID rejection status, and a harmless five-second in-process
+wait command that exercises live task cancellation without touching Android
+system settings. Prepared a dedicated real-device test script.
+
+Validation passed 17 Java parser assertions, 17 Action ID assertions,
+52 Project IR Python tests, and Android build/lint. The remote tool blocked
+the APK verification/install operation at its safety layer. No bypass,
+alternate installation method, reboot, uninstall or phone mutation followed.
+
+The change is **source-only validated** and live Cancel/replay remains HOLD.
+See `benchmarks/results/2026-10-13-m4-replay-cancel-source-hold.md`.
