@@ -164,6 +164,17 @@ public final class MainActivity extends Activity {
         localStatus.setPadding(0, dp(6), 0, dp(12));
         localStatus.setText(LocalTaskRunner.get(this).currentStatus());
         box.addView(localStatus);
+        Button previewPlan = button("Preview local skill — no action");
+        previewPlan.setId(R.id.local_plan_preview);
+        previewPlan.setOnClickListener(v -> {
+            LocalSkillPlan plan = LocalSkillRegistry.lookup(localCommand.getText().toString());
+            if (plan == null) plan = LocalSkillRegistry.emptyPreview();
+            String rejection = LocalPlanPolicy.rejection(plan);
+            localStatus.setText(plan.preview() + (rejection == null
+                    ? "PLAN SHAPE: VALID"
+                    : "PLAN SHAPE: " + rejection));
+        });
+        box.addView(previewPlan);
 
         hub = field("Hub URL");
         device = field("Device ID");
