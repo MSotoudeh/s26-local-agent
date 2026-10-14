@@ -92,6 +92,23 @@ Canary package: `io.projectir.plan.canary`; not the main
 Detailed reproduction and test contracts are in
 `project-ir/docs/android-plan-canary-device-20261014.md`.
 
+## Safe next-install preflight staged without disturbing the Agent
+
+At Project IR branch commit `d91dc26`, the prepared main Agent APK
+has been signed with a locally available signing key whose certificate
+**matches the installed package**. Android source build and lint passed.
+
+- Candidate: `app-s26-matching-signer.apk` in the isolated Project IR
+  worktree's Android build-output directory (not committed).
+- SHA-256: `efb826ec1ff86b1478d3ee2839917cd78896659f806fd519e20db74699bb9ce2`.
+- A read-only verified backup of the currently installed APK was also
+  preserved under Ops local ProjectIR backups (not committed).
+- Neither the production APK nor AgentService was replaced/restarted.
+- **HOLD** installing the main APK until the user explicitly confirms
+  that other concurrent Project IR chats can tolerate a brief disconnect.
+- See `project-ir/docs/android-plan-agent-release-preflight-20261014.md`
+  for signer checks, rollback boundaries and post-install acceptance.
+
 ## Next gates
 
 1. Preserve all active Project IR chats before any APK reinstall, AgentService
