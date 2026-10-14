@@ -65,6 +65,33 @@ replaced, so these features have NOT executed a real phone task.
 Seven non-blocking Java compiler warnings about missing annotation enums
 were observed; Gradle assemble and lint still passed.
 
+## Actual S26 isolated ART canary — 2026-10-14 update
+
+Project IR source branch: `feat/s26-plan-adapter-20261014`
+Canary evidence/code commit: `2aeeb6f` (pushed)
+Canary package: `io.projectir.plan.canary`; not the main
+`io.projectir.mobile` installation.
+
+- Independent, zero-network-permission APK: Android build/lint PASS.
+- On the actual S26 Android Runtime: 100/100 **simulated** multistep
+  engine workflows PASS. Another 100/100 simulation run PASS.
+- Android SharedPreferences durability: PREPARED state persisted,
+  the canary app alone was force-stopped, recovery returned
+  INTERRUPTED_UNKNOWN, and duplicate ID was rejected. PASS.
+- Read-only actual Accessibility bridge: 20/20 usable complete
+  snapshots, zero truncated; 47 nodes each; 19/19 adjacent unchanged.
+  Raw screen content was neither persisted nor printed.
+- Original Agent and Shizuku server process IDs remained unchanged
+  during the bounded canary run. No Wi-Fi, Hub or phone reboot change.
+- The project agent still reports no Shizuku Binder readiness although
+  Android shows a Shizuku shell server process and Project IR's Shizuku
+  permission granted. Root cause remains unverified.
+- No actual multi-step UI click was made; original Agent APK remains
+  unchanged. Real UI deployment and unplugged Wi-Fi-off endurance HOLD.
+
+Detailed reproduction and test contracts are in
+`project-ir/docs/android-plan-canary-device-20261014.md`.
+
 ## Next gates
 
 1. Preserve all active Project IR chats before any APK reinstall, AgentService
