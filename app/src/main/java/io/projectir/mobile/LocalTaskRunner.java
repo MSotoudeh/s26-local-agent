@@ -56,6 +56,12 @@ public final class LocalTaskRunner {
         if (value != null) value.onLocalTaskChanged(currentStatus());
     }
 
+    public boolean isBusy() { return busy; }
+
+    public boolean hasSeenId(String id) {
+        return LocalActionIdentity.seen(preferences.getString("recent_action_ids", ""), id);
+    }
+
     public String currentStatus() {
         return preferences.getString("status", "IDLE") + " | "
                 + preferences.getString("command", "none") + " | "
@@ -77,7 +83,9 @@ public final class LocalTaskRunner {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw new IllegalStateException("LocalTaskRunner must run on the UI loop");
         }
-        if (busy || !LocalActionIdentity.valid(actionId)) return false;
+        if (busy || !LocalActionIdentity.valid(actionId)
+                || LocalAndroidPlanRuntime.get(context).busy()
+                || LocalAndroidPlanRuntime.get(context).seenId(actionId)) return false;
         if (LocalActionIdentity.seen(
                 preferences.getString("recent_action_ids", ""), actionId)) {
             persist("REJECTED_DUPLICATE", "UNSUPPORTED",

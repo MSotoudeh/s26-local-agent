@@ -174,6 +174,45 @@ public final class UiAccessibilityService extends AccessibilityService {
         return hits == 1 && queue.isEmpty() && clickNodeOrAncestor(candidate);
     }
 
+    /**
+     * Fail-closed canonical plan click. Only the exact BFS node ID may be used.
+     * No implicit click on an ancestor; rejects duplicate labels and
+     * incomplete trees. Caller also validates a full UI state digest first.
+     */
+    public boolean clickVerifiedNodeInPackage(String expectedPackage, String label,
+                                              int expectedNodeId) {
+        if (expectedPackage == null || label == null || expectedNodeId < 0) return false;
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null || root.getPackageName() == null
+                || !expectedPackage.contentEquals(root.getPackageName())) return false;
+        ArrayDeque<AccessibilityNodeInfo> queue = new ArrayDeque<>();
+        queue.add(root);
+        AccessibilityNodeInfo selected = null;
+        int visited = 0;
+        int matches = 0;
+        String normalized = LocalSkillRegistry.normalize(label);
+        while (!queue.isEmpty() && visited < DEFAULT_MAX_NODES) {
+            AccessibilityNodeInfo node = queue.removeFirst();
+            int id = visited++;
+            CharSequence packageName = node.getPackageName();
+            CharSequence text = node.getText();
+            if (packageName != null && expectedPackage.contentEquals(packageName)
+                    && text != null
+                    && normalized.equals(LocalSkillRegistry.normalize(text.toString()))) {
+                matches++;
+                if (id == expectedNodeId) selected = node;
+                if (matches > 1) return false;
+            }
+            for (int i = 0; i < node.getChildCount(); i++) {
+                AccessibilityNodeInfo child = node.getChild(i);
+                if (child != null) queue.addLast(child);
+            }
+        }
+        if (!queue.isEmpty() || matches != 1 || selected == null
+                || !selected.isEnabled() || !selected.isClickable()) return false;
+        return selected.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+    }
+
     public boolean clickExactText(String text) {
         if (text == null || text.isEmpty()) return false;
         AccessibilityNodeInfo root = getRootInActiveWindow();

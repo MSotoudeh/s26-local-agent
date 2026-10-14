@@ -33,6 +33,7 @@ public final class MainActivity extends Activity {
     private EditText localCommand;
     private EditText localActionId;
     private TextView localStatus;
+    private TextView planStatus;
 
     private final Shizuku.OnRequestPermissionResultListener permissionListener =
             (requestCode, grantResult) -> {
@@ -94,6 +95,9 @@ public final class MainActivity extends Activity {
         LocalTaskRunner.get(this).setListener(result -> {
             if (localStatus != null) localStatus.setText(result);
         });
+        LocalAndroidPlanRuntime.get(this).setListener(result -> {
+            if (planStatus != null) planStatus.setText(result);
+        });
         handler.post(refresher);
     }
 
@@ -101,6 +105,7 @@ public final class MainActivity extends Activity {
     protected void onPause() {
         handler.removeCallbacks(refresher);
         LocalTaskRunner.get(this).setListener(null);
+        LocalAndroidPlanRuntime.get(this).setListener(null);
         super.onPause();
     }
 
@@ -175,6 +180,27 @@ public final class MainActivity extends Activity {
                     : "PLAN SHAPE: " + rejection));
         });
         box.addView(previewPlan);
+
+        Button runVerifiedPlan = button("Run verified multi-step plan (offline)");
+        runVerifiedPlan.setOnClickListener(v -> {
+            String id = localActionId.getText().toString().trim();
+            if (id.isEmpty()) id = java.util.UUID.randomUUID().toString();
+            if (!LocalAndroidPlanRuntime.get(this).start(
+                    localCommand.getText().toString(), id)) {
+                toast("Plan rejected: verify Accessibility, policy and task ID");
+            }
+        });
+        box.addView(runVerifiedPlan);
+        Button cancelVerifiedPlan = button("Cancel multi-step plan");
+        cancelVerifiedPlan.setOnClickListener(v -> {
+            if (!LocalAndroidPlanRuntime.get(this).cancel()) {
+                toast("No active multi-step plan");
+            }
+        });
+        box.addView(cancelVerifiedPlan);
+        planStatus = new TextView(this);
+        planStatus.setText(LocalAndroidPlanRuntime.get(this).status());
+        box.addView(planStatus);
 
         hub = field("Hub URL");
         device = field("Device ID");
