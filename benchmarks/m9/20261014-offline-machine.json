@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-14",
+  "mode": "source-only-fake-observations",
+  "simulation_tasks_pass": 1000,
+  "assertions_pass": 15022,
+  "actual_android_effects": 0,
+  "test_duration_ms": 436,
+  "device_tested": false,
+  "reboot_performed": false,
+  "result": "PASS_SIMULATION_ONLY"
+}

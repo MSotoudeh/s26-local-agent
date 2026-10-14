@@ -252,3 +252,18 @@ acceptance and device evidence. Phone reboot remains intentionally deferred.
 
 Source and acceptance boundaries:
 `benchmarks/results/2026-10-13-offline-planner-preview.md`.
+
+## 2026-10-14 — M9 reference multi-step engine, source only
+
+The new canonical `LocalPlanMachine` is an offline, side-effect-free
+state machine with REQUEST/ACK/POSTCONDITION/CANCEL boundaries, explicit
+deadlines, stale-state checks and no retry of uncertain side effects.
+Host validation passed 1,000 simulated Settings/Connections workflows
+and 15,022 assertions; **no phone tasks were executed**.
+
+M9 **simulation GO / real task engine integration HOLD**. Remaining:
+fresh UI adapter with click revalidation, durable per-step transaction
+journal, cancellation races, live app navigation, USB-detached
+endurance and model-backed task planning. No reboot performed or planned
+during this iteration. See
+`benchmarks/results/2026-10-14-offline-plan-machine.md`.

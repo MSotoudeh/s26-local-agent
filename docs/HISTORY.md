@@ -459,3 +459,21 @@ ASR transcript, audio recording, LLM/NPU inference or speed claim resulted.
 
 No APK installation, phone reboot, user interaction or PSTN source changes
 occurred. See `benchmarks/results/2026-10-13-offline-planner-preview.md`.
+
+## 2026-10-14 — Pure local multi-step machine with fault injection
+
+After auditing the interrupted HTTP 502 operation, verified that the
+previous offline Planner and Persian evaluator had already been committed
+and the actual metric test count was 9/9. No duplicate edits were necessary.
+
+Added `LocalPlanMachine` to the canonical Android feature branch: an
+offline reference state machine with single-dispatch ACK behavior, bounded
+per-step deadlines, pinned UI state for semantic clicks, explicit
+postcondition stages, cancellation and terminal fail-closed behavior.
+Executed 1,000 simulated multi-step Settings/Connections plans and 15,022
+host JVM assertions, with **zero actual Android side effects**.
+
+This is a source/simulation milestone. Live adapter binding, durable
+step-level state, real app navigation, USB detachment, genuine model
+inference and reboot are still HOLD. See
+`benchmarks/results/2026-10-14-offline-plan-machine.md`.
