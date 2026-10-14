@@ -309,3 +309,19 @@ intent accuracy/F1 math are a measurement scaffold only. They do not prove
 offline Persian ASR, local LLM, NPU routing, task success, latency or battery
 performance. Obtain actual independent inference evidence before selecting
 a model or claiming a milestone GO.
+
+## D038 — Separate plan-state correctness from physical Android execution
+
+Status: pure Java simulation GO, 2026-10-14.
+
+The planner returns canonical structured steps; a pure state machine
+advances only through explicit Dispatch requests, ACKs and independently
+verified postconditions. Never treat an ACK as task completion, or
+automatically retry an uncertain side effect. Cancel invalidates future
+steps but cannot undo previously executed Android effects.
+
+A future Android adapter must independently revalidate current UI
+state and capability authorization before dispatch. The reference
+engine cannot itself prove hardware/task reliability. Host results
+(1,000 simulated tasks; 15,022 assertions) may not be reported as
+real-world mobile task success. Reboot is deferred.
