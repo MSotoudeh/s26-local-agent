@@ -109,6 +109,42 @@ has been signed with a locally available signing key whose certificate
 - See `project-ir/docs/android-plan-agent-release-preflight-20261014.md`
   for signer checks, rollback boundaries and post-install acceptance.
 
+## M5: actual offline Persian ASR / local LLM / Assistant-role milestone (2026-10-15)
+
+Canonical implementation in Project IR:
+- Repo: `MSotoudeh/project-ir`
+- Branch: `feat/s26-voice-assistant-20261015`
+- Commit: `614c934`
+- Full evidence: `docs/S26_OFFLINE_FA_ASR_LOCAL_LLM_ASSISTANT_2026-10-15.md`
+
+Delivered onto the **actual S26 Ultra**, not just simulated:
+- Vosk Persian `small-fa-0.42` ASR model stored locally (about 97 MiB
+  extracted); the packaged Persian WAV transcribed entirely offline, without
+  microphone access or network use.
+- One-sample quality check compared a 5.448-second bundled public WAV with
+  its reference, obtaining WER 3.400, CER 1.864. That FAILS the accuracy gate;
+  do not represent speech accuracy as production-ready.
+- Push-to-talk microphone integration is implemented with Android runtime
+  permission; actual spoken user tests remain pending. Recognized text is
+  drafted for review, never auto-executed.
+- MediaPipe model inference using an on-device Qwen2.5-0.5B-Instruct model,
+  546,660,344 bytes, SHA-256 verified on the phone. Test query
+  `Say hello in Persian` produced a nonempty Persian model answer.
+  LLM outputs have **no** direct authority to execute phone actions.
+- Android `ACTION_ASSIST` intent qualification implemented; explicit assist
+  intent launched the app, the UI exposes an opt-in `ROLE_ASSISTANT` request.
+  Default system Assistant remains Google until owner confirmation; the
+  role picker/gesture acceptance is not yet validated.
+- Android Gradle Build/Lint PASS with JDK 25, Python suite 52/52 PASS,
+  existing JVM plan regressions PASS, and Hub plus Shizuku UserService
+  remained connected after data-preserving APK replacement.
+- New release is backed by a verified APK rollback copy on Ops.
+  No model weights, APKs, tokens, phone speech, or other sensitive data
+  were committed to Git.
+
+This milestone is a **working offline prototype** and optional Assistant
+role candidate, not a fully autonomous always-on personal assistant.
+
 ## Next gates
 
 1. Preserve all active Project IR chats before any APK reinstall, AgentService
