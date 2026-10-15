@@ -10,4 +10,8 @@
     <item name="m2_whisper_benchmark" type="id"/>
     <item name="m2_qwen3_install" type="id"/>
     <item name="m2_qwen3_benchmark" type="id"/>
+    <item name="m2_asr_compare_engine" type="id"/>
+    <item name="m2_asr_compare_selected" type="id"/>
+    <item name="m2_asr_compare_all" type="id"/>
+    <item name="m2_asr_compare_result" type="id"/>
 </resources>

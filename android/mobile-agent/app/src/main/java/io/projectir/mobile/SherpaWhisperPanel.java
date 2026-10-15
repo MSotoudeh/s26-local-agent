@@ -28,7 +28,7 @@ public final class SherpaWhisperPanel {
         TextView result = new TextView(activity);
         result.setText("M2_WHISPER_NO_BENCHMARK_YET");
         result.setTextIsSelectable(true);
-        AtomicBoolean busy = new AtomicBoolean();
+        AtomicBoolean busy = ModelLabBenchmarkGate.shared();
 
         Button install = new Button(activity);
         install.setId(R.id.m2_whisper_install);

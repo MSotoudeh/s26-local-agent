@@ -160,6 +160,8 @@ public final class ModelLabPanel {
         });
         parent.addView(activate);
         parent.addView(active);
+        // Cross-runtime A/B comparison is read-only, separate from Side-key model switching.
+        SherpaAsrComparisonPanel.attach(activity, parent, asr);
         // Independent M2 engine benchmark. No implicit change to Assistant ASR.
         SherpaOmniPanel.attach(activity, parent, asr);
         // Second sherpa backend target: pinned multilingual Whisper-base Int8.

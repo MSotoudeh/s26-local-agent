@@ -59,7 +59,7 @@ public final class SherpaOmniRunner {
         m.setOmnilingual(new OfflineOmnilingualAsrCtcModelConfig(model.getAbsolutePath()));
         m.setTokens(tokens.getAbsolutePath());
         m.setModelType("omnilingual");
-        m.setNumThreads(3);
+        m.setNumThreads(2); // Comparable two-thread CPU budget across M2 engines
         m.setProvider("cpu");
         OfflineRecognizerConfig config = new OfflineRecognizerConfig();
         config.setModelConfig(m);
