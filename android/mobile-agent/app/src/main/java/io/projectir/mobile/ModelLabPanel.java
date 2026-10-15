@@ -162,5 +162,7 @@ public final class ModelLabPanel {
         parent.addView(active);
         // Independent M2 engine benchmark. No implicit change to Assistant ASR.
         SherpaOmniPanel.attach(activity, parent, asr);
+        // Second sherpa backend target: pinned multilingual Whisper-base Int8.
+        SherpaWhisperPanel.attach(activity, parent, asr);
     }
 }
