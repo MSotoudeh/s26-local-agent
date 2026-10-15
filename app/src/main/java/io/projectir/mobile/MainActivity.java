@@ -2,6 +2,7 @@ package io.projectir.mobile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.app.role.RoleManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -39,6 +40,14 @@ public final class MainActivity extends Activity {
     private TextView llmStatus;
     private LocalPersianAsr persianAsr;
     private LocalLlmEngine llmEngine;
+    private TextView assistantVoiceBanner;
+    private boolean activityResumed;
+    private boolean pendingAssistGesture;
+    private boolean assistantMicrophoneActive;
+    private boolean assistTranscriptHandled;
+    private int voiceSession;
+    private static final String SKIP_MIC_TEST_EXTRA =
+            "io.projectir.mobile.extra.SKIP_ASSIST_MIC";
 
     private final Shizuku.OnRequestPermissionResultListener permissionListener =
             (requestCode, grantResult) -> {
@@ -63,6 +72,9 @@ public final class MainActivity extends Activity {
         shell = ShellBridge.get(this);
         persianAsr = new LocalPersianAsr(this);
         llmEngine = new LocalLlmEngine(this);
+        // The ACTION_ASSIST launch is a deliberate foreground user gesture.
+        // Never auto-open a microphone during MAIN/launcher launches or tests.
+        pendingAssistGesture = isUserAssistIntent(getIntent());
 
         boolean imported = false;
         try {
@@ -99,6 +111,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        activityResumed = true;
         LocalTaskRunner.get(this).setListener(result -> {
             if (localStatus != null) localStatus.setText(result);
         });
@@ -106,10 +119,15 @@ public final class MainActivity extends Activity {
             if (planStatus != null) planStatus.setText(result);
         });
         handler.post(refresher);
+        maybeStartAssistGesture();
     }
 
     @Override
     protected void onPause() {
+        activityResumed = false;
+        pendingAssistGesture = false;
+        ++voiceSession;
+        assistantMicrophoneActive = false;
         handler.removeCallbacks(refresher);
         // A microphone session may not continue invisibly in the background.
         if (persianAsr != null) persianAsr.stop();
@@ -145,6 +163,16 @@ public final class MainActivity extends Activity {
         TextView subtitle = new TextView(this);
         subtitle.setText("Native outbound Android executor — no PC required after bootstrap.");
         box.addView(subtitle);
+        assistantVoiceBanner = new TextView(this);
+        assistantVoiceBanner.setTextSize(17);
+        assistantVoiceBanner.setPadding(0, dp(12), 0, dp(8));
+        assistantVoiceBanner.setText(
+                "ASSIST_READY: Hold Side key to listen in Persian offline. "
+                + "Verified navigation: Settings / Connections; questions: Qwen text only.");
+        box.addView(assistantVoiceBanner);
+        Button cancelAssistantVoice = button("Stop Assistant listening");
+        cancelAssistantVoice.setOnClickListener(v -> stopAssistantListening());
+        box.addView(cancelAssistantVoice);
 
         TextView localTitle = label("Local Text Agent (fully on-device)");
         localTitle.setTextSize(18);
@@ -218,7 +246,7 @@ public final class MainActivity extends Activity {
         box.addView(faTitle);
         voiceStatus = new TextView(this);
         voiceStatus.setText("FA_IR_ASR_MODEL=" + (persianAsr.modelInstalled() ? "INSTALLED" : "MISSING")
-                + " (no microphone use until you tap Listen)");
+                + " (microphone starts only from Side-key Assist or explicit Listen)");
         box.addView(voiceStatus);
         Button listenPersian = button("Listen Persian offline (tap to start)");
         listenPersian.setOnClickListener(v -> {
@@ -356,6 +384,146 @@ public final class MainActivity extends Activity {
         status.setPadding(0, dp(18), 0, 0);
         box.addView(status);
         return scroll;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        pendingAssistGesture = isUserAssistIntent(intent);
+        maybeStartAssistGesture();
+    }
+
+    private static boolean isUserAssistIntent(Intent intent) {
+        return intent != null && Intent.ACTION_ASSIST.equals(intent.getAction())
+                && !intent.getBooleanExtra(SKIP_MIC_TEST_EXTRA, false);
+    }
+
+    private void maybeStartAssistGesture() {
+        if (!activityResumed || !pendingAssistGesture) return;
+        pendingAssistGesture = false; // intent consumed at most once
+        final int ticket = ++voiceSession;
+        handler.postDelayed(() -> {
+            if (ticket == voiceSession && activityResumed) {
+                beginAssistListening(ticket);
+            }
+        }, 350L);
+    }
+
+    private void beginAssistListening(int ticket) {
+        if (!activityResumed || assistantVoiceBanner == null) return;
+        RoleManager role = getSystemService(RoleManager.class);
+        if (role == null || !role.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+            assistantVoiceBanner.setText("ASSIST_REJECTED_NOT_DEFAULT_ASSISTANT");
+            return;
+        }
+        KeyguardManager keyguard = getSystemService(KeyguardManager.class);
+        if (keyguard != null && keyguard.isKeyguardLocked()) {
+            assistantVoiceBanner.setText("ASSIST_REJECTED_LOCKED_DEVICE");
+            return;
+        }
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            assistantVoiceBanner.setText(
+                    "ASSIST_NEEDS_MIC_PERMISSION: use Listen Persian offline to grant");
+            return;
+        }
+        if (!persianAsr.modelInstalled()) {
+            assistantVoiceBanner.setText("ASSIST_PERSIAN_MODEL_MISSING");
+            return;
+        }
+        if (LocalAndroidPlanRuntime.get(this).busy()
+                || LocalTaskRunner.get(this).isBusy()) {
+            assistantVoiceBanner.setText("ASSIST_REJECTED_OTHER_TASK_ACTIVE");
+            return;
+        }
+        // Explicitly foreground only: no hotword, passive recording or
+        // background service is used for microphone access.
+        if (persianAsr.isActive()) persianAsr.stop();
+        assistTranscriptHandled = false;
+        assistantMicrophoneActive = true;
+        localCommand.setText("");
+        assistantVoiceBanner.setText("ASSIST_LISTENING_FA_IR_OFFLINE: speak now");
+        persianAsr.begin(new LocalPersianAsr.Listener() {
+            @Override public void onStatus(String state) {
+                handler.post(() -> {
+                    if (ticket != voiceSession || !activityResumed
+                            || !assistantMicrophoneActive) return;
+                    if (state.startsWith("ASR_MODEL_ERROR")
+                            || state.startsWith("ASR_START_FAILED")
+                            || "ASR_BUSY".equals(state) || "ASR_MIC_ERROR".equals(state)
+                            || "ASR_TIMEOUT".equals(state)
+                            || "ASR_MODEL_NOT_INSTALLED".equals(state)
+                            || "ASR_STOPPED".equals(state)) {
+                        assistantMicrophoneActive = false;
+                        assistantVoiceBanner.setText("ASSIST_" + state);
+                    } else {
+                        assistantVoiceBanner.setText("ASSIST_" + state);
+                    }
+                });
+            }
+            @Override public void onTranscript(String transcript) {
+                handler.post(() -> acceptAssistTranscript(ticket, transcript));
+            }
+        });
+    }
+
+    private void stopAssistantListening() {
+        ++voiceSession;
+        pendingAssistGesture = false;
+        assistantMicrophoneActive = false;
+        assistTranscriptHandled = true;
+        if (persianAsr != null) persianAsr.stop();
+        if (assistantVoiceBanner != null) {
+            assistantVoiceBanner.setText("ASSIST_LISTENING_CANCELLED");
+        }
+    }
+
+    private void acceptAssistTranscript(int ticket, String transcript) {
+        if (ticket != voiceSession || !activityResumed || !assistantMicrophoneActive
+                || assistTranscriptHandled) return;
+        // Vosk may deliver onResult AND onFinalResult. At most one
+        // transcript from a physical Side-key session is acted upon.
+        assistTranscriptHandled = true;
+        assistantMicrophoneActive = false;
+        persianAsr.stop();
+        localCommand.setText(transcript);
+        localCommand.setSelection(localCommand.length());
+        LocalVoiceRouting.Decision decision = LocalVoiceRouting.classify(transcript);
+        if (decision.kind == LocalVoiceRouting.Kind.NAVIGATE) {
+            LocalSkillPlan canonical = LocalSkillRegistry.canonicalById(decision.skillId);
+            if (canonical == null || !LocalPlanPolicy.mayExecute(canonical)
+                    || !decision.skillId.equals(canonical.skillId)
+                    || LocalAndroidPlanRuntime.get(this).busy()
+                    || LocalTaskRunner.get(this).isBusy()) {
+                assistantVoiceBanner.setText("ASSIST_NAVIGATION_REJECTED_BY_POLICY");
+                return;
+            }
+            // Unique ID: a previous spoken action is never silently replayed.
+            String id = "assist_" + java.util.UUID.randomUUID();
+            localActionId.setText(id);
+            assistantVoiceBanner.setText(
+                    "ASSIST_VERIFIED_R0_START: " + decision.skillId);
+            boolean accepted = LocalAndroidPlanRuntime.get(this).start(
+                    decision.canonicalCommand, id);
+            if (!accepted) {
+                assistantVoiceBanner.setText("ASSIST_PLAN_REJECTED_OR_ACCESSIBILITY_MISSING");
+            }
+        } else if (decision.kind == LocalVoiceRouting.Kind.ANSWER) {
+            assistantVoiceBanner.setText("ASSIST_QWEN_LOCAL_TEXT_ONLY_LOADING");
+            boolean accepted = llmEngine.generate(transcript, answer -> {
+                if (ticket != voiceSession || !activityResumed) return;
+                llmStatus.setText(answer);
+                assistantVoiceBanner.setText("ASSIST_QWEN_TEXT_RESULT_READY: "
+                        + answer.substring(0, Math.min(130, answer.length())));
+            });
+            if (!accepted) {
+                assistantVoiceBanner.setText("ASSIST_QWEN_UNAVAILABLE_OR_BUSY");
+            }
+        } else {
+            assistantVoiceBanner.setText(
+                    "ASSIST_UNSUPPORTED_SPEECH: no device action; check/edit draft");
+        }
     }
 
     private void loadFields() {
