@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "notice": "Provider and runtime comparison candidates only. No API keys, costs, subscriptions, or online search calls have been configured by this plan.",
+  "selection_policy": {
+    "offline_default": true,
+    "network_allowed_only_by_explicit_user_intent": true,
+    "no_search_without_network_or_consent": true,
+    "no_secrets_in_git": true,
+    "backend_selection_require_actual_runtime_evidence": true
+  },
+  "search": [
+    {
+      "id": "search.searxng.private",
+      "source": "https://docs.searxng.org/",
+      "mode": "self-hosted",
+      "status": "planned",
+      "cost_gate": "deployment_and_infrastructure-review",
+      "privacy": "sensitive queries stay within authorized self-host, upstream engines still see queries",
+      "notes": "Needs authorized host and permitted use; no new cloud cost without approval"
+    },
+    {
+      "id": "search.brave.api",
+      "source": "https://brave.com/search/api/",
+      "mode": "third-party API",
+      "status": "planned",
+      "cost_gate": "api-pricing-approval",
+      "privacy": "query transmitted to Brave",
+      "notes": "API key in Android Keystore or scoped remote token broker, never hardcoded"
+    },
+    {
+      "id": "search.tavily.api",
+      "source": "https://tavily.com/",
+      "mode": "third-party API",
+      "status": "planned",
+      "cost_gate": "api-pricing-approval",
+      "privacy": "query transmitted to Tavily",
+      "notes": "Compare result grounding, links, quota and real cost"
+    },
+    {
+      "id": "search.browser.manual",
+      "source": "https://developer.android.com/reference/android/content/Intent#ACTION_WEB_SEARCH",
+      "mode": "owner browser interaction",
+      "status": "planned",
+      "cost_gate": "none",
+      "privacy": "search visible to browser/provider",
+      "notes": "Fallback opens browser; cannot claim machine-readable answer without verification"
+    }
+  ],
+  "ocr": [
+    {
+      "id": "ocr.accessibility.tree",
+      "status": "installed_verified",
+      "source": "https://developer.android.com/reference/android/accessibilityservice/AccessibilityService",
+      "notes": "Structured labels/IDs and actions; may not expose drawings, does not require screenshot"
+    },
+    {
+      "id": "ocr.mlkit.offline",
+      "status": "planned",
+      "source": "https://developers.google.com/ml-kit/vision/text-recognition/v2/android",
+      "notes": "Confirm required language model bundled and actual offline operation before claim"
+    },
+    {
+      "id": "ocr.tesseract.android",
+      "status": "planned",
+      "source": "https://github.com/tesseract-ocr/tesseract",
+      "notes": "Requires verified fa traineddata, JNI packaging 16KiB, resource/accuracy test"
+    },
+    {
+      "id": "ocr.vlm.image",
+      "status": "planned",
+      "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct",
+      "notes": "Not classical OCR, compare grounded text and icon interpretation"
+    }
+  ],
+  "compute_backends": [
+    {
+      "id": "compute.cpu.llama_cpp",
+      "status": "planned",
+      "source": "https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md",
+      "notes": "Arm64 baseline; runtime compile and ABI test"
+    },
+    {
+      "id": "compute.opencl.llama_cpp",
+      "status": "candidate_only",
+      "source": "https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md",
+      "notes": "Adreno GPU only if vendor ICD and actual driver available, fallback to CPU"
+    },
+    {
+      "id": "compute.litert",
+      "status": "installed_verified",
+      "source": "https://ai.google.dev/edge/litert",
+      "notes": "Existing MediaPipe compatible Qwen .task with runtime telemetry; NPU NOT proved"
+    },
+    {
+      "id": "compute.qualcomm_aihub",
+      "status": "candidate_only",
+      "source": "https://aihub.qualcomm.com/",
+      "notes": "Device-specific export, ABI/version, terms, NPU compatibility must be measured"
+    }
+  ]
+}
