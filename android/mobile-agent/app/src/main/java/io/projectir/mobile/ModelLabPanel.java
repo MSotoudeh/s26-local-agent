@@ -160,5 +160,7 @@ public final class ModelLabPanel {
         });
         parent.addView(activate);
         parent.addView(active);
+        // Independent M2 engine benchmark. No implicit change to Assistant ASR.
+        SherpaOmniPanel.attach(activity, parent, asr);
     }
 }

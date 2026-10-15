@@ -4,4 +4,6 @@
     <item name="model_lab_model_spinner" type="id"/>
     <item name="model_lab_install_staged_vosk" type="id"/>
     <item name="model_lab_activate_vosk" type="id"/>
+    <item name="m2_omni_install" type="id"/>
+    <item name="m2_omni_benchmark" type="id"/>
 </resources>
