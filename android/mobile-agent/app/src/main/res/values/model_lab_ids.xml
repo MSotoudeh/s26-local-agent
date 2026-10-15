@@ -8,4 +8,6 @@
     <item name="m2_omni_benchmark" type="id"/>
     <item name="m2_whisper_install" type="id"/>
     <item name="m2_whisper_benchmark" type="id"/>
+    <item name="m2_qwen3_install" type="id"/>
+    <item name="m2_qwen3_benchmark" type="id"/>
 </resources>
