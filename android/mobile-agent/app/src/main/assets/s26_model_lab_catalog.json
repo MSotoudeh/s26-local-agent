@@ -1,0 +1,505 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_name": "S26 Model Lab",
+  "purpose": "Installation roadmap and runtime-switching lab; entries marked planned are NOT installed.",
+  "verified_device": {
+    "model": "SM-S948B",
+    "soc": "SM8850",
+    "android_api": 37,
+    "ram_memtotal_kib": 11350972,
+    "memavailable_kib_snapshot": 4957864,
+    "storage_free_gb_snapshot": 161,
+    "observation_date": "2026-10-15"
+  },
+  "installation_policy": {
+    "current_stage": "plan_only",
+    "allowlist_only": true,
+    "max_one_heavy_runtime": true,
+    "downloads_require_license_check": true,
+    "commercial_prohibited_models_excluded": true,
+    "reserve_free_storage_gb": 30,
+    "planned_model_storage_cap_gb": 110,
+    "default_network": "wifi_only",
+    "no_auto_download_on_metered": true,
+    "never_export_screenshots_or_audio": true
+  },
+  "entries": [
+    {
+      "id": "asr.vosk.fa-small-042",
+      "task": "asr",
+      "source": "https://alphacephei.com/vosk/models/vosk-model-small-fa-0.42.zip",
+      "runtimes": [
+        "vosk-android"
+      ],
+      "tier": "baseline",
+      "status": "installed_verified",
+      "license": "apache-2.0",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Current functional on-device, offline, fast; 96.6 MiB extracted."
+    },
+    {
+      "id": "asr.qwen3.0_6b.int8",
+      "task": "asr",
+      "source": "https://k2-fsa.github.io/sherpa/onnx/qwen3-asr/pretrained.html",
+      "runtimes": [
+        "sherpa-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "verify-on-artifact",
+      "formats": [
+        "onnx-int8"
+      ],
+      "notes": "Persian supported; ONNX int8 runtime and decode benchmark mandatory."
+    },
+    {
+      "id": "asr.omni_ctc_300m.int8",
+      "task": "asr",
+      "source": "https://k2-fsa.github.io/sherpa/onnx/omnilingual-asr/models.html",
+      "runtimes": [
+        "sherpa-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "verify-on-artifact",
+      "formats": [
+        "onnx-int8"
+      ],
+      "notes": "Omnilingual 300M; about 348 MB weights per sherpa documentation."
+    },
+    {
+      "id": "asr.omni_ctc_1b.int8",
+      "task": "asr",
+      "source": "https://k2-fsa.github.io/sherpa/onnx/omnilingual-asr/models.html",
+      "runtimes": [
+        "sherpa-onnx"
+      ],
+      "tier": "stress",
+      "status": "planned",
+      "license": "verify-on-artifact",
+      "formats": [
+        "onnx-int8"
+      ],
+      "notes": "Higher-resource accuracy candidate, load only if benchmark safety gates pass."
+    },
+    {
+      "id": "asr.whisper.small",
+      "task": "asr",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "runtimes": [
+        "whisper.cpp"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "mit",
+      "formats": [
+        "ggml-f16",
+        "ggml-q5"
+      ],
+      "notes": "Multilingual model ~466 MiB; compare language auto-detect vs fa forced."
+    },
+    {
+      "id": "asr.whisper.medium",
+      "task": "asr",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "runtimes": [
+        "whisper.cpp"
+      ],
+      "tier": "heavy",
+      "status": "planned",
+      "license": "mit",
+      "formats": [
+        "ggml-q5",
+        "ggml-f16"
+      ],
+      "notes": "Multilingual ~1.5 GiB unquantized; quant first, long-form quality."
+    },
+    {
+      "id": "asr.whisper.large_v3_turbo.q5",
+      "task": "asr",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "runtimes": [
+        "whisper.cpp"
+      ],
+      "tier": "heavy",
+      "status": "planned",
+      "license": "mit",
+      "formats": [
+        "ggml-q5"
+      ],
+      "notes": "~547 MiB q5 weights; fast/accuracy competitive candidate."
+    },
+    {
+      "id": "asr.whisper.large_v3.q5",
+      "task": "asr",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "runtimes": [
+        "whisper.cpp"
+      ],
+      "tier": "heavy",
+      "status": "planned",
+      "license": "mit",
+      "formats": [
+        "ggml-q5"
+      ],
+      "notes": "~1.1 GiB q5; compare with turbo, avoid cold memory pressure."
+    },
+    {
+      "id": "asr.whisper.large_v3.f16",
+      "task": "asr",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "runtimes": [
+        "whisper.cpp"
+      ],
+      "tier": "stress",
+      "status": "planned",
+      "license": "mit",
+      "formats": [
+        "ggml-f16"
+      ],
+      "notes": "~2.9 GiB weights and larger runtime; thermal tests only after q5 passes."
+    },
+    {
+      "id": "vad.webrtc",
+      "task": "vad",
+      "source": "https://github.com/wiseman/py-webrtcvad",
+      "runtimes": [
+        "android-webrtc-vad"
+      ],
+      "tier": "baseline",
+      "status": "planned",
+      "license": "bsd-or-compatible-verify",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Small deterministic VAD option; verify Android library license."
+    },
+    {
+      "id": "vad.silero",
+      "task": "vad",
+      "source": "https://github.com/snakers4/silero-vad",
+      "runtimes": [
+        "onnxruntime-mobile"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "mit",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Compare false barge-in and endpoint accuracy; no cloud."
+    },
+    {
+      "id": "tts.android_system.fa",
+      "task": "tts",
+      "source": "https://developer.android.com/reference/android/speech/tts/TextToSpeech",
+      "runtimes": [
+        "android-tts"
+      ],
+      "tier": "baseline",
+      "status": "planned",
+      "license": "system-provider",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "On-device only if offline Persian voice reported installed; do not send text to cloud engine."
+    },
+    {
+      "id": "tts.piper.amir.medium",
+      "task": "tts",
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/fa/fa_IR/amir",
+      "runtimes": [
+        "piper-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "per-voice-review",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Persian voice option; verify voice attribution and actual file license."
+    },
+    {
+      "id": "tts.piper.ganji.medium",
+      "task": "tts",
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/fa/fa_IR/ganji",
+      "runtimes": [
+        "piper-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "per-voice-review",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Persian voice option; record quality latency and pronunciation."
+    },
+    {
+      "id": "tts.piper.ganji_adabi.medium",
+      "task": "tts",
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/fa/fa_IR/ganji_adabi",
+      "runtimes": [
+        "piper-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "per-voice-review",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Alternative speaking style; verify availability and its voice license."
+    },
+    {
+      "id": "tts.piper.gyro.medium",
+      "task": "tts",
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/fa/fa_IR/gyro",
+      "runtimes": [
+        "piper-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "per-voice-review",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Reference sample rate 22050 Hz from upstream."
+    },
+    {
+      "id": "tts.piper.reza_ibrahim.medium",
+      "task": "tts",
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/fa/fa_IR/reza_ibrahim",
+      "runtimes": [
+        "piper-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "per-voice-review",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Another Persian timbre; verify actual file first."
+    },
+    {
+      "id": "tts.meta.mms_fas",
+      "task": "tts",
+      "source": "https://huggingface.co/facebook/mms-tts-fas",
+      "runtimes": [
+        "onnxruntime-mobile",
+        "custom-vits"
+      ],
+      "tier": "research_only",
+      "status": "license_blocked_for_commercial",
+      "license": "cc-by-nc-4.0",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Noncommercial license: install only in isolated research environment; never include in sellable distributable."
+    },
+    {
+      "id": "llm.qwen2_5.0_5b.int8",
+      "task": "llm",
+      "source": "https://huggingface.co/litert-community/Qwen2.5-0.5B-Instruct",
+      "runtimes": [
+        "mediapipe-genai"
+      ],
+      "tier": "baseline",
+      "status": "installed_verified",
+      "license": "apache-2.0",
+      "formats": [
+        "litert-task-q8"
+      ],
+      "notes": "Current Qwen .task 546660344 bytes; retain rollback baseline."
+    },
+    {
+      "id": "llm.qwen3_5.0_8b",
+      "task": "llm",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-0.8B",
+      "runtimes": [
+        "llama.cpp",
+        "litert-converted"
+      ],
+      "tier": "speed",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "gguf-q4",
+        "gguf-q8"
+      ],
+      "notes": "Quantized lightweight candidate, on-device Android runnable artifact to be verified."
+    },
+    {
+      "id": "llm.qwen3_5.2b",
+      "task": "llm,vlm",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-2B",
+      "runtimes": [
+        "llama.cpp",
+        "litert-converted"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "gguf-q4",
+        "gguf-q8"
+      ],
+      "notes": "Preferred balance candidate, verify actual vision adapter and tokenizer support."
+    },
+    {
+      "id": "llm.qwen3_5.4b",
+      "task": "llm,vlm",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-4B",
+      "runtimes": [
+        "llama.cpp",
+        "litert-converted"
+      ],
+      "tier": "quality",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "gguf-q4",
+        "gguf-q5"
+      ],
+      "notes": "4B quant memory gate, full image processor must be available."
+    },
+    {
+      "id": "llm.qwen3_5.9b",
+      "task": "llm,vlm",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-9B",
+      "runtimes": [
+        "llama.cpp"
+      ],
+      "tier": "stress",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "gguf-q3",
+        "gguf-q4"
+      ],
+      "notes": "Stress only; start low quant and reduced context, never prewarm with other LLMs."
+    },
+    {
+      "id": "llm.qwen3.14b",
+      "task": "llm",
+      "source": "https://huggingface.co/Qwen/Qwen3-14B",
+      "runtimes": [
+        "llama.cpp"
+      ],
+      "tier": "extreme",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "gguf-q2",
+        "gguf-q3"
+      ],
+      "notes": "Memory-risk characterization only; hard stop if RAM/thermal gate fails."
+    },
+    {
+      "id": "llm.qwen3.32b",
+      "task": "llm",
+      "source": "https://huggingface.co/Qwen/Qwen3-32B",
+      "runtimes": [
+        "llama.cpp"
+      ],
+      "tier": "beyond_phone",
+      "status": "not_auto_install",
+      "license": "apache-2.0",
+      "formats": [
+        "gguf-q2"
+      ],
+      "notes": "Record as envelope limit / off-device reference; never force Android OOM to prove impossible."
+    },
+    {
+      "id": "vlm.qwen3_vl.2b",
+      "task": "vlm",
+      "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct",
+      "runtimes": [
+        "llama.cpp-multimodal",
+        "qualcomm-ai-hub"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "model-plus-mmproj"
+      ],
+      "notes": "Screenshot VLM candidate; requires compatible visual projector and safe screenshot capture."
+    },
+    {
+      "id": "vlm.gemma3n.e2b",
+      "task": "vlm,llm",
+      "source": "https://huggingface.co/google/gemma-3n-E2B-it-litert-preview",
+      "runtimes": [
+        "litert"
+      ],
+      "tier": "balanced",
+      "status": "gated_approval",
+      "license": "gemma-terms",
+      "formats": [
+        "litert-task"
+      ],
+      "notes": "Access requires user acceptance of terms; do not bypass; evaluate memory envelope."
+    },
+    {
+      "id": "vlm.gemma3n.e4b",
+      "task": "vlm,llm",
+      "source": "https://huggingface.co/google/gemma-3n-E4B-it-litert-preview",
+      "runtimes": [
+        "litert"
+      ],
+      "tier": "heavy",
+      "status": "gated_approval",
+      "license": "gemma-terms",
+      "formats": [
+        "litert-task"
+      ],
+      "notes": "Access requires user acceptance of terms; do not bypass; image and text tests."
+    },
+    {
+      "id": "vision.accessibility_tree",
+      "task": "vision",
+      "source": "https://developer.android.com/reference/android/accessibilityservice/AccessibilityService",
+      "runtimes": [
+        "android-accessibility"
+      ],
+      "tier": "baseline",
+      "status": "installed_verified",
+      "license": "android-api",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Current native structured UI observation; read-only and redacted."
+    },
+    {
+      "id": "vision.screenshot_a11y",
+      "task": "vision",
+      "source": "https://developer.android.com/reference/android/accessibilityservice/AccessibilityService#takeScreenshot(int,%20java.util.concurrent.Executor,%20android.accessibilityservice.AccessibilityService.TakeScreenshotCallback)",
+      "runtimes": [
+        "android-accessibility"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "android-api",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Explicit user gesture, transient image memory, never persist screenshots by default."
+    },
+    {
+      "id": "vision.ocr_mlkit",
+      "task": "vision",
+      "source": "https://developers.google.com/ml-kit/vision/text-recognition/v2/android",
+      "runtimes": [
+        "google-mlkit"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "google-terms-review",
+      "formats": [
+        "verify-artifact"
+      ],
+      "notes": "Offline only if required recognizer model is packaged and verified, no surprise network fetch."
+    }
+  ]
+}
