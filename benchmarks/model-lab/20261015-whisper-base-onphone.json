@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "m2-s26-whisper-base-multilingual-int8-20261015",
+  "device": {
+    "model": "SM-S948B",
+    "soc": "SM8850",
+    "android_api": 37,
+    "default_assistant": "io.projectir.mobile"
+  },
+  "runtime": {
+    "name": "sherpa-onnx",
+    "version": "1.13.8",
+    "backend": "cpu",
+    "threads": 2,
+    "language": "fa",
+    "task": "transcribe",
+    "aar_sha256": "633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96"
+  },
+  "model": {
+    "id": "asr.whisper.base.int8",
+    "archive_url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2",
+    "archive_sha256": "911b2083efd7c0dca2ac3b358b75222660dc09fb716d64fbfc417ba6c99ff3de",
+    "archive_bytes": 207557382,
+    "extracted_bytes": 160609290,
+    "verified_file_count": 3,
+    "license": "apache-2.0",
+    "install_receipt": "M2_WHISPER_INSTALL_SHA256_VERIFIED_INSTALLED | files=3 bytes=160609290"
+  },
+  "fixture": {
+    "source": "Vosk Persian 0.42 public test/test.wav",
+    "sha256": "4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3",
+    "bytes": 523052,
+    "sample_rate_hz": 48000,
+    "sample_count": 261504,
+    "reference_text": "من عرضه اين کارو ندارم"
+  },
+  "outcome": {
+    "native_load": true,
+    "transcript": "من ارزیه ان کار رونداره",
+    "load_ms": 393,
+    "decode_ms": 402,
+    "total_native_ms": 795,
+    "wall_ms_including_ui_polling": 4165,
+    "microphone_used": false,
+    "android_action_effects": 0,
+    "model_released_after_decode": true
+  },
+  "comparison": {
+    "baseline_vosk042_transcript": "من عرضه این کار رو ندارم",
+    "omnilingual_300m_transcript": "من اورزی اینکاررو نداره",
+    "note": "One public WAV does not rank accuracy. Whisper native runtime time excludes Android UI polling whereas Vosk comparison measures full UI/ADB wall clock."
+  },
+  "safety": {
+    "data_preserving_upgrade": true,
+    "same_apk_signer": true,
+    "native_16kb_alignment_pass": true,
+    "assistant_pipeline_still_vosk042": true,
+    "side_key_manual_test_on_exact_apk": "not_yet_repeated",
+    "cloud_spend": 0
+  }
+}

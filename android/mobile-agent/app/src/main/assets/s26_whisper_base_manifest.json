@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "asr.whisper.base.int8",
+  "directory": "sherpa-whisper-base-int8",
+  "runtime": "sherpa-onnx-v1.13.8-android",
+  "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2",
+  "archive_sha256": "911b2083efd7c0dca2ac3b358b75222660dc09fb716d64fbfc417ba6c99ff3de",
+  "archive_bytes": 207557382,
+  "license": "apache-2.0",
+  "license_source": "https://huggingface.co/csukuangfj/sherpa-onnx-whisper-base/blob/31dc0cc3b59ba4a0b52941f1d6dce9c0e30311b4/README.md",
+  "total_expanded_bytes": 160609290,
+  "files": [
+    {
+      "path": "base-decoder.int8.onnx",
+      "bytes": 130672026,
+      "sha256": "9759d217388a01b3a4c7c15533201067b48ae819c4daafc8624e64b9409dc02d"
+    },
+    {
+      "path": "base-encoder.int8.onnx",
+      "bytes": 29120534,
+      "sha256": "0b8fb1304b6109976038efff5ace81720e00386f3ff6b54ee8c75291ca0a1e11"
+    },
+    {
+      "path": "base-tokens.txt",
+      "bytes": 816730,
+      "sha256": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126"
+    }
+  ]
+}

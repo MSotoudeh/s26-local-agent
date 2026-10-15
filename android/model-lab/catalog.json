@@ -100,6 +100,21 @@
       "notes": "Higher-resource accuracy candidate, load only if benchmark safety gates pass."
     },
     {
+      "id": "asr.whisper.base.int8",
+      "task": "asr",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2",
+      "runtimes": [
+        "sherpa-onnx"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "onnx-int8"
+      ],
+      "notes": "Multilingual Whisper-base Int8 encoder/decoder; Persian transcribe task. Signed model manifest verification and measured benchmark separate from Assistant role."
+    },
+    {
       "id": "asr.whisper.small",
       "task": "asr",
       "source": "https://github.com/ggml-org/whisper.cpp",
