@@ -21,4 +21,8 @@ secrets/
 __pycache__/
 .venv/
 
+# Public upstream ASR runtime downloaded by the pinned M2 bootstrap; not committed
+android/mobile-agent/app/libs/*.aar
+android/mobile-agent/app/libs/*.partial
+
 # Keep benchmark JSON/MD evidence unless explicitly sensitive

@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "m2-ondevice-sherpa-onnx-omni-300m-20261015",
+  "device": {
+    "model": "SM-S948B",
+    "soc": "SM8850",
+    "android_api": 37,
+    "active_default_assistant": "io.projectir.mobile"
+  },
+  "runtime": {
+    "name": "sherpa-onnx-android",
+    "version": "1.13.8",
+    "runtime_aar_sha256": "633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96",
+    "backend": "cpu",
+    "threads": 3,
+    "architecture": "arm64-v8a",
+    "native_16k_page_check": "PASS"
+  },
+  "model": {
+    "id": "asr.omni_ctc_300m.int8",
+    "archive_url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12.tar.bz2",
+    "archive_sha256": "cdcd0559c7c73efed54209a926e321afc914d046c5fdbf3665f00dc78180e5ed",
+    "archive_bytes": 292571207,
+    "extracted_bytes": 365439124,
+    "file_hashes_in_signed_apk": 3,
+    "license": "apache-2.0",
+    "install_receipt": "M2_OMNI_INSTALL_SHA256_VERIFIED_INSTALLED | files=3 bytes=365439124"
+  },
+  "fixture": {
+    "source": "installed Vosk fa-small 0.42 test/test.wav",
+    "sha256": "4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3",
+    "bytes": 523052,
+    "sample_rate_hz": 48000,
+    "sample_count": 261504,
+    "reference": "من عرضه اين کارو ندارم"
+  },
+  "outcome": {
+    "model_loaded": true,
+    "model_released_after_decode": true,
+    "transcript": "من اورزی اینکاررو نداره",
+    "load_ms": 673,
+    "decode_ms": 545,
+    "total_ms": 1218,
+    "wall_ms_including_phone_ui_polling": 4181,
+    "microphone_used": false,
+    "router_actions_executed": 0
+  },
+  "baseline_reference": {
+    "model_id": "asr.vosk.fa-small-042",
+    "transcript": "من عرضه این کار رو ندارم",
+    "wall_ms_including_ui_polling": 4188,
+    "source": "benchmarks/model-lab/20261015-vosk-fa-small-042-vs-05.json"
+  },
+  "interpretation": "Single fixed public utterance; only a functionality and on-device latency sanity check. Not sufficient for Persian model accuracy ranking. Do not compare Omni measured pure decode time directly with Vosk wall clock including UI polling.",
+  "operational_checks": {
+    "android_assistant_role_preserved": true,
+    "project_ir_agent_foreground": true,
+    "mic_permission_preserved": true,
+    "accessibility_rebound_and_connected": true,
+    "third_party_accessibility_settings_unchanged": true,
+    "shizuku_running_unchanged": true,
+    "vosk042_remained_present": true,
+    "existing_qwen_weights_not_modified": true,
+    "side_key_manual_test_on_m2_exact_apk": "not_yet_repeated",
+    "cloud_costs": 0
+  }
+}
