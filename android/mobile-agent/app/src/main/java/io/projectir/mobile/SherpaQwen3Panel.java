@@ -28,7 +28,7 @@ public final class SherpaQwen3Panel {
         TextView result = new TextView(activity);
         result.setText("M2_QWEN3_ASR_NO_BENCHMARK_YET");
         result.setTextIsSelectable(true);
-        AtomicBoolean busy = new AtomicBoolean();
+        AtomicBoolean busy = ModelLabBenchmarkGate.shared();
 
         Button install = new Button(activity);
         install.setId(R.id.m2_qwen3_install);
