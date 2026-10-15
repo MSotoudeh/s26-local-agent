@@ -2,6 +2,7 @@ package io.projectir.mobile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.role.RoleManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -34,6 +35,10 @@ public final class MainActivity extends Activity {
     private EditText localActionId;
     private TextView localStatus;
     private TextView planStatus;
+    private TextView voiceStatus;
+    private TextView llmStatus;
+    private LocalPersianAsr persianAsr;
+    private LocalLlmEngine llmEngine;
 
     private final Shizuku.OnRequestPermissionResultListener permissionListener =
             (requestCode, grantResult) -> {
@@ -56,6 +61,8 @@ public final class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         store = new ConfigStore(this);
         shell = ShellBridge.get(this);
+        persianAsr = new LocalPersianAsr(this);
+        llmEngine = new LocalLlmEngine(this);
 
         boolean imported = false;
         try {
@@ -104,6 +111,8 @@ public final class MainActivity extends Activity {
     @Override
     protected void onPause() {
         handler.removeCallbacks(refresher);
+        // A microphone session may not continue invisibly in the background.
+        if (persianAsr != null) persianAsr.stop();
         LocalTaskRunner.get(this).setListener(null);
         LocalAndroidPlanRuntime.get(this).setListener(null);
         super.onPause();
@@ -112,6 +121,8 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         Shizuku.removeRequestPermissionResultListener(permissionListener);
+        if (persianAsr != null) persianAsr.release();
+        if (llmEngine != null) llmEngine.release();
         super.onDestroy();
     }
 
@@ -201,6 +212,98 @@ public final class MainActivity extends Activity {
         planStatus = new TextView(this);
         planStatus.setText(LocalAndroidPlanRuntime.get(this).status());
         box.addView(planStatus);
+
+        TextView faTitle = label("Persian speech - Vosk on-device only (push to talk)");
+        faTitle.setTextSize(18);
+        box.addView(faTitle);
+        voiceStatus = new TextView(this);
+        voiceStatus.setText("FA_IR_ASR_MODEL=" + (persianAsr.modelInstalled() ? "INSTALLED" : "MISSING")
+                + " (no microphone use until you tap Listen)");
+        box.addView(voiceStatus);
+        Button listenPersian = button("Listen Persian offline (tap to start)");
+        listenPersian.setOnClickListener(v -> {
+            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 4102);
+                voiceStatus.setText("Grant mic permission, then tap Listen again");
+                return;
+            }
+            persianAsr.begin(new LocalPersianAsr.Listener() {
+                @Override public void onStatus(String message) {
+                    voiceStatus.setText(message);
+                }
+                @Override public void onTranscript(String transcript) {
+                    // A transcript is merely a DRAFT, not an action.
+                    localCommand.setText(transcript);
+                    localCommand.setSelection(localCommand.length());
+                    voiceStatus.setText("FA_IR_DRAFT_READY_REVIEW_BEFORE_RUN");
+                }
+            });
+        });
+        box.addView(listenPersian);
+        Button stopPersian = button("Stop Persian microphone");
+        stopPersian.setOnClickListener(v -> {
+            persianAsr.stop();
+            voiceStatus.setText("ASR_STOP_REQUESTED");
+        });
+        box.addView(stopPersian);
+        Button verifyPersian = button("Test offline Persian sample (no microphone)");
+        verifyPersian.setOnClickListener(v -> {
+            boolean started = persianAsr.evaluateBundledSample(new LocalPersianAsr.Listener() {
+                @Override public void onStatus(String message) {
+                    voiceStatus.setText(message);
+                }
+                @Override public void onTranscript(String transcript) {
+                    // This is public bundled test audio. No action is dispatched.
+                    localCommand.setText(transcript);
+                    voiceStatus.setText("ASR_BUNDLED_SAMPLE_TRANSCRIBED");
+                }
+            });
+            if (!started) voiceStatus.setText("ASR_SAMPLE_MODEL_OR_SESSION_UNAVAILABLE");
+        });
+        box.addView(verifyPersian);
+
+        TextView modelTitle = label("Local language model - text responses only");
+        modelTitle.setTextSize(18);
+        box.addView(modelTitle);
+        llmStatus = new TextView(this);
+        llmStatus.setText("QWEN_LOCAL_MODEL=" + (llmEngine.ready() ? "INSTALLED" : "MISSING")
+                + " (never authorized to execute device actions)");
+        box.addView(llmStatus);
+        Button queryLocalLlm = button("Ask Qwen locally - show response, no actions");
+        queryLocalLlm.setOnClickListener(v -> {
+            llmStatus.setText("LOCAL_LLM_LOADING");
+            boolean started = llmEngine.generate(localCommand.getText().toString(),
+                    answer -> llmStatus.setText(answer));
+            if (!started) llmStatus.setText("LOCAL_LLM_NOT_READY_OR_BUSY");
+        });
+        box.addView(queryLocalLlm);
+
+        TextView assistantTitle = label("Android Assistant role (owner opt-in)");
+        assistantTitle.setTextSize(18);
+        box.addView(assistantTitle);
+        TextView assistantStatus = new TextView(this);
+        RoleManager roles = getSystemService(RoleManager.class);
+        assistantStatus.setText(roles == null || !roles.isRoleAvailable(RoleManager.ROLE_ASSISTANT)
+                ? "ASSISTANT_ROLE_UNAVAILABLE"
+                : roles.isRoleHeld(RoleManager.ROLE_ASSISTANT)
+                    ? "ASSISTANT_ROLE_ALREADY_HELD"
+                    : "ASSISTANT_ROLE_NOT_HELD (current default unchanged)");
+        box.addView(assistantStatus);
+        Button requestAssistant = button("Request Android Assistant role (system confirmation)");
+        requestAssistant.setOnClickListener(v -> {
+            RoleManager manager = getSystemService(RoleManager.class);
+            if (manager == null || !manager.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) {
+                assistantStatus.setText("ASSISTANT_ROLE_UNAVAILABLE");
+                return;
+            }
+            if (manager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+                assistantStatus.setText("ASSISTANT_ROLE_ALREADY_HELD");
+                return;
+            }
+            startActivityForResult(manager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT), 4103);
+        });
+        box.addView(requestAssistant);
 
         hub = field("Hub URL");
         device = field("Device ID");
