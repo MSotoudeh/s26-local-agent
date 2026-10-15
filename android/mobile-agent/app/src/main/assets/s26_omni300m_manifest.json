@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "asr.omni_ctc_300m.int8",
+  "directory": "sherpa-omni300m-ctc-int8",
+  "runtime": "sherpa-onnx-v1.13.8-android",
+  "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12.tar.bz2",
+  "archive_sha256": "cdcd0559c7c73efed54209a926e321afc914d046c5fdbf3665f00dc78180e5ed",
+  "archive_bytes": 292571207,
+  "license": "apache-2.0",
+  "total_expanded_bytes": 365439124,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 581,
+      "sha256": "a70a523bafbb595c2844104feb313d204904dac91c3d186c05f22a10a71c7a94"
+    },
+    {
+      "path": "model.int8.onnx",
+      "bytes": 365352120,
+      "sha256": "e7c4e54ee4c4c47829cc6667d5d00ed8ea7bef1dcfeef0fce766f77752a2726c"
+    },
+    {
+      "path": "tokens.txt",
+      "bytes": 86423,
+      "sha256": "a7a044c52cb29cbe8b0dc1953e92cefd4ca16b0ed968177b6beab21f9a7d0b31"
+    }
+  ]
+}

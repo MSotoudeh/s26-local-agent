@@ -42,4 +42,7 @@ dependencies {
     implementation "dev.rikka.shizuku:provider:13.1.5"
     implementation "com.alphacephei:vosk-android:0.3.75"
     implementation "com.google.mediapipe:tasks-genai:0.10.27"
+    // Official sherpa-onnx Android AAR, fetched and SHA256-pinned via scripts/Prepare-S26SherpaRuntime.ps1
+    implementation files("libs/sherpa-onnx-1.13.8.aar")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.2.10"
 }
