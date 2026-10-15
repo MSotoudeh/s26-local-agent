@@ -43,7 +43,10 @@ public final class ModelLabInventory {
             return false;
         }
         public String describe() {
-            return (availableNow ? "[READY] " : "[NOT INSTALLED] ") + id
+            return (availableNow
+                    ? (ModelLabModelStore.CANDIDATE_ID.equals(id)
+                        ? "[FILES PRESENT, VERIFY ON SWITCH] " : "[READY] ")
+                    : "[NOT INSTALLED] ") + id
                     + " [" + tier + "; " + sourceStatus + "]";
         }
     }
@@ -77,7 +80,9 @@ public final class ModelLabInventory {
             for (int j = 0; j < arr.length(); j++) runtimes[j] = arr.getString(j);
             result.add(new Entry(id, task, status, e.getString("license"),
                     e.getString("tier"), runtimes,
-                    "installed_verified".equals(status) && physicallyAvailable(context, id)));
+                    ("installed_verified".equals(status)
+                            || ModelLabModelStore.CANDIDATE_ID.equals(id))
+                            && physicallyAvailable(context, id)));
         }
         return Collections.unmodifiableList(result);
     }
@@ -88,6 +93,9 @@ public final class ModelLabInventory {
         }
         File models = ctx.getExternalFilesDir("models");
         if (models == null) return false;
+        if (ModelLabModelStore.CANDIDATE_ID.equals(id)) {
+            return new ModelLabModelStore(ctx).candidatePresent();
+        }
         if ("asr.vosk.fa-small-042".equals(id)) {
             File path = new File(models, "vosk-model-small-fa-0.42");
             return new File(path, "am/final.mdl").isFile()

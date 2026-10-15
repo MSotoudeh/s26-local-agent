@@ -383,7 +383,7 @@ public final class MainActivity extends Activity {
         status.setTextSize(14);
         status.setPadding(0, dp(18), 0, 0);
         box.addView(status);
-        ModelLabPanel.attach(this, box);
+        ModelLabPanel.attach(this, box, persianAsr);
         return scroll;
     }
 
