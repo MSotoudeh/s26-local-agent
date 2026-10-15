@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "s26-20261015-vosk-fa-small-042-vs-05-one-common-wav",
+  "device": {
+    "model": "SM-S948B",
+    "soc": "SM8850",
+    "android_api": 37
+  },
+  "runtime": {
+    "name": "vosk-android",
+    "version": "0.3.75",
+    "backend": "arm64-cpu",
+    "model_select_via": "Android Model Lab UI"
+  },
+  "common_fixture": {
+    "origin_model": "vosk-model-small-fa-0.42/test/test.wav",
+    "sha256": "4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3",
+    "bytes": 523052,
+    "sample_rate_hz": 48000,
+    "reference_text_original": "من عرضه اين کارو ندارم",
+    "reference_origin": "Vosk package test/test.txt"
+  },
+  "models": [
+    {
+      "model_id": "asr.vosk.fa-small-042",
+      "label": "baseline",
+      "native_load_confirmed": true,
+      "same_wav_processed": true,
+      "transcript": "من عرضه این کار رو ندارم",
+      "wall_clock_ui_ms": 4188
+    },
+    {
+      "model_id": "asr.vosk.fa-small-05",
+      "label": "candidate",
+      "source_url": "https://alphacephei.com/vosk/models/vosk-model-small-fa-0.5.zip",
+      "archive_sha256": "7e5697239c6bcbfd4188659bb92c8603cd3228a8a4370d789aaeb9d2eeac42c9",
+      "expanded_bytes": 138541153,
+      "hash_verified_files": 18,
+      "native_load_confirmed": true,
+      "same_wav_processed": true,
+      "transcript": "من عرضه این کار را ندارم",
+      "wall_clock_ui_ms": 4199
+    }
+  ],
+  "conclusions": {
+    "device_install": "PASS",
+    "switch_a_to_b_to_a": "PASS",
+    "sample_e2e": "PASS",
+    "per_model_latency": "NOT_MEASURED_PURE_DECODE_ONLY",
+    "persian_quality_ranking": "INSUFFICIENT_SAMPLES",
+    "ground_truth_wer": "COMPUTED_BY_SEPARATE_SCRIPT",
+    "warm_cold": "MIXED_WITH_UI_RPC",
+    "owner_live_voice_on_new_build": "NOT_YET_RETESTED"
+  },
+  "safety": {
+    "assistant_role_preserved": true,
+    "mic_permission_preserved": true,
+    "qwen_weights_unmodified": true,
+    "vosk_baseline_weights_unmodified": true,
+    "hub_and_shizuku_untouched": true
+  }
+}

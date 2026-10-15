@@ -19,15 +19,16 @@ import java.util.List;
 public final class ModelLabPanel {
     private ModelLabPanel() {}
 
-    public static void attach(Activity activity, LinearLayout parent) {
+    public static void attach(Activity activity, LinearLayout parent, LocalPersianAsr asr) {
         TextView title = new TextView(activity);
-        title.setText("Model Lab (catalog + verified baseline; alternative runtimes pending)");
+        title.setText("Model Lab: staged verified Vosk install + real ASR switching");
         title.setTextSize(18);
         parent.addView(title);
         TextView status = new TextView(activity);
         status.setText("MODEL_LAB_CATALOG_LOADING");
         parent.addView(status);
         Spinner tasks = new Spinner(activity);
+        tasks.setId(R.id.model_lab_task_spinner);
         String[] kinds = {"ASR", "LLM", "TTS", "VAD", "VLM", "Vision"};
         ArrayAdapter<String> taskAdapter = new ArrayAdapter<>(activity,
                 android.R.layout.simple_spinner_item, kinds);
@@ -36,6 +37,7 @@ public final class ModelLabPanel {
         parent.addView(tasks, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         Spinner models = new Spinner(activity);
+        models.setId(R.id.model_lab_model_spinner);
         parent.addView(models, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         final List<ModelLabInventory.Entry> catalog;
@@ -55,7 +57,13 @@ public final class ModelLabPanel {
             for (ModelLabInventory.Entry entry : catalog) {
                 if (entry.matches(filter)) {
                     selection.add(entry);
+                    if (ModelLabModelStore.CANDIDATE_ID.equals(entry.id)
+                        && new ModelLabModelStore(activity).candidatePresent()) {
+                    descriptions.add("[FILES PRESENT, VERIFY ON SWITCH] " + entry.id
+                            + " [balanced; SHA256 manifest]");
+                } else {
                     descriptions.add(entry.describe());
+                }
                 }
             }
             ArrayAdapter<String> modelAdapter = new ArrayAdapter<>(activity,
@@ -90,5 +98,67 @@ public final class ModelLabPanel {
                     + " | switch=NOT_YET_ENABLED_UNTIL_ADAPTER_GATE");
         });
         parent.addView(inspect);
+
+        ModelLabModelStore store = new ModelLabModelStore(activity);
+        Button install = new Button(activity);
+        install.setId(R.id.model_lab_install_staged_vosk);
+        install.setText("Verify and install staged Vosk Persian 0.5");
+        install.setOnClickListener(v -> {
+            if (asr.isActive()) {
+                status.setText("MODEL_LAB_INSTALL_DENIED_ASR_BUSY");
+                return;
+            }
+            install.setEnabled(false);
+            status.setText("MODEL_LAB_INSTALL_VERIFYING_SHA256_BACKGROUND");
+            new Thread(() -> {
+                ModelLabModelStore.Receipt receipt = store.installStagedCandidate();
+                activity.runOnUiThread(() -> {
+                    install.setEnabled(true);
+                    if (receipt.ok) populate.run();
+                    status.setText("MODEL_LAB_INSTALL_" + receipt.state
+                            + " | files=" + receipt.files + " | bytes=" + receipt.bytes);
+                });
+            }, "model-lab-stage-verify").start();
+        });
+        parent.addView(install);
+
+        TextView active = new TextView(activity);
+        active.setText("ASR_SELECTED_MODEL=" + asr.selectedModelId());
+        Button activate = new Button(activity);
+        activate.setId(R.id.model_lab_activate_vosk);
+        activate.setText("Activate selected Vosk ASR model (verified only)");
+        activate.setOnClickListener(v -> {
+            int pos = models.getSelectedItemPosition();
+            if (!"ASR".equals(kinds[tasks.getSelectedItemPosition()])
+                    || pos < 0 || pos >= selection.size()) {
+                status.setText("MODEL_LAB_SWITCH_SELECT_ASR_FIRST");
+                return;
+            }
+            String selected = selection.get(pos).id;
+            if (!ModelLabModelStore.BASELINE_ID.equals(selected)
+                    && !ModelLabModelStore.CANDIDATE_ID.equals(selected)) {
+                status.setText("MODEL_LAB_SWITCH_NO_AVAILABLE_ADAPTER");
+                return;
+            }
+            activate.setEnabled(false);
+            boolean accepted = asr.switchModel(selected, new LocalPersianAsr.Listener() {
+                @Override public void onStatus(String message) {
+                    status.setText("MODEL_LAB_" + message);
+                    active.setText("ASR_SELECTED_MODEL=" + asr.selectedModelId());
+                    if (message.startsWith("ASR_SWITCH_OK_")
+                            || message.startsWith("ASR_SWITCH_ROLLED_BACK_")
+                            || message.startsWith("ASR_SWITCH_ROLLBACK_FAILED_")
+                            || message.startsWith("ASR_SWITCH_ALREADY_ACTIVE_")
+                            || message.startsWith("ASR_SWITCH_BUSY")
+                            || message.startsWith("ASR_SWITCH_UNSUPPORTED_")) {
+                        activate.setEnabled(true);
+                    }
+                }
+                @Override public void onTranscript(String text) { /* no mic during switch */ }
+            });
+            if (!accepted) activate.setEnabled(true);
+        });
+        parent.addView(activate);
+        parent.addView(active);
     }
 }
