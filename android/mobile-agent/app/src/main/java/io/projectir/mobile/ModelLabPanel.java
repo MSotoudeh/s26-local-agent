@@ -164,5 +164,6 @@ public final class ModelLabPanel {
         SherpaOmniPanel.attach(activity, parent, asr);
         // Second sherpa backend target: pinned multilingual Whisper-base Int8.
         SherpaWhisperPanel.attach(activity, parent, asr);
+        SherpaQwen3Panel.attach(activity, parent, asr);
     }
 }
