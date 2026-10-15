@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "s26-m2-qwen3-asr-0-6b-int8-onphone-20261015",
+  "device": {
+    "model": "SM-S948B",
+    "soc": "SM8850",
+    "android_api": 37,
+    "active_assistant": "io.projectir.mobile",
+    "production_asr": "asr.vosk.fa-small-042"
+  },
+  "model": {
+    "id": "asr.qwen3.0_6b.int8",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25.tar.bz2",
+    "sha256": "393f8a14e2f5fb96746aaab342997a40641001fbd5bf9592a080a8329178ee96",
+    "archive_bytes": 878702423,
+    "installed_files": 6,
+    "installed_bytes": 987015347,
+    "license": "apache-2.0",
+    "on_phone_install_receipt": "M2_QWEN3_ASR_INSTALL_SHA256_VERIFIED_INSTALLED | files=6 bytes=987015347"
+  },
+  "runtime": {
+    "name": "sherpa-onnx",
+    "version": "1.13.8",
+    "backend": "cpu",
+    "num_threads": 2,
+    "architecture": "arm64-v8a",
+    "aar_sha256": "633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96",
+    "native_16k_elf_pass": true
+  },
+  "fixture": {
+    "source": "Vosk Persian fa-small 0.42 bundled test/test.wav",
+    "sha256": "4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3",
+    "sample_rate_hz": 48000,
+    "sample_count": 261504,
+    "reference_transcript": "من عرضه اين کارو ندارم"
+  },
+  "result": {
+    "on_phone_native_inference_succeeded": true,
+    "transcript": "Man Ordeia encarrou Nadara.",
+    "model_load_ms": 2680,
+    "decode_ms": 644,
+    "total_native_ms": 3324,
+    "ui_rpc_wall_ms": 6196,
+    "android_actions_executed_from_transcript": 0,
+    "microphone_used": false
+  },
+  "context": {
+    "baseline_vosk042_transcript": "من عرضه این کار رو ندارم",
+    "omni300m_transcript": "من اورزی اینکاررو نداره",
+    "whisper_base_int8_transcript": "من ارزیه ان کار رونداره",
+    "accuracy_note": "One identical public Persian WAV; Qwen3-ASR produced Latin transliteration-like text rather than accurate Persian. Cannot rank model quality or make WER claims for real-world speech from a single fixture. Pure native timings and UI wall timings are not interchangeable.",
+    "qwen3_production_asr_selected": false
+  },
+  "safety": {
+    "same_apk_signer": true,
+    "release_nondebuggable": true,
+    "apk_sha256": "d023f3598a088954f5bfd7656e59e8cb82dc033c46037a9673f285858b105f0f",
+    "rollback_apk_sha256": "ab06d78e9b211f1bb3f10aee0ff5778637a2c9a6fd725bfafe5a301dd6e82d1e",
+    "data_preserving_upgrade": true,
+    "assistant_role_preserved": true,
+    "agent_foreground": true,
+    "microphone_granted": true,
+    "project_ir_accessibility_connected": true,
+    "bitwarden_accessibility_preserved": true,
+    "kdeconnect_accessibility_preserved": true,
+    "vosk042_active": true,
+    "whisper_and_omni_weights_preserved": true,
+    "shizuku_restarted": false,
+    "owner_manual_sidekey_test_after_qwen3_apk": "not_performed",
+    "cloud_costs": 0
+  }
+}

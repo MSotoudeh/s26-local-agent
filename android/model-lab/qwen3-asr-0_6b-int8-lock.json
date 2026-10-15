@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "asr.qwen3.0_6b.int8",
+  "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25.tar.bz2",
+  "bytes": 878702423,
+  "sha256": "393f8a14e2f5fb96746aaab342997a40641001fbd5bf9592a080a8329178ee96",
+  "conversion_source": "k2-fsa/sherpa-onnx asr-models release",
+  "original_model": "https://huggingface.co/Qwen/Qwen3-ASR-0.6B",
+  "original_license": "apache-2.0",
+  "runtime": "sherpa-onnx-android-1.13.8",
+  "status": "archive_hash_recorded_no_phone_install_yet"
+}
