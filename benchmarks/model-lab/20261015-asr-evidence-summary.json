@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_kind": "real_android_receipts_offline_host_scoring",
+  "receipt_sha256": [
+    "4a874fcdc4d2562ceb65e4fbc5fe6d0eda67590df698254ca9a059748bcd2560"
+  ],
+  "model_count": 3,
+  "total_unique_wav_hashes": 1,
+  "balanced_identical_fixture_coverage": true,
+  "required_unique_fixtures_per_model": 100,
+  "required_trials_for_latency_distribution": 20,
+  "sufficient_corpus_coverage_for_quality_comparison": false,
+  "production_model_auto_promotion": "PROHIBITED_REQUIRES_MANUAL_REVIEW",
+  "models": {
+    "asr.omni_ctc_300m.int8": {
+      "native_trials": 1,
+      "unique_audio_fixtures": 1,
+      "wer": 0.8,
+      "cer": 0.333333,
+      "script_mismatch_unique_fixtures": 0,
+      "latency_median_native_ms": null,
+      "latency_p95_native_ms": null,
+      "latency_distribution": "INSUFFICIENT_TRIALS"
+    },
+    "asr.qwen3.0_6b.int8": {
+      "native_trials": 1,
+      "unique_audio_fixtures": 1,
+      "wer": 1.0,
+      "cer": 1.277778,
+      "script_mismatch_unique_fixtures": 1,
+      "latency_median_native_ms": null,
+      "latency_p95_native_ms": null,
+      "latency_distribution": "INSUFFICIENT_TRIALS"
+    },
+    "asr.whisper.base.int8": {
+      "native_trials": 1,
+      "unique_audio_fixtures": 1,
+      "wer": 0.8,
+      "cer": 0.333333,
+      "script_mismatch_unique_fixtures": 0,
+      "latency_median_native_ms": null,
+      "latency_p95_native_ms": null,
+      "latency_distribution": "INSUFFICIENT_TRIALS"
+    }
+  },
+  "limitations": [
+    "Repeated WAV hashes never count as additional accuracy samples.",
+    "Single-utterance WER/CER are diagnostic only, not population estimates.",
+    "Even 100 unique WAVs do not prove diverse speakers or conditions.",
+    "Native timings exclude Android UI, audio capture and Assistant latency.",
+    "Cold/warm stratification and peak PSS are absent from this receipt schema."
+  ]
+}
