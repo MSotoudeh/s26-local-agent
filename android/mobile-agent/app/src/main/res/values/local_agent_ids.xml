@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="local_command_input"/>
+    <item type="id" name="local_command_run"/>
+    <item type="id" name="local_command_cancel"/>
+    <item type="id" name="local_action_id_input"/>
+    <item type="id" name="local_plan_preview"/>
+</resources>

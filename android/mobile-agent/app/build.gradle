@@ -1,0 +1,45 @@
+plugins {
+    id "com.android.application"
+}
+android {
+    namespace "io.projectir.mobile"
+    compileSdk 37
+    defaultConfig {
+        applicationId "io.projectir.mobile"
+        minSdk 30
+        targetSdk 37
+        versionCode 1
+        versionName "0.1.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes {
+        release {
+            // Non-debuggable owner-only build. Reuse the current installed
+            // signing identity to preserve package data during the migration.
+            // Replace this development keystore with a guarded production
+            // key before distributing outside the owner's test device.
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+    }
+    packaging {
+        resources {
+            excludes += ["META-INF/AL2.0", "META-INF/LGPL2.1"]
+        }
+        // Bundled JNI is extracted from a compressed APK; avoid ZIP
+        // offset alignment dependence, while requiring 16KB-safe ELF.
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+dependencies {
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "dev.rikka.shizuku:api:13.1.5"
+    implementation "dev.rikka.shizuku:provider:13.1.5"
+    implementation "com.alphacephei:vosk-android:0.3.75"
+    implementation "com.google.mediapipe:tasks-genai:0.10.27"
+}
