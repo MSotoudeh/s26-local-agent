@@ -26,4 +26,17 @@ Canonical repository: `MSotoudeh/s26-local-agent`. This checkpoint is **M1 scaff
 
 ## Existing active device configuration
 
-The app installed **before** M1 remains the working non-debuggable `io.projectir.mobile` Voice Assistant with Vosk Persian and Qwen 0.5B baseline. The new M1 branch is source+build only until a distinct deployment receipt exists. All source changes are in the canonical `s26-local-agent` repository.
+The on-phone baseline was updated via signed data-preserving install after passing the M1 release preflight. The rollback APK is retained on Ops; this implementation contains read-only catalog selection, not runtime switching between alternative models.
+## Live phone rollout receipt (additional verification)
+
+- Device: authorized Samsung S26 Ultra, Android API 37. No reboot or phone-data reset.
+- M1 APK SHA-256: fd25a3c5f8bf9095e885bb7ea90effe5f3cd315fc438fe30220829f57a718ae5.
+- Pre-upgrade APK backed up on Ops at C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-canonical-m1.apk; SHA-256 b277a5314707709988746fb6272e278745ef5f96492e17f7432f22b52b5e27d7.
+- Certificate matches the pre-upgrade installed APK; non-debuggable and 16-KiB-aligned zipalign checks PASS.
+- Data-preserving adb install -r returned Success; Agent process, ForegroundService, Android Assistant role and microphone grant preserved.
+- Accessibility provider connected; foreground MainActivity displays Model Lab 31-entry catalog and selection, voice-ready banner, Vosk installed and Qwen installed.
+- Native ACTION_ASSIST launch with SKIP_ASSIST_MIC=true: PASS, compatibility dialog absent; no microphone automatically activated by the test.
+- Live on-device bundled public Persian WAV recognition returned ASR_BUNDLED_SAMPLE_OK_OFFLINE.
+- Live on-device Qwen2.5-0.5B returned a nonempty 20-character inference response, model process remained running.
+- Physical Side/Power-key invocation after this precise upgrade has NOT been retested by owner; previous pre-M1 live voice test passed.
+- Alternative ASR/LLM/TTS/VLM models remain NOT installed and production activation UI is intentionally disabled until adapter integrity tests.
