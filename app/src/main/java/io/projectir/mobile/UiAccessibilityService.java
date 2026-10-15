@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class UiAccessibilityService extends AccessibilityService {
@@ -175,9 +176,12 @@ public final class UiAccessibilityService extends AccessibilityService {
     }
 
     /**
-     * Fail-closed canonical plan click. Only the exact BFS node ID may be used.
-     * No implicit click on an ancestor; rejects duplicate labels and
-     * incomplete trees. Caller also validates a full UI state digest first.
+     * Fail-closed canonical-plan click. A uniquely labelled leaf may delegate
+     * ACTION_CLICK to a bounded same-package ancestor. The exact actionable
+     * BFS ID must still equal the engine's pre-dispatch selection.
+     *
+     * The tree is freshly traversed and selector policy re-run immediately
+     * before the effect. No coordinate click, guessed parent, or long ascent.
      */
     public boolean clickVerifiedNodeInPackage(String expectedPackage, String label,
                                               int expectedNodeId) {
@@ -185,32 +189,37 @@ public final class UiAccessibilityService extends AccessibilityService {
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null || root.getPackageName() == null
                 || !expectedPackage.contentEquals(root.getPackageName())) return false;
-        ArrayDeque<AccessibilityNodeInfo> queue = new ArrayDeque<>();
-        queue.add(root);
-        AccessibilityNodeInfo selected = null;
-        int visited = 0;
-        int matches = 0;
-        String normalized = LocalSkillRegistry.normalize(label);
-        while (!queue.isEmpty() && visited < DEFAULT_MAX_NODES) {
-            AccessibilityNodeInfo node = queue.removeFirst();
-            int id = visited++;
-            CharSequence packageName = node.getPackageName();
+        ArrayDeque<NodeRecord> queue = new ArrayDeque<>();
+        queue.add(new NodeRecord(root, -1));
+        ArrayList<AccessibilityNodeInfo> actual = new ArrayList<>();
+        ArrayList<LocalSemanticSelector.Node> logical = new ArrayList<>();
+
+        while (!queue.isEmpty() && actual.size() < DEFAULT_MAX_NODES) {
+            NodeRecord entry = queue.removeFirst();
+            AccessibilityNodeInfo node = entry.node;
+            int id = actual.size();
+            actual.add(node);
+            CharSequence pkg = node.getPackageName();
             CharSequence text = node.getText();
-            if (packageName != null && expectedPackage.contentEquals(packageName)
-                    && text != null
-                    && normalized.equals(LocalSkillRegistry.normalize(text.toString()))) {
-                matches++;
-                if (id == expectedNodeId) selected = node;
-                if (matches > 1) return false;
-            }
+            logical.add(new LocalSemanticSelector.Node(id, entry.parentId,
+                    pkg == null ? "" : pkg.toString(),
+                    text == null ? "" : text.toString(),
+                    node.isEnabled(), node.isClickable()));
             for (int i = 0; i < node.getChildCount(); i++) {
                 AccessibilityNodeInfo child = node.getChild(i);
-                if (child != null) queue.addLast(child);
+                if (child != null) queue.addLast(new NodeRecord(child, id));
             }
         }
-        if (!queue.isEmpty() || matches != 1 || selected == null
-                || !selected.isEnabled() || !selected.isClickable()) return false;
-        return selected.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        if (!queue.isEmpty()) return false; // fail closed on truncated tree
+        LocalSemanticSelector.Decision decision = LocalSemanticSelector.decide(
+                "live-state", "live-state", expectedPackage, expectedPackage,
+                label, logical, false);
+        if (!decision.accepted || decision.nodeId != expectedNodeId
+                || expectedNodeId >= actual.size()) return false;
+        AccessibilityNodeInfo target = actual.get(expectedNodeId);
+        if (!expectedPackage.equals(activePackageName())
+                || !target.isEnabled() || !target.isClickable()) return false;
+        return target.performAction(AccessibilityNodeInfo.ACTION_CLICK);
     }
 
     public boolean clickExactText(String text) {

@@ -130,10 +130,22 @@ public final class LocalAndroidPlanRuntime {
     }
 
     private final class AccessibilityBackend implements LocalPlanCoordinator.Backend {
+        private final LocalObservationGate observationGate = new LocalObservationGate();
+
         @Override
         public LocalPlanMachine.Observation observe() throws Exception {
             Snapshot state = readSnapshot();
-            return state == null ? null : state.observation;
+            // Selection and package arrival require a quiet, repeated UI tree.
+            // Final VERIFY_TEXTS is read-only and may verify the complete
+            // destination tree immediately after a real action. Holding it
+            // behind a global Accessibility quiet timer caused false timeouts
+            // while Samsung rendered the already-correct destination.
+            if (coordinator != null
+                    && coordinator.currentStepKind() == LocalSkillPlan.StepKind.VERIFY_TEXTS) {
+                return state == null ? null : state.observation;
+            }
+            return observationGate.accept(state == null ? null : state.observation,
+                    state == null ? 0L : state.ageMs);
         }
 
         @Override
@@ -199,8 +211,8 @@ public final class LocalAndroidPlanRuntime {
                 boolean clickable = node.optBoolean("clickable", false);
                 boolean enabled = node.optBoolean("enabled", false);
                 if (!nodeText.isEmpty()) labels.add(nodeText);
-                nodes.add(new LocalSemanticSelector.Node(id, nodePkg, nodeText,
-                        enabled, clickable));
+                nodes.add(new LocalSemanticSelector.Node(id, node.optInt("parent", -1),
+                        nodePkg, nodeText, enabled, clickable));
                 // Fixed-order structured digest, independent of JSON map order.
                 for (String key : new String[]{"id", "parent", "text",
                         "contentDescription", "resourceId", "className",

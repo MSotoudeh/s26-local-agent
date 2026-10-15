@@ -38,6 +38,7 @@ public final class LocalPlanCoordinator {
 
     public LocalPlanMachine.State state() { return machine.state(); }
     public String reason() { return stopped ? stopReason : machine.reason(); }
+    public LocalSkillPlan.StepKind currentStepKind() { return machine.currentStepKind(); }
     public boolean stopped() { return stopped; }
 
     public void tick(long nowMs) {

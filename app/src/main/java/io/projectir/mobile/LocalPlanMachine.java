@@ -94,6 +94,10 @@ public final class LocalPlanMachine {
     public State state() { return state; }
     public String reason() { return terminalReason; }
     public int stepIndex() { return stepIndex; }
+    public LocalSkillPlan.StepKind currentStepKind() {
+        return stepIndex >= 0 && stepIndex < plan.steps.size()
+                ? plan.steps.get(stepIndex).kind : null;
+    }
 
     /** Safe to repeat: while waiting for ACK, it never emits another effect. */
     public Event advance(Observation observed, long nowMs) {

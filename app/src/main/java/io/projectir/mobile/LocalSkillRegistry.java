@@ -111,7 +111,7 @@ public final class LocalSkillRegistry {
                         new LocalSkillPlan.Step(LocalSkillPlan.StepKind.CLICK_UNIQUE_TEXT,
                                 SETTINGS, "Connections", 2000),
                         new LocalSkillPlan.Step(LocalSkillPlan.StepKind.VERIFY_TEXTS,
-                                SETTINGS, "", 4000, "Connections", "Wi-Fi", "Bluetooth"),
+                                SETTINGS, "", 5000, "Connections", "Wi-Fi", "Bluetooth"),
                         new LocalSkillPlan.Step(LocalSkillPlan.StepKind.REPORT,
                                 SETTINGS, "", 1000)
                 ));
