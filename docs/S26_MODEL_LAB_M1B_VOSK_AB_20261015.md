@@ -1,7 +1,8 @@
 # S26 Model Lab M1b — first verified real model A/B
 
-Status: **IMPLEMENTATION IN PROGRESS** — do not mark final until live phone
-receipts and merged commit are included.
+Status: **DEVICE INSTALL + A/B SWITCH + ONE SHARED WAV VERIFIED**;
+release published only after GitHub PR review/merge. Full model catalog remains
+future work.
 
 Canonical project: https://github.com/MSotoudeh/s26-local-agent
 Baseline after PR #2: `d9ca088b228ef45056e7cbaa39ac2cd55ed77832`.
@@ -59,6 +60,62 @@ runtime to isolate the effect of model choice:
 - Android Assistant holder, microphone permission, ForegroundService,
   Accessibility, Vosk and Qwen baseline and Shizuku remain healthy.
 - Commit and Push to `s26-local-agent`; only merge after tests pass.
+
+## Live S26 proof (executed)
+
+- Official public ZIP: **62,153,530 bytes**,
+  SHA256 `7e5697239c6bcbfd4188659bb92c8603cd3228a8a4370d789aaeb9d2eeac42c9`.
+  Safe extraction verified all **18 model files**, total 138,541,153 bytes.
+- `android/mobile-agent/app/src/main/assets/vosk_fa_small_05_manifest.json`
+  pins every file's path, byte length, SHA256; weights are **not** committed.
+- USB ADB pushed the new 18 files **only into app-scoped staging**.
+  The live Android `ModelLabModelStore` UI returned:
+  `MODEL_LAB_INSTALL_INSTALLED_SHA256_VERIFIED | files=18 | bytes=138541153`.
+  Original Vosk 0.42 weights remained untouched; staging was atomically renamed.
+- New Vosk 0.5 model on the S26: `ASR_SWITCH_OK_asr.vosk.fa-small-05`
+  after the pinned hash checks, native Model and Recognizer load.
+  Same-device return to old model:
+  `ASR_SWITCH_OK_asr.vosk.fa-small-042`, persisted as default.
+- **Same on-device Vosk Persian WAV**: SHA256
+  `4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3`,
+  523,052 bytes, 48 kHz. Reference from Vosk `test/test.txt`:
+  «من عرضه اين کارو ندارم». Both runs passed:
+  - model 0.42 → «من عرضه این کار رو ندارم»;
+    literal normalized WER **0.4**, CER **0.0556**, wall 4,188 ms.
+  - model 0.5 → «من عرضه این کار را ندارم»;
+    literal normalized WER **0.4**, CER **0.1111**, wall 4,199 ms.
+  - WER here treats «کارو» as one token, while both model outputs
+    tokenize the phrase as two tokens; colloquial equivalence is
+    not assumed. **One file cannot rank overall Persian accuracy**.
+    Timings include 2-second host polling intervals, Android UI
+    interaction and ADB overhead; not a pure inference benchmark.
+  - Machine-readable result and score function:
+    `benchmarks/model-lab/20261015-vosk-fa-small-042-vs-05.json`,
+    `scripts/Evaluate-S26VoskAB.py`.
+- Android Release `assembleRelease lintRelease`: PASS with JDK25.
+  Host 9 standalone Java suites PASS (24,000 model-switch assertions),
+  destination Python tests 11 + 3 subtests PASS; model catalog validator
+  32 candidates and six negative safety cases PASS.
+- Final installed APK after UI refresh: SHA256
+  `9c5e417f4912dda3143abc956a9e224bf26d670a2f9e05a2c04ca827d6b0f92d`.
+  Release keeps original signing certificate, non-debuggable APK and
+  16 KiB alignment. Upgrade via `adb install -r` preserved Agent process,
+  ForegroundService, Android Assistant role, mic permission and Accessibility.
+  After final install, catalog 32 entries, Vosk/Qwen baseline files and
+  `ASR_SELECTED_MODEL=asr.vosk.fa-small-042` confirmed. Vosk 0.5 is
+  visibly `[FILES PRESENT, VERIFY ON SWITCH]`.
+- Rollback APKs on Ops:
+  `C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-modelstore-vosk-ab.apk`
+  (SHA256 `fd25a3c5...`) and
+  `C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-vosk-ui-refresh.apk`
+  (SHA256 `dde69b2...`). Neither backup nor model weights is in Git.
+- The manifest Catalog status `planned` is repository-portable; actual
+  physical model presence/verification is device-specific and shown
+  dynamically by Model Lab. Do not interpret catalog `planned` as
+  the absence of a successful on-phone install.
+- **Owner's physical Side/Power-key spoken-command check is still pending
+  after this latest APK**, although previous releases passed and automated
+  role/mic/Accessibility checks all pass. No reboot or Shizuku restart.
 
 ## Remaining after M1b
 
