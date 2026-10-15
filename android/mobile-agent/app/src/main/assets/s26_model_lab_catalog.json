@@ -40,6 +40,21 @@
       "notes": "Current functional on-device, offline, fast; 96.6 MiB extracted."
     },
     {
+      "id": "asr.vosk.fa-small-05",
+      "task": "asr",
+      "source": "https://alphacephei.com/vosk/models/vosk-model-small-fa-0.5.zip",
+      "runtimes": [
+        "vosk-android"
+      ],
+      "tier": "balanced",
+      "status": "planned",
+      "license": "apache-2.0",
+      "formats": [
+        "kaldi-vosk"
+      ],
+      "notes": "First comparison candidate: official archive 62153530 bytes, sha256 pinned in signed APK; reported WER on CV17 31.2 vs 0.42 small 23.4, so this is not assumed higher-quality."
+    },
+    {
       "id": "asr.qwen3.0_6b.int8",
       "task": "asr",
       "source": "https://k2-fsa.github.io/sherpa/onnx/qwen3-asr/pretrained.html",

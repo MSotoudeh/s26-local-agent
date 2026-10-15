@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "asr.vosk.fa-small-05",
+  "directory": "vosk-model-small-fa-0.5",
+  "archive_sha256": "7e5697239c6bcbfd4188659bb92c8603cd3228a8a4370d789aaeb9d2eeac42c9",
+  "archive_bytes": 62153530,
+  "source": "https://alphacephei.com/vosk/models/vosk-model-small-fa-0.5.zip",
+  "license": "apache-2.0",
+  "total_expanded_bytes": 138541153,
+  "files": [
+    {
+      "path": "README",
+      "bytes": 24,
+      "sha256": "1f51538baada60b1c7251606e9a585763feb492a60b0b6451452a2e2bb437a7e"
+    },
+    {
+      "path": "am/final.mdl",
+      "bytes": 19548365,
+      "sha256": "e48cb415bba25750f7f639a1d23ad4f003f19655ac2433c2dfb4ac49d08f49cb"
+    },
+    {
+      "path": "am/tree",
+      "bytes": 218780,
+      "sha256": "dfce7d9393dd4ba57e214b0299037c072a94f9a7e2ccf3755aa33596fe74b6f5"
+    },
+    {
+      "path": "conf/mfcc.conf",
+      "bytes": 82,
+      "sha256": "42b1450e80757f2702bd640ff6c0aa4b3809610754f883bac6fd26eea2699107"
+    },
+    {
+      "path": "conf/model.conf",
+      "bytes": 289,
+      "sha256": "dd7178da0e99fdbe489816c1e9702c3daa28e02accacc2993e0becb7af33b80c"
+    },
+    {
+      "path": "graph/Gr.fst",
+      "bytes": 51218235,
+      "sha256": "b61c3a3f7cb57e30618617cd63587d4e53dbdb6cbf875ac6ca0f5c1bb53acad3"
+    },
+    {
+      "path": "graph/HCLr.fst",
+      "bytes": 58550234,
+      "sha256": "504456cf096d0abe648b9d71c0b2204116344cf99fa339fe6c56adcf6ea04133"
+    },
+    {
+      "path": "graph/disambig_tid.int",
+      "bytes": 130,
+      "sha256": "658f07b8ed86770ee7adee9ec5bf0a833a44226f3f7e5dac2ac092337f0faf76"
+    },
+    {
+      "path": "graph/phones/word_boundary.int",
+      "bytes": 1311,
+      "sha256": "876fef2ab58a0aedc814fb7032fd6a1d3ec3b58825dfcba0657f542d2423b5e2"
+    },
+    {
+      "path": "ivector/final.dubm",
+      "bytes": 168048,
+      "sha256": "91af0259da9f315a8e66f85bed3fbd18dba023a4d81bc8f292ddd2a80bf1aaf7"
+    },
+    {
+      "path": "ivector/final.ie",
+      "bytes": 8288887,
+      "sha256": "7cdfc31868abd6ab081c0e25e35f2760f448819a54dc8431b9d74818f6cf3129"
+    },
+    {
+      "path": "ivector/final.mat",
+      "bytes": 22575,
+      "sha256": "e16af4b0da99842b9cf087f06ed660ad5e5c3e5503660050b64a831381c3a25f"
+    },
+    {
+      "path": "ivector/global_cmvn.stats",
+      "bytes": 556,
+      "sha256": "867644ea29e2a6686f928dc463c232bc585db7858345263f4ab63f05875582ee"
+    },
+    {
+      "path": "ivector/online_cmvn.conf",
+      "bytes": 95,
+      "sha256": "a2f3571754b64297cb7efb2e7ca3df61995c5a45fcbb97188f90613552bb2dfe"
+    },
+    {
+      "path": "ivector/splice.conf",
+      "bytes": 35,
+      "sha256": "9f0c5f7c82d18eaf25d8bce470efa9f7741f88411fe428774bc0a9bb69a24756"
+    },
+    {
+      "path": "test/test.txt",
+      "bytes": 41,
+      "sha256": "699ff8d73748f63eea0f173e62d01b1b3db1211f59d8fe4a6f4a69f393115e0d"
+    },
+    {
+      "path": "test/test.wav",
+      "bytes": 523052,
+      "sha256": "4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3"
+    },
+    {
+      "path": "test/test_simple.py",
+      "bytes": 414,
+      "sha256": "6c57831b18e189d34e87c68304a55054af78a0f203cddc849e0a232b3d6f11da"
+    }
+  ]
+}
