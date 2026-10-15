@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "session_type": "all_three",
+  "timestamp_unix_ms": 1792082471853,
+  "reference_wav_sha256": "4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3",
+  "reference_transcript": "من عرضه اين کارو ندارم",
+  "active_assistant_asr_at_start": "asr.vosk.fa-small-042",
+  "runtime": "sherpa-onnx-android-v1.13.8",
+  "backend": "cpu",
+  "intent_effects": 0,
+  "trials": [
+    {
+      "model_id": "asr.omni_ctc_300m.int8",
+      "threads": 2,
+      "resource_before": {
+        "available_ram_bytes": 5210099712,
+        "android_low_memory": false,
+        "thermal_status": 0,
+        "battery_percent": 79
+      },
+      "transcript": "من اورزی اینکاررو نداره",
+      "load_ms": 673,
+      "decode_ms": 445,
+      "total_native_ms": 1118,
+      "resource_after": {
+        "available_ram_bytes": 5197975552,
+        "android_low_memory": false,
+        "thermal_status": 0,
+        "battery_percent": 79
+      },
+      "status": "PASSED_NATIVE_INFERENCE"
+    },
+    {
+      "model_id": "asr.whisper.base.int8",
+      "threads": 2,
+      "resource_before": {
+        "available_ram_bytes": 5209202688,
+        "android_low_memory": false,
+        "thermal_status": 0,
+        "battery_percent": 79
+      },
+      "transcript": "من ارزیه ان کار رونداره",
+      "load_ms": 382,
+      "decode_ms": 392,
+      "total_native_ms": 774,
+      "resource_after": {
+        "available_ram_bytes": 5072117760,
+        "android_low_memory": false,
+        "thermal_status": 0,
+        "battery_percent": 79
+      },
+      "status": "PASSED_NATIVE_INFERENCE"
+    },
+    {
+      "model_id": "asr.qwen3.0_6b.int8",
+      "threads": 2,
+      "resource_before": {
+        "available_ram_bytes": 5069213696,
+        "android_low_memory": false,
+        "thermal_status": 0,
+        "battery_percent": 79
+      },
+      "transcript": "Man Ordeia encarrou Nadara.",
+      "load_ms": 2524,
+      "decode_ms": 642,
+      "total_native_ms": 3166,
+      "resource_after": {
+        "available_ram_bytes": 6201901056,
+        "android_low_memory": false,
+        "thermal_status": 0,
+        "battery_percent": 79
+      },
+      "status": "PASSED_NATIVE_INFERENCE"
+    }
+  ],
+  "active_assistant_asr_at_end": "asr.vosk.fa-small-042"
+}
