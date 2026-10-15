@@ -33,14 +33,23 @@ public final class LocalPersianAsr {
     private boolean loading;
     private boolean listening;
     private int generation;
+    private final ModelLabModelStore modelStore;
+    private String selectedId;
 
     public LocalPersianAsr(Context context) {
         this.context = context.getApplicationContext();
+        this.modelStore = new ModelLabModelStore(this.context);
+        String saved = this.context.getSharedPreferences("model_lab_asr", Context.MODE_PRIVATE)
+                .getString("selected_model_id", ModelLabModelStore.BASELINE_ID);
+        this.selectedId = ModelLabModelStore.CANDIDATE_ID.equals(saved)
+                && modelStore.candidatePresent()
+                ? ModelLabModelStore.CANDIDATE_ID : ModelLabModelStore.BASELINE_ID;
     }
 
-    public File modelDirectory() {
-        File root = context.getExternalFilesDir("models");
-        return root == null ? null : new File(root, "vosk-model-small-fa-0.42");
+    public synchronized String selectedModelId() { return selectedId; }
+
+    public synchronized File modelDirectory() {
+        return modelStore.resolve(selectedId);
     }
 
     public boolean modelInstalled() {
@@ -65,7 +74,14 @@ public final class LocalPersianAsr {
         listener.onStatus("ASR_LOADING_OFFLINE_MODEL");
         executor.execute(() -> {
             try {
-                if (model == null) model = new Model(modelDirectory().getAbsolutePath());
+                if (model == null) {
+                    if (ModelLabModelStore.CANDIDATE_ID.equals(selectedId)
+                            && !modelStore.verifyCandidate().ok) {
+                        resetToBaseline();
+                        main.post(() -> listener.onStatus("ASR_INVALID_CANDIDATE_ROLLBACK"));
+                    }
+                    model = new Model(modelDirectory().getAbsolutePath());
+                }
                 main.post(() -> startMicrophone(ticket, listener));
             } catch (Exception e) {
                 main.post(() -> {
@@ -119,7 +135,7 @@ public final class LocalPersianAsr {
     /** Deterministic offline WAV smoke test; NO microphone is activated. */
     public synchronized boolean evaluateBundledSample(Listener listener) {
         if (loading || listening || !modelInstalled()) return false;
-        File sample = new File(modelDirectory(), "test/test.wav");
+        File sample = new File(modelStore.baselineDirectory(), "test/test.wav");
         if (!sample.isFile()) return false;
         loading = true;
         final int ticket = ++generation;
@@ -127,7 +143,14 @@ public final class LocalPersianAsr {
         executor.execute(() -> {
             String result = "";
             try {
-                if (model == null) model = new Model(modelDirectory().getAbsolutePath());
+                if (model == null) {
+                    if (ModelLabModelStore.CANDIDATE_ID.equals(selectedId)
+                            && !modelStore.verifyCandidate().ok) {
+                        resetToBaseline();
+                        main.post(() -> listener.onStatus("ASR_INVALID_CANDIDATE_ROLLBACK"));
+                    }
+                    model = new Model(modelDirectory().getAbsolutePath());
+                }
                 // Vosk's upstream sample is 48 kHz signed 16-bit mono PCM WAV.
                 try (FileInputStream stream = new FileInputStream(sample);
                      Recognizer recognizer = new Recognizer(model, 48000.0f)) {
@@ -161,6 +184,99 @@ public final class LocalPersianAsr {
                     listener.onStatus("ASR_BUNDLED_SAMPLE_EMPTY_OR_ERROR");
                 }
             });
+        });
+        return true;
+    }
+
+    private synchronized void resetToBaseline() {
+        selectedId = ModelLabModelStore.BASELINE_ID;
+        context.getSharedPreferences("model_lab_asr", Context.MODE_PRIVATE)
+                .edit().putString("selected_model_id", selectedId).commit();
+    }
+
+    /**
+     * Switches two VERIFIED Vosk Persian models on the same existing JNI
+     * runtime. Unloads the old model BEFORE loading the next; failure keeps
+     * the previously persisted selection and attempts to reload the prior.
+     * No microphone is opened during this operation.
+     */
+    public synchronized boolean switchModel(String targetId, Listener listener) {
+        if (listener == null) return false;
+        if (loading || listening) {
+            listener.onStatus("ASR_SWITCH_BUSY"); return false;
+        }
+        if (!ModelLabModelStore.BASELINE_ID.equals(targetId)
+                && !ModelLabModelStore.CANDIDATE_ID.equals(targetId)) {
+            listener.onStatus("ASR_SWITCH_UNSUPPORTED_MODEL"); return false;
+        }
+        if (selectedId.equals(targetId) && model != null) {
+            listener.onStatus("ASR_SWITCH_ALREADY_ACTIVE_" + targetId);
+            return true;
+        }
+        loading = true;
+        final int ticket = ++generation;
+        final String oldId = selectedId;
+        listener.onStatus("ASR_SWITCH_VERIFY_AND_LOAD_" + targetId);
+        executor.execute(() -> {
+            String outcome;
+            Model newlyLoaded = null;
+            Model old = model;
+            boolean previouslyLoaded = old != null;
+            String oldPath = modelStore.resolve(oldId).getAbsolutePath();
+            try {
+                if (ModelLabModelStore.CANDIDATE_ID.equals(targetId)) {
+                    ModelLabModelStore.Receipt proof = modelStore.verifyCandidate();
+                    if (!proof.ok) throw new IllegalStateException(proof.state);
+                } else if (!modelStore.baselineAvailable()) {
+                    throw new IllegalStateException("BASELINE_ABSENT");
+                }
+                // No overlapping resident recognizers or model weights.
+                if (old != null) {
+                    old.close();
+                    model = null;
+                }
+                File chosen = modelStore.resolve(targetId);
+                newlyLoaded = new Model(chosen.getAbsolutePath());
+                try (Recognizer check = new Recognizer(newlyLoaded, 16000.0f)) {
+                    check.acceptWaveForm(new byte[3200], 3200);
+                }
+                synchronized (LocalPersianAsr.this) {
+                    if (ticket != generation) {
+                        newlyLoaded.close();
+                        return;
+                    }
+                    if (!context.getSharedPreferences("model_lab_asr", Context.MODE_PRIVATE)
+                            .edit().putString("selected_model_id", targetId).commit()) {
+                        throw new IllegalStateException("SELECTION_PERSIST_FAILED");
+                    }
+                    selectedId = targetId;
+                    model = newlyLoaded;
+                    loading = false;
+                    outcome = "ASR_SWITCH_OK_" + targetId;
+                }
+            } catch (Exception | LinkageError ex) {
+                if (newlyLoaded != null) try { newlyLoaded.close(); }
+                catch (Exception ignored) { }
+                boolean rollbackHealthy = !previouslyLoaded;
+                if (previouslyLoaded) {
+                    try {
+                        model = new Model(oldPath);
+                        rollbackHealthy = true;
+                    } catch (Exception | LinkageError ignored) {
+                        model = null;
+                    }
+                }
+                synchronized (LocalPersianAsr.this) {
+                    if (ticket != generation) return;
+                    selectedId = oldId;
+                    loading = false;
+                }
+                outcome = rollbackHealthy
+                        ? "ASR_SWITCH_ROLLED_BACK_" + ex.getClass().getSimpleName()
+                        : "ASR_SWITCH_ROLLBACK_FAILED_" + ex.getClass().getSimpleName();
+            }
+            final String finalOutcome = outcome;
+            main.post(() -> listener.onStatus(finalOutcome));
         });
         return true;
     }

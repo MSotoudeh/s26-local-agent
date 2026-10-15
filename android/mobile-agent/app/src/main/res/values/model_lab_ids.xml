@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="model_lab_task_spinner" type="id"/>
+    <item name="model_lab_model_spinner" type="id"/>
+    <item name="model_lab_install_staged_vosk" type="id"/>
+    <item name="model_lab_activate_vosk" type="id"/>
+</resources>
