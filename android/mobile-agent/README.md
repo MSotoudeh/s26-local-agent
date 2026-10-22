@@ -68,7 +68,7 @@ The app can restart and reconnect after `BOOT_COMPLETED`, but an unrooted app ca
 Requires:
 - Android SDK API 37;
 - Build Tools 36.0.0;
-- JDK 17;
+- JDK 21+ (JDK 25 verified on Ops; MediaPipe 0.10.27 requires classfile version 65);
 - AGP 9.4.1;
 - Gradle 9.6.0.
 

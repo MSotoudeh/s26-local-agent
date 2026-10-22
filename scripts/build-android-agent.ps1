@@ -1,6 +1,8 @@
 param(
-    [string]$JavaHome = (Join-Path $env:LOCALAPPDATA "ProjectIR\toolchains\jdk-17.0.20.1+1"),
-    [string]$AndroidSdk = (Join-Path $env:LOCALAPPDATA "Android\Sdk"),
+    # MediaPipe tasks-genai 0.10.27 contains Java 21 bytecode (class version 65).
+    # Ops has JDK 25; do not build this app with the older project JDK 17.
+    [string]$JavaHome = 'C:\Program Files\Eclipse Adoptium\jdk-25.0.4.7-hotspot',
+    [string]$AndroidSdk = (Join-Path $env:USERPROFILE 'AppData\Local\Android\Sdk'),
     [switch]$SkipLint
 )
 
@@ -17,6 +19,10 @@ if (-not (Test-Path (Join-Path $AndroidSdk "platforms\android-37.0"))) {
 $env:JAVA_HOME = $JavaHome
 $env:ANDROID_HOME = $AndroidSdk
 $env:ANDROID_SDK_ROOT = $AndroidSdk
+if (-not $env:GRADLE_USER_HOME) {
+    # Project IR may run as SYSTEM with a redirected user profile.
+    $env:GRADLE_USER_HOME = Join-Path $env:USERPROFILE '.gradle'
+}
 $env:Path = "$JavaHome\bin;$env:Path"
 
 $root = Join-Path $PSScriptRoot "..\android\mobile-agent"

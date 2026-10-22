@@ -2,6 +2,7 @@ package io.projectir.mobile;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
@@ -65,6 +66,17 @@ public final class UiBridgeProvider extends ContentProvider {
         try {
             if ("status".equals(method)) {
                 result = status(service);
+            } else if ("agent_start".equals(method)) {
+                // Explicit owner/shell-gated recovery after APK replacement.
+                // Does not grant privileges or bypass Android FGS policy.
+                ConfigStore.Config config = new ConfigStore(getContext()).load();
+                if (!config.ready()) {
+                    result = unavailable("agent-not-configured");
+                } else {
+                    getContext().startForegroundService(
+                            new Intent(getContext(), AgentService.class));
+                    result = ok(new JSONObject().put("startRequested", true));
+                }
             } else if (service == null) {
                 result = unavailable("accessibility-not-connected");
             } else if ("state".equals(method)) {
