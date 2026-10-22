@@ -7,20 +7,39 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Handler;
+import android.os.Looper;
 
 public final class AgentService extends Service {
     private static final String CHANNEL_ID = "project_ir_agent";
     private static final int NOTIFICATION_ID = 4110;
 
     public static volatile String runtimeState = "stopped";
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Runnable localHealthPoll = new Runnable() {
+        @Override public void run() {
+            // Binder recovery is local. Do not wait for a Hub connection or
+            // infer health from ShizukuPlus's mDNS foreground notification.
+            if (shell != null && shell.hasPermission() && !shell.isShellServiceReady()) {
+                shell.ensureBound();
+            }
+            updateNotification(hubState);
+            mainHandler.postDelayed(this, 10_000L);
+        }
+    };
+    private volatile String hubState = "starting";
+    private String lastNotificationState;
     private HubClient client;
+    private ShellBridge shell;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createChannel();
-        startForeground(NOTIFICATION_ID, notification("starting"));
+        shell = ShellBridge.get(this);
+        startForeground(NOTIFICATION_ID, notification("Hub: starting | Shell: checking"));
         startClient();
+        mainHandler.postDelayed(localHealthPoll, 1_000L);
     }
 
     @Override
@@ -38,15 +57,14 @@ public final class AgentService extends Service {
             return;
         }
         if (client != null) client.stop();
-        client = new HubClient(this, config, state -> {
-            runtimeState = state;
-            updateNotification(state);
-        });
+        client = new HubClient(this, config, state ->
+                mainHandler.post(() -> updateNotification(state)));
         client.start();
     }
 
     @Override
     public void onDestroy() {
+        mainHandler.removeCallbacks(localHealthPoll);
         if (client != null) {
             client.stop();
             client = null;
@@ -88,7 +106,18 @@ public final class AgentService extends Service {
     }
 
     private void updateNotification(String state) {
+        hubState = state;
+        // Binder ping and UserService readiness are checked independently of
+        // Hub connectivity, notifications and mDNS discovery. Fail closed.
+        boolean alive = shell != null && shell.isShizukuRunning();
+        int uid = alive ? shell.shizukuUid() : -1;
+        boolean permitted = alive && shell.hasPermission();
+        boolean ready = permitted && shell.isShellServiceReady();
+        String combined = AgentHealthState.compose(state, alive, permitted, uid, ready);
+        runtimeState = combined;
+        if (combined.equals(lastNotificationState)) return;
+        lastNotificationState = combined;
         getSystemService(NotificationManager.class)
-                .notify(NOTIFICATION_ID, notification(state));
+                .notify(NOTIFICATION_ID, notification(combined));
     }
 }

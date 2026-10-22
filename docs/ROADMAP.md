@@ -46,6 +46,8 @@ Remaining connectivity/offline endurance belongs to M1, not M0.5.
 
 ## M1 — Shizuku no-Wi-Fi runtime
 
+**2026-10-22 local-first health rollout:** updated Android Agent separates live Binder/UserService readiness from Hub WebSocket health, with a shell/owner-gated post-install service-start path. See [S26_AGENT_HEALTH_HUB_401_20261022.md](S26_AGENT_HEALTH_HUB_401_20261022.md). On-device Shell GO; Hub HTTP401 and autonomous reboot remain HOLD.
+
 **2026-10-22 ShizukuPlus provider test extension:** Boot persistence, watchdog, Wi-Fi-off, Device Owner verification and future AI-bridge experiments are tracked in [S26_SHIZUKUPLUS_BOOT_AI_TEST_PLAN_20261022.md](S26_SHIZUKUPLUS_BOOT_AI_TEST_PLAN_20261022.md). Preserve user-selected advanced/compatibility/AI settings; cold reboot acceptance remains HOLD.
 
 Status: **bounded offline persistence GO / full acceptance HOLD** (2026-10-13). Initial Airplane Mode check 12/12 PASS; strict Airplane Mode + Wi-Fi off + mobile data off + no IPv4 default route check 8/8 PASS. USB remained attached for recovery; long-run, physically unplugged and post-reboot operation are still unverified. A subsequent controlled UserService Binder failure test exposed an initial process-only false positive, then verified automatic end-to-end recovery in 2/2 repeat trials after stale-connection unbind/rebind hardening. See benchmarks/results/2026-10-13-m1-m2.md and benchmarks/results/2026-10-13-shizuku-rebind.md.

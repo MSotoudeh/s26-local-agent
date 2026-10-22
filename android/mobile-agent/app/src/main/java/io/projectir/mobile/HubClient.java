@@ -263,7 +263,8 @@ public final class HubClient {
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
-            if (socket == webSocket) socket = null;
+            if (socket != webSocket) return; // Ignore a superseded connection.
+            socket = null;
             if (!stopped.get()) {
                 state("disconnected");
                 scheduleReconnect();
@@ -272,9 +273,16 @@ public final class HubClient {
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            if (socket == webSocket) socket = null;
+            if (socket != webSocket) return; // Stale socket cannot replace current status.
+            socket = null;
             if (!stopped.get()) {
-                state("network-error:" + t.getClass().getSimpleName());
+                // Report the handshake HTTP status, if present, without ever
+                // logging the Authorization header, body, token, or Hub URL.
+                String failure = response == null
+                        ? t.getClass().getSimpleName()
+                        : "HTTP" + response.code() + ":" + t.getClass().getSimpleName();
+                Log.w(TAG, "WebSocket connection failure: " + failure);
+                state("network-error:" + failure);
                 scheduleReconnect();
             }
         }
