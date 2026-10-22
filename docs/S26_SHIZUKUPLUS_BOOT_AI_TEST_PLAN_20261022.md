@@ -79,3 +79,15 @@ Until post-reboot evidence exists, keep **ShizukuPlus as experimental provider**
 - **P5 INDETERMINATE:** Issued a `svc power reboot` command via DroidBridge. The remote transport replied `NOT_FOUND: Tunnel-client did not poll after this request was enqueued`; subsequent status reads also returned this error. This is **not proof** that reboot was executed or that Shizuku failed to autostart. Postboot boot ID, binder state, and shell revalidation were unavailable. Do not mark PASS or FAIL.
 - Project IR older direct `s26` hub was offline; this is not authoritative for the independent DroidBridge tunnel.
 - Next diagnostic once DroidBridge reconnects: compare kernel boot ID to receipt, check `sys.boot_completed`, `wifi_on`, `dpm list-owners`, Shizuku+ activity/Watchdog logs and `id -u`. If boot ID unchanged, the reboot command was not delivered; if changed, determine whether any user intervention occurred before binder restoration.
+
+## Follow-up receipt — 2026-10-22 13:20 Europe/Rome
+
+User screenshots show ShizukuPlus main screen Running / adb (USB), while Starting Shizuku / port discovery timed out notification remains and Project IR Mobile Agent shows network-error:ProtocolException.
+
+USB ADB plus independent DroidBridge query on boot ID e28ec629-768f-4817-bbac-9f468e867e39 confirm shizuku_plus_server as shell and shizuku.shell=available; id -u=2000 succeeds with Wi-Fi OFF and no port 5555 listener. Running screen is authoritative for current Binder health. The generic Wireless Debugging card label does not prove the service was started wirelessly.
+
+Android JobScheduler history shows AdbStartWorker jobs 37 and 38 STOPPED (jobFinished), while ongoing notification ID 1447 (channel AdbStartWorker, title Starting Shizuku) remains. This is a stale/orphan notification rather than proof of a stopped server. Targeted Notification Listener dismissal returned dismissed=true, but independent dumpsys notification still showed ID 1447; **not verified cleared**. Do not disable Watchdog or alter the protected feature settings to hide this notification. Provider-side future fix: reconcile/cancel AdbStartWorker foreground notification when an external USB start yields healthy Binder; ensure watchdog checks live Binder rather than stale notification/mDNS status.
+
+Separate unresolved defect: io.projectir.mobile shows network-error:ProtocolException; Project IR hub device s26 is offline. Network/control-plane issue is not proof of Shizuku Binder failure. Investigate backend HTTP/WebSocket handshake separately.
+
+The USB recovery helper scripts/Recover-S26ShizukuPlus-USB.ps1 was tested against the phone: already-running no-op PASS; explicit -Force restart PASS; Binder reconnect PASS. It is not automatic and does not solve postboot phone-only independence. Experimental Settings.Global.adb_tcp_port=5555 was reverted to null; port 5555 is not listening. Wi-Fi OFF was restored.
