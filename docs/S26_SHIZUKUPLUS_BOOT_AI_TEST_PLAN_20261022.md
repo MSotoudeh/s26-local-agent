@@ -1,6 +1,6 @@
 # ShizukuPlus boot persistence and Local Agent integration — 2026-10-22
 
-Status: **IN PROGRESS / reboot acceptance NOT YET VERIFIED**.
+Status: **IN PROGRESS — Wi-Fi-off Shell runtime verified; autonomous ShizukuPlus cold boot FAILED in a later controlled reboot. Feature experiments pending.** (The earlier indeterminate reboot receipt below is retained as historical evidence; see the later results and detailed backlog.)
 
 ## Scope and constraints
 
@@ -58,6 +58,8 @@ Each test records Android boot-id, timestamp, package version, available transpo
 **Hard gate**: A boot test is PASS only if Binder + real `uid=2000` operation return automatically, while no PC and no manual start are required. Keep HOLD otherwise.
 
 ## AI Bridge future experiment backlog (keep current switches ON)
+
+**Detailed, prioritized and still unexecuted feature-by-feature plan:** [S26_SHIZUKUPLUS_CAPABILITY_BACKLOG_20261022.md](S26_SHIZUKUPLUS_CAPABILITY_BACKLOG_20261022.md). This covers all preserved enhanced, AI, compatibility, simulation and boot/Watchdog options with independent real-effect acceptance tests and stop conditions.
 
 - **AI-1**: document enabled ShizukuPlus AI Core / AI Bridge & NPU / NPU Acceleration / Window Hierarchy Crawler / Experimental AI Automation / Display Tuner; read actual capability/API support.
 - **AI-2**: record hardware inference backend used by local LLM and Qwen3-ASR. Distinguish actual NPU delegation from displayed NPU options. Compare latency, power, memory and thermals in repeated workloads.
