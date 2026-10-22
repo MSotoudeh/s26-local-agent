@@ -70,3 +70,12 @@ No production model/runtime or AI feature change before results and a reviewed i
 ## Decision record
 
 Until post-reboot evidence exists, keep **ShizukuPlus as experimental provider** and stock Shizuku installed for fallback. Protect the user's selected enhanced/compatibility/AI settings. `Dhizuku enabled` and `Device Owner active` are not equivalent. Do not promote boot-persistence to GO based on current running state.
+
+## Execution receipt — 2026-10-22 12:23 Europe/Rome
+
+- **P0 PASS:** 10/10 independent DroidBridge Shizuku shell `id -u` invocations returned 2000; reported duration 50 ms each (instrument floor, not a defensible p50 latency estimate).
+- **P2 PASS:** Android `settings get global wifi_on` was `0`, while local shell operations succeeded through cellular/runtime transport. ADB shell TCP was listening on `*:5555`.
+- Pre-attempt boot ID: `bc28a541-d4ec-4877-b15b-c206a8283de0`, up 7 days at 12:23 local time; `sys.boot_completed=1`.
+- **P5 INDETERMINATE:** Issued a `svc power reboot` command via DroidBridge. The remote transport replied `NOT_FOUND: Tunnel-client did not poll after this request was enqueued`; subsequent status reads also returned this error. This is **not proof** that reboot was executed or that Shizuku failed to autostart. Postboot boot ID, binder state, and shell revalidation were unavailable. Do not mark PASS or FAIL.
+- Project IR older direct `s26` hub was offline; this is not authoritative for the independent DroidBridge tunnel.
+- Next diagnostic once DroidBridge reconnects: compare kernel boot ID to receipt, check `sys.boot_completed`, `wifi_on`, `dpm list-owners`, Shizuku+ activity/Watchdog logs and `id -u`. If boot ID unchanged, the reboot command was not delivered; if changed, determine whether any user intervention occurred before binder restoration.
