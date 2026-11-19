@@ -20,7 +20,7 @@ Official public sherpa-onnx release:
 Pinned archive is 207,557,382 bytes and SHA256:
 `911b2083efd7c0dca2ac3b358b75222660dc09fb716d64fbfc417ba6c99ff3de`.
 
-The `scripts/Prepare-S26WhisperBase.py` script rejects unexpected archive roots/types, symlinks, duplicate required files and size/hash mismatches, then selects only these three model files:
+The `scripts/prepare-s26-whisper-base.py` script rejects unexpected archive roots/types, symlinks, duplicate required files and size/hash mismatches, then selects only these three model files:
 
 - `base-encoder.int8.onnx` — 29,120,534 bytes.
 - `base-decoder.int8.onnx` — 130,672,026 bytes.
@@ -59,7 +59,7 @@ It measures native model load and decode in monotonic elapsed milliseconds, neve
 
 - From a previous interrupted attempt, the 3-model-file `*.tar.bz2` extraction and creation of the signed-APK manifest were complete. Its exact pinned archive SHA-256 and all three file hashes matched on `ops`. Rather than downloading/transferring twice, the existing app-scoped Android **staging** directory was verified against the manifest via on-device `sha256sum`: `WHISPER_STAGE_ALL_BYTES_AND_HASHES_PASS=YES`.
 - First Gradle build was blocked by missing `decoder` local variable and omitted Whisper encoder/decoder configuration; corrected both. Then **`assembleRelease lintRelease` PASS**. The APK passed release-signing-certificate equality against the existing app, nondebuggable packaging, `zipalign -c -P 16`, and all seven native ELF libraries passed 16 KiB PT_LOAD alignment checks.
-- Current app APK saved before upgrade at `C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-whisper-base-m2.apk`, SHA256 `88de7cafa68fd023b58e39ceb8f486a9983482de3aa53eb74771528f992757f7`. Upgraded APK SHA256 `ab06d78e9b211f1bb3f10aee0ff5778637a2c9a6fd725bfafe5a301dd6e82d1e`. Data-preserving `adb install -r` returned Success; no app data removed and no reboot.
+- Current app APK saved before upgrade at `%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-whisper-base-m2.apk`, SHA256 `88de7cafa68fd023b58e39ceb8f486a9983482de3aa53eb74771528f992757f7`. Upgraded APK SHA256 `ab06d78e9b211f1bb3f10aee0ff5778637a2c9a6fd725bfafe5a301dd6e82d1e`. Data-preserving `adb install -r` returned Success; no app data removed and no reboot.
 - **Android atomic model installation:** `M2_WHISPER_INSTALL_SHA256_VERIFIED_INSTALLED | files=3 bytes=160609290`. The app verified all three expected file sizes/hashes from its signed manifest and moved the staging directory into the permanent app-scoped path.
 - **Real native on-phone CPU inference on the exact same public WAV:** `M2_WHISPER_RESULT: transcript=من ارزیه ان کار رونداره | load_ms=393 decode_ms=402 total_ms=795 | input_hz=48000 samples=261504`. The transcript has substantial errors versus the reference «من عرضه اين کارو ندارم». 4,165 ms UI/ADB wall-clock includes polling delays. This one fixture is insufficient to rank Persian models. Raw record: `benchmarks/model-lab/20261015-whisper-base-onphone.json`.
 - **Regression:** 21 Python tests plus three subtests passed, 33 catalog candidates validated and six negative safety tests passed. Post-upgrade checks found `io.projectir.mobile` still holding Assistant role, service running in foreground, mic permission and Project IR Accessibility connection alive; Bitwarden and KDE Connect Accessibility settings preserved. On-screen `ASR_SELECTED_MODEL=asr.vosk.fa-small-042` and 33 catalog entries confirmed. No Shizuku restart.

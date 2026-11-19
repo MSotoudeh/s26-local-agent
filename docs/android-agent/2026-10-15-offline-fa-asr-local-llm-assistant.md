@@ -87,7 +87,7 @@ Wi-Fi change, Shizuku server restart, microphone authorization or role-holder
 change was performed.
 
 Read-only backup of the immediately prior installed working APK:
-`C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-fa-asr-qwen-assistant.apk`.
+`%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-fa-asr-qwen-assistant.apk`.
 SHA-256 `11660ff0be15388a3f8a99c1e0883e99c78c2a180ecd498a81e8934eb876fe30`.
 Models and backed-up APK remain local on user-owned Ops/phone and are NOT
 committed or uploaded to Git.

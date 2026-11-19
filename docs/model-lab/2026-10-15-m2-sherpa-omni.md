@@ -26,7 +26,7 @@ the available native binder is not the assistant's active ASR adapter yet.
   Source tag `11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf`.
 - Android `arm64-v8a` AAR native libraries all had ELF PT_LOAD alignment
   **16384**, equal page offset and VAddr modulo 16384. The final APK must
-  separately pass `Audit-16k-ELF.py` after build.
+  separately pass `scripts/audit-16k-elf.py` after build.
 - Public ONNX model URL:
   `https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12.tar.bz2`
   GitHub response length 292,571,207 bytes; verified SHA-256
@@ -49,7 +49,7 @@ the available native binder is not the assistant's active ASR adapter yet.
 1. Run `pwsh -File scripts/Prepare-S26SherpaRuntime.ps1`, which downloads the
    exact official `.aar`, checks the SHA and leaves it **ignored by Git**
    in `android/mobile-agent/app/libs/`. No manual app-side downloading.
-2. Prepare public model using `scripts/Prepare-S26OmniAsr.py` to verify full
+2. Prepare public model using `scripts/prepare-s26-omni-asr.py` to verify full
    archive hash and unpack three allowlisted files. Manifest and source in
    Git, large model weights outside Git.
 3. `adb push` them into the app-scoped
@@ -97,12 +97,12 @@ overwriting the existing Vosk 0.42 baseline.
 
 ## Executed on-device receipts — 2026-10-15
 
-- **Official runtime:** `sherpa-onnx-1.13.8.aar`, 50,129,134 bytes, SHA256 `633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96`, prebuilt `arm64-v8a`; all four new native libraries passed 16 KiB ELF segment alignment checks. The complete nondebuggable Release APK passed `zipalign -c -P 16` and all seven native ELFs passed `Audit-16k-ELF.py`.
+- **Official runtime:** `sherpa-onnx-1.13.8.aar`, 50,129,134 bytes, SHA256 `633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96`, prebuilt `arm64-v8a`; all four new native libraries passed 16 KiB ELF segment alignment checks. The complete nondebuggable Release APK passed `zipalign -c -P 16` and all seven native ELFs passed `scripts/audit-16k-elf.py`.
 - **Official model:** 292,571,207-byte model archive SHA256 `cdcd0559c7c73efed54209a926e321afc914d046c5fdbf3665f00dc78180e5ed`; three extracted public files 365,439,124 bytes. Staged via USB, verified on phone against signed manifest and atomically installed. Exact UI receipt: `M2_OMNI_INSTALL_SHA256_VERIFIED_INSTALLED | files=3 bytes=365439124`.
 - **Native CPU inference on S26:** `M2_OMNI_RESULT: transcript=من اورزی اینکاررو نداره | load_ms=673 decode_ms=545 total_ms=1218 | input_hz=48000 samples=261504`. Input was the same public Vosk 0.42 `test/test.wav` (SHA256 `4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3`). Its reference transcript is «من عرضه اين کارو ندارم». The Omnilingual output is erroneous; one fixture cannot determine language-wide WER or choose a winner. UI/ADB wall time of ~4.18 seconds includes polling and is not comparable to pure decoding.
 - **Measured raw JSON:** `benchmarks/model-lab/20261015-omni300m-onphone.json`. This is an independent read-only benchmark: **no execution of Android actions from the ASR transcript and no replacement of the default voice assistant ASR**.
 - **Build and regression:** `assembleRelease lintRelease` PASS; nine existing independent host Java test suites PASS, including 24,000 voice-router assertions and 24,000 model-switch assertions; destination pytest 17 passed + 3 subtests; 32-entry catalog + six negative-safety checks PASS.
-- **APK:** SHA256 `88de7cafa68fd023b58e39ceb8f486a9983482de3aa53eb74771528f992757f7`, signed with same certificate as installed baseline, non-debuggable, data-preserving `adb install -r` succeeded. Previous APK retained on Ops at `C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-sherpa-m2.apk` (SHA256 `9c5e417f4912dda3143abc956a9e224bf26d670a2f9e05a2c04ca827d6b0f92d`).
+- **APK:** SHA256 `88de7cafa68fd023b58e39ceb8f486a9983482de3aa53eb74771528f992757f7`, signed with same certificate as installed baseline, non-debuggable, data-preserving `adb install -r` succeeded. Previous APK retained on Ops at `%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-sherpa-m2.apk` (SHA256 `9c5e417f4912dda3143abc956a9e224bf26d670a2f9e05a2c04ca827d6b0f92d`).
 - **Post-install health:** Agent foreground process running, Assistant role held by `io.projectir.mobile`, microphone permission granted, Vosk 0.42 and existing Qwen model present. Immediately after APK update Project IR's Accessibility service was stuck in binding; only its service was narrowly toggled in the enabled-services setting and the original complete string was restored byte-for-byte, preserving Bitwarden and KDE Connect. Accessibility bridge subsequently reconnected. Shizuku was untouched and still running.
 - `ACTION_ASSIST` launch test with explicit `SKIP_ASSIST_MIC=true` passed with `ASSIST_READY`, Vosk/Qwen installed and `ASR_SELECTED_MODEL=asr.vosk.fa-small-042`. **Physical Side-key invocation with this exact M2 APK has not yet been retested by the owner**; the owner had verified the physical Side-key command on M1b before this upgrade.
 

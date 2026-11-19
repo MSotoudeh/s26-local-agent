@@ -10,7 +10,7 @@
 - Important distinction: Console rendering of Persian text can be lossy depending on PowerShell/remote transport encoding, but the original JSON contains actual UTF-8 Persian bytes. Inspection of the source file with Python confirmed non-ASCII UTF-8; do not rewrite or "repair" this valid receipt based on console display alone.
 
 ## Delivered in this branch
-- scripts/Evaluate-S26AsrEvidence.py: strictly offline scoring of schema-validated, previously collected Android ASR receipt JSONs (no model execution, phone state changes, recordings or network access).
+- scripts/evaluate-s26-asr-evidence.py: strictly offline scoring of schema-validated, previously collected Android ASR receipt JSONs (no model execution, phone state changes, recordings or network access).
 - tests/test_s26_asr_evidence_quality_gate.py: test coverage of real three-way receipt, Unicode normalization, integrity fields, safety invariants, duplicate WAVs, contradictory references, model coverage, and synthetic 100-distinct-fixture scenarios.
 - benchmarks/model-lab/20261015-asr-evidence-summary.json: machine-readable derived report from the real *single public WAV* session.
 
@@ -42,6 +42,6 @@ Current report: unique WAVs=1; compared ASRs=3; latency trials per engine=1. Hen
 
 To reproduce offline:
 
-    python scripts/Evaluate-S26AsrEvidence.py --out benchmarks/model-lab/20261015-asr-evidence-summary.json
+    python scripts/evaluate-s26-asr-evidence.py --out benchmarks/model-lab/20261015-asr-evidence-summary.json
 
 To score more receipts, pass their exact local JSON paths as positional arguments.

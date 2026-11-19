@@ -35,7 +35,7 @@ def test_qwen3_verified_model_store_requires_digest_and_guards():
     assert "MODEL_FILE_COUNT_CAP" in s
 
 def test_secure_public_model_extractor_requires_lock():
-    s=(ROOT/"scripts/Prepare-S26Qwen3Asr.py").read_text(encoding="utf-8")
+    s=(ROOT/"scripts/prepare-s26-qwen3-asr.py").read_text(encoding="utf-8")
     for marker in ("ARCHIVE_SHA256_MISMATCH","UNSAFE_ARCHIVE_PATH",
                    "member.issym()", "member.islnk()", "OUTPUT_COLLISION",
                    "878702423", "MODEL_ID"):

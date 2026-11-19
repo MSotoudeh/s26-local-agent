@@ -123,7 +123,7 @@ Phone actions (reuse this repo's Shizuku adapters and plan agent)
 Reliability and offline
 - F16 Local LLM fallback when offline or Claude is unreachable (llama.cpp / MLC with a small multilingual model; reuse S26 local-LLM lab results). Clearly announced as "offline mode".
 - F17 Cloud STT/TTS fallback when local confidence is low (optional, off by default).
-- F18 Smart fallback chain per stage, following docs/SMART_FALLBACK.md.
+- F18 Smart fallback chain per stage, following docs/smart-fallback.md.
 - F19 Health and telemetry: per-stage latency, token usage, cost, error counts, stored locally; optional push to the Project IR hub.
 
 Security and privacy

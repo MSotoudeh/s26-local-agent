@@ -71,7 +71,7 @@ with a rollback if the artifact signer or installed package is ambiguous.
 A verified, read-only backup of the original installed APK has now been
 preserved on Ops at:
 
-`C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261014-before-local-plan-update.apk`
+`%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261014-before-local-plan-update.apk`
 
 - Size: `3925603` bytes.
 - SHA-256: `2f234cf131452ab2813f570dbcc6ecd2a1dac5e7c4f3de7c48feda4b3bc58b34`.

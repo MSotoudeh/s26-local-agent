@@ -94,7 +94,7 @@ One initial simulator run failed on Windows CP1252 console encoding when printin
 ## Commands
 
 ```powershell
-cd C:\GitHub\s26-local-agent
+cd <repository root>
 py -3.14 -m unittest discover -s tests -p test_pstn_offline_bridge.py -v
 py -3.14 scripts\pstn-audio-probe\simulate_pstn_audio.py
 pwsh -NoProfile -File scripts\pstn-audio-probe\Invoke-PstnReadOnlyProbe.ps1

@@ -68,7 +68,7 @@ There was no installation or live task performed on the S26.
 - Test real phone actions and USB-detached operation when user intervention
   is unnecessary. Reboot remains deferred by request.
 
-See also `project-ir/docs/offline-plan-machine.md`.
+See also `docs/android-agent/2026-10-14-offline-plan-machine.md`.
 
 ## Final validation and reproducibility
 

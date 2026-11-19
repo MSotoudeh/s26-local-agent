@@ -1,7 +1,7 @@
 # ShizukuPlus capability evaluation backlog for S26 Local LLM
 Status: **PLANNED ONLY — no new phone setting, permission or runtime changes**.
 Updated: 2026-10-22.
-Related: [S26_SHIZUKUPLUS_BOOT_AI_TEST_PLAN_20261022.md](S26_SHIZUKUPLUS_BOOT_AI_TEST_PLAN_20261022.md), [S26_AGENT_HEALTH_HUB_401_20261022.md](S26_AGENT_HEALTH_HUB_401_20261022.md), [ROADMAP.md](ROADMAP.md).
+Related: [2026-10-22-shizukuplus-boot-test.md](../android-agent/2026-10-22-shizukuplus-boot-test.md), [2026-10-22-agent-health-hub-401.md](../android-agent/2026-10-22-agent-health-hub-401.md), [roadmap.md](../roadmap.md).
 
 ## Goal and decision rule
 
@@ -73,4 +73,4 @@ The first four establish dependable execution and truthful effects; AI/NPU featu
 
 ## Gate for next session
 
-Before executing any new experiment: re-read this backlog and `S26_SHIZUKUPLUS_BOOT_AI_TEST_PLAN_20261022.md`, check live running service / active chats, and select exactly one bounded experiment with a known recovery strategy. **This file authorizes planning only, not changing preserved settings.**
+Before executing any new experiment: re-read this backlog and `docs/android-agent/2026-10-22-shizukuplus-boot-test.md`, check live running service / active chats, and select exactly one bounded experiment with a known recovery strategy. **This file authorizes planning only, not changing preserved settings.**

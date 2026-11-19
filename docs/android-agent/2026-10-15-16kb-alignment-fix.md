@@ -22,7 +22,7 @@ not proof that local 16-KB paging is in use.
 
 ## Exact original APK findings
 
-Using `scripts/Audit-16k-ELF.py` (stdlib ZIP and ELF program header
+Using `scripts/audit-16k-elf.py` (stdlib ZIP and ELF program header
 inspection), Android's three arm64 native libraries had:
 
 | library | ELF PT_LOAD p_align | zip method | APK ZIP page-aligned |
@@ -78,7 +78,7 @@ unsuitable for direct uncompressed mmap on 16-KB devices.
 ## Safe rollout and live checks
 
 Before upgrade, pulled and verified the installed working voice-agent APK:
-`C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-16kb-fix.apk`.
+`%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-16kb-fix.apk`.
 SHA-256 `f44982951ae6f7947bbc0f245327bc7c8e3494c66e45a4ed3062dc8527544431`.
 Rollback requires `adb install -r` of that exact backup; **never**
 uninstall or clear the app's data during troubleshooting.
