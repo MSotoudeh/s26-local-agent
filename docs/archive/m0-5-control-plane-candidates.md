@@ -1,6 +1,6 @@
 # M0.5 Control Plane Candidates
 
-Status: **ARCHIVED EVALUATION**. This document records the candidate set before testing. Final decision on 2026-10-07: Project IR Mobile Agent + native Accessibility bridge selected; Mobilerun KILL/REPLACE and removed. See `HISTORY.md`.
+Status: **ARCHIVED EVALUATION**. This document records the candidate set before testing. Final decision on 2026-10-07: Project IR Mobile Agent + native Accessibility bridge selected; Mobilerun KILL/REPLACE and removed. See [HISTORY.md](../HISTORY.md).
 
 ## First baseline: raw USB ADB
 
