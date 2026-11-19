@@ -16,9 +16,9 @@ This is a **separate Android debug application**, `io.s26.pstnlab`, which does *
 ## Build on ops (Windows)
 
 ```powershell
-cd C:\GitHub\s26-local-agent\android\pstn-audio-lab
+cd android\pstn-audio-lab   # from the repository root
 $env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot'
-$env:GRADLE_USER_HOME='C:\Users\mmsot\.gradle'
+$env:GRADLE_USER_HOME="$env:USERPROFILE\.gradle"
 .\gradlew.bat :app:assembleDebug --offline --no-daemon --console=plain
 ```
 
@@ -51,4 +51,4 @@ The user approved the isolated lab's Shizuku access during installation. Shizuku
 
 Real call downlink capture, uplink injection, STT/LLM/TTS integration are **NOT** tested or enabled.
 
-See `docs/CALL_AUDIO_SHIZUKU_LIVE_LAB_2026-10-13.md` for the device evidence.
+See `docs/call-audio/2026-10-13-shizuku-live-lab.md` for the device evidence.

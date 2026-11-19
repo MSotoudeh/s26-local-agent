@@ -1,7 +1,8 @@
 param(
-    [string]$AndroidRepo = 'C:\GitHub\project-ir-android-agent',
-    [string]$JavaHome = 'C:\Users\mmsot\AppData\Local\ProjectIR\toolchains\jdk-17.0.20.1+1',
-    [string]$Output = 'C:\GitHub\s26-local-agent\benchmarks\m9\20261014-offline-machine.json'
+    # Repository that contains android\mobile-agent (this repository by default).
+    [string]$AndroidRepo = (Join-Path $PSScriptRoot '..'),
+    [string]$JavaHome = (Join-Path $env:LOCALAPPDATA 'ProjectIR\toolchains\jdk-17.0.20.1+1'),
+    [string]$Output = (Join-Path $PSScriptRoot '..\benchmarks\m9\20261014-offline-machine.json')
 )
 $ErrorActionPreference = 'Stop'
 $javac = Join-Path $JavaHome 'bin\javac.exe'

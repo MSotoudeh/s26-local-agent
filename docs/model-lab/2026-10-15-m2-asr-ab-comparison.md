@@ -40,7 +40,7 @@ The real physical Side-key voice command on this exact comparison APK should be 
 
 ## Physical S26 A/B execution receipts — 2026-10-15
 
-- Release APK SHA256 `9d35c5c2864a060fb1f3baf63e23f851e2782b7f6df9103371762bb64c3cfc70`, signing certificate matched prior Android agent APK, 16KiB ELF and zipalign PASS, non-debuggable. Prior stable Qwen3 APK backed up on Ops: `C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-asr-comparison-m2.apk`, SHA256 `d023f3598a088954f5bfd7656e59e8cb82dc033c46037a9673f285858b105f0f`. Data-preserving `adb install -r` PASS; core agent alive/foreground, role/mic/Accessibility intact.
+- Release APK SHA256 `9d35c5c2864a060fb1f3baf63e23f851e2782b7f6df9103371762bb64c3cfc70`, signing certificate matched prior Android agent APK, 16KiB ELF and zipalign PASS, non-debuggable. Prior stable Qwen3 APK backed up on Ops: `%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-asr-comparison-m2.apk`, SHA256 `d023f3598a088954f5bfd7656e59e8cb82dc033c46037a9673f285858b105f0f`. Data-preserving `adb install -r` PASS; core agent alive/foreground, role/mic/Accessibility intact.
 - Android UI compare-all button: `io.projectir.mobile:id/m2_asr_compare_all`, on-device receipt `M2_COMPARE_PASS_3_MODELS | saved=m2-asr-compare-1792082481218-29678.json`.
 - Fixed public audio (SHA256 `4a656d803a1e07eb3707365433dccdac7cf2f055d0e0aeae2084d4f6dd255bc3`), identical CPU provider, two threads each:
   - Omnilingual 300M: transcript «من اورزی اینکاررو نداره», **load=673ms decode=445ms native_total=1118ms**

@@ -90,7 +90,7 @@ Canary package: `io.projectir.plan.canary`; not the main
   unchanged. Real UI deployment and unplugged Wi-Fi-off endurance HOLD.
 
 Detailed reproduction and test contracts are in
-`project-ir/docs/android-plan-canary-device-20261014.md`.
+`docs/android-agent/2026-10-14-isolated-art-canary.md`.
 
 ## Safe next-install preflight staged without disturbing the Agent
 
@@ -106,7 +106,7 @@ has been signed with a locally available signing key whose certificate
 - Neither the production APK nor AgentService was replaced/restarted.
 - **HOLD** installing the main APK until the user explicitly confirms
   that other concurrent Project IR chats can tolerate a brief disconnect.
-- See `project-ir/docs/android-plan-agent-release-preflight-20261014.md`
+- See `docs/android-agent/2026-10-14-release-preflight.md`
   for signer checks, rollback boundaries and post-install acceptance.
 
 ## M5: actual offline Persian ASR / local LLM / Assistant-role milestone (2026-10-15)
@@ -115,7 +115,7 @@ Canonical implementation in Project IR:
 - Repo: `MSotoudeh/project-ir`
 - Branch: `feat/s26-voice-assistant-20261015`
 - Commit: `614c934`
-- Full evidence: `docs/S26_OFFLINE_FA_ASR_LOCAL_LLM_ASSISTANT_2026-10-15.md`
+- Full evidence: `docs/android-agent/2026-10-15-offline-fa-asr-local-llm-assistant.md`
 
 Delivered onto the **actual S26 Ultra**, not just simulated:
 - Vosk Persian `small-fa-0.42` ASR model stored locally (about 97 MiB

@@ -61,7 +61,7 @@ def test_real_device_result_is_read_only_and_grounded():
 def test_weights_and_runtime_not_committed():
     ignore = IGNORE.read_text(encoding="utf-8")
     assert "android/mobile-agent/app/libs/*.aar" in ignore
-    prep = (ROOT / "scripts/Prepare-S26WhisperBase.py").read_text(encoding="utf-8")
+    prep = (ROOT / "scripts/prepare-s26-whisper-base.py").read_text(encoding="utf-8")
     assert MODEL_SHA in prep
     assert 'member.issym()' in prep
     assert 'member.islnk()' in prep

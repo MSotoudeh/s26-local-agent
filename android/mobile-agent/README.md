@@ -80,4 +80,4 @@ On Ops use:
 
 The canonical JDK lives under `%LOCALAPPDATA%\ProjectIR\toolchains`; generated build state and `local.properties` stay outside Git.
 
-For bootstrap and full architecture/validation details, see `../../docs/android-mobile-agent.md`.
+For bootstrap and full architecture/validation details, see `../../docs/android-agent/overview.md`.

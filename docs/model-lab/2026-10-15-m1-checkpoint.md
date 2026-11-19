@@ -31,7 +31,7 @@ The on-phone baseline was updated via signed data-preserving install after passi
 
 - Device: authorized Samsung S26 Ultra, Android API 37. No reboot or phone-data reset.
 - M1 APK SHA-256: fd25a3c5f8bf9095e885bb7ea90effe5f3cd315fc438fe30220829f57a718ae5.
-- Pre-upgrade APK backed up on Ops at C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-canonical-m1.apk; SHA-256 b277a5314707709988746fb6272e278745ef5f96492e17f7432f22b52b5e27d7.
+- Pre-upgrade APK backed up on Ops at %LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-canonical-m1.apk; SHA-256 b277a5314707709988746fb6272e278745ef5f96492e17f7432f22b52b5e27d7.
 - Certificate matches the pre-upgrade installed APK; non-debuggable and 16-KiB-aligned zipalign checks PASS.
 - Data-preserving adb install -r returned Success; Agent process, ForegroundService, Android Assistant role and microphone grant preserved.
 - Accessibility provider connected; foreground MainActivity displays Model Lab 31-entry catalog and selection, voice-ready banner, Vosk installed and Qwen installed.

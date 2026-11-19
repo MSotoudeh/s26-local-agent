@@ -59,7 +59,7 @@ Each test records Android boot-id, timestamp, package version, available transpo
 
 ## AI Bridge future experiment backlog (keep current switches ON)
 
-**Detailed, prioritized and still unexecuted feature-by-feature plan:** [S26_SHIZUKUPLUS_CAPABILITY_BACKLOG_20261022.md](S26_SHIZUKUPLUS_CAPABILITY_BACKLOG_20261022.md). This covers all preserved enhanced, AI, compatibility, simulation and boot/Watchdog options with independent real-effect acceptance tests and stop conditions.
+**Detailed, prioritized and still unexecuted feature-by-feature plan:** [shizukuplus-capability-backlog.md](../plans/shizukuplus-capability-backlog.md). This covers all preserved enhanced, AI, compatibility, simulation and boot/Watchdog options with independent real-effect acceptance tests and stop conditions.
 
 - **AI-1**: document enabled ShizukuPlus AI Core / AI Bridge & NPU / NPU Acceleration / Window Hierarchy Crawler / Experimental AI Automation / Display Tuner; read actual capability/API support.
 - **AI-2**: record hardware inference backend used by local LLM and Qwen3-ASR. Distinguish actual NPU delegation from displayed NPU options. Compare latency, power, memory and thermals in repeated workloads.

@@ -23,7 +23,7 @@ The project is deliberately benchmark-driven. No subsystem becomes a production 
 
 **This repository is the single source of truth for every on-phone component**, including `android/mobile-agent`, `android/pstn-audio-lab`, `android/model-lab`, Persian ASR/TTS, local LLM/VLM, Assistant integration, Android benchmark code, native Android tests, and the Model Lab roadmap. All new on-phone changes must be proposed here, not under `project-ir/android/mobile-agent`.
 
-The Android package remains `io.projectir.mobile` to preserve the installed app signature, data and default Assistant assignment. This package ID is not an indication of Git repository ownership. For source lineage, cross-repo split SHA, migration policy and remaining work, see [Repository ownership and migration](docs/REPOSITORY_OWNERSHIP_20261015.md). For model switching and heavy benchmarks, see [S26 Model Lab](docs/S26_MODEL_LAB_MASTER_PLAN_20261015.md). For the conservative on-phone ASR evidence scorer and the reason no ASR production promotion is justified yet, see [ASR evidence quality gate](docs/S26_ASR_QUALITY_EVIDENCE_GATE_20261015.md).
+The Android package remains `io.projectir.mobile` to preserve the installed app signature, data and default Assistant assignment. This package ID is not an indication of Git repository ownership. For source lineage, cross-repo split SHA, migration policy and remaining work, see [Repository ownership and migration](docs/repository-ownership.md). For model switching and heavy benchmarks, see [S26 Model Lab](docs/model-lab/master-plan.md). For the conservative on-phone ASR evidence scorer and the reason no ASR production promotion is justified yet, see [ASR evidence quality gate](docs/model-lab/2026-10-15-asr-quality-evidence-gate.md).
 
 `MSotoudeh/project-ir` owns the shared Hub, remote transport, coordination, cross-device authentication and infrastructure. It is **not** the canonical source for the S26 Android package going forward.
 
@@ -40,16 +40,16 @@ ChatGPT -> Project IR -> Project IR Hub -> S26 Mobile Agent
 Mobilerun was used for feasibility experiments and then retired after repeated reliability failures. See [Experiment and decision history](docs/HISTORY.md).
 
 See:
-- [Architecture](docs/ARCHITECTURE.md)
-- [Component options](docs/COMPONENT_OPTIONS.md)
-- [Roadmap and gates](docs/ROADMAP.md)
-- [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md)
-- [Control plane](docs/CONTROL_PLANE.md)
-- [Skills and app knowledge](docs/SKILLS.md)
-- [Smart fallback](docs/SMART_FALLBACK.md)
-- [Security and privacy](docs/SECURITY_PRIVACY.md)
-- [M0 device census](docs/M0_DEVICE_CENSUS.md)
-- [Decisions](docs/DECISIONS.md)
+- [Architecture](docs/architecture.md)
+- [Component options](docs/component-options.md)
+- [Roadmap and gates](docs/roadmap.md)
+- [Experiment protocol](docs/experiment-protocol.md)
+- [Control plane](docs/control-plane.md)
+- [Skills and app knowledge](docs/skills.md)
+- [Smart fallback](docs/smart-fallback.md)
+- [Security and privacy](docs/security-privacy.md)
+- [M0 device census](docs/m0-device-census.md)
+- [Decisions](docs/decisions.md)
 - [Experiment and decision history](docs/HISTORY.md)
 
 ## Milestones

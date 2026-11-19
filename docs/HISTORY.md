@@ -284,7 +284,7 @@ Removed from Ops:
 
 JDK 17 was **not** deleted because it became a real Project IR Mobile Agent build dependency. It was moved out of Temp into:
 
-`C:\Users\mmsot\AppData\Local\ProjectIR\toolchains\jdk-17.0.20.1+1`
+`%LOCALAPPDATA%\ProjectIR\toolchains\jdk-17.0.20.1+1`
 
 Shizuku was retained because it is a canonical runtime dependency.
 
@@ -396,7 +396,7 @@ Three more real local app launches passed with verified foreground packages: Cal
 
 **Decision:** local deterministic text execution can be integrated as a limited v0. This is the first runtime component that performs task interpretation and action on the phone itself, unlike remote Project IR control. It is not yet a general planning agent or voice assistant. More real-app tasks, statistical stress, local models, TTS/ASR, and no-USB runtime still remain.
 
-See `benchmarks/results/2026-10-13-m4-local-text-agent-v0.md` and `project-ir/android-mobile-agent docs/local-text-agent-v0.md`.
+See `benchmarks/results/2026-10-13-m4-local-text-agent-v0.md` and `project-ir/android-mobile-agent docs/android-agent/2026-10-13-local-text-agent-v0.md`.
 
 An additional real on-device safety check submitted a shell-like unsupported compound command through the Local Text Agent UI. The task runner returned `REJECTED / UNSUPPORTED`. The historical PowerShell harness was retired after the Python UTF-8-byte-decoding benchmark succeeded, while failed JSON evidence was retained. The Project IR Python suite passed 52/52 with the Android-only changes in the feature worktree.
 ## 2026-10-13 — Reliable Local Executor v1, bounded device verification

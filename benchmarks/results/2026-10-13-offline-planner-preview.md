@@ -95,5 +95,5 @@ physical USB-detached endurance, Assistant role and Wake Word. **Reboot
 remains postponed by user request.**
 
 Raw source: `project-ir/android/mobile-agent/app/src/main/java/io/projectir/mobile`.
-Android implementation notes: `project-ir/docs/offline-skill-planner.md`.
-Speech benchmark protocol: `../m3/README_SPEECH_EVAL.md`.
+Android implementation notes: `docs/android-agent/2026-10-13-offline-skill-planner.md`.
+Speech benchmark protocol: `../m3/README.md`.
