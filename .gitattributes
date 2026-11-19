@@ -1,3 +1,12 @@
-* text=auto`n*.md text eol=lf`n*.json text eol=lf`n*.yaml text eol=lf`n*.yml text eol=lf`n*.ps1 text eol=lf
-
-android/mobile-agent/gradle/wrapper/gradle-wrapper.jar binary
+* text=auto
+*.md text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.ps1 text eol=lf
+*.py text eol=lf
+*.java text eol=lf
+*.gradle text eol=lf
+*.bat text eol=crlf
+*.jar binary

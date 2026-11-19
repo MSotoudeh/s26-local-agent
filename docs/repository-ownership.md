@@ -1,5 +1,7 @@
 # Repository ownership, migration ledger, and operational cutover — 2026-10-15
 
+> Note (2026-11-19): file names in this ledger are as of 2026-10-15. Docs were later renamed and grouped; see [README.md](README.md). `scripts/Install-S26Agent-Safe.ps1` was removed as a one-off.
+
 ## Decision
 
 The owner chose `MSotoudeh/s26-local-agent` as the **sole maintained repository for all on-phone code**. The separate `MSotoudeh/project-ir` repository continues to own its generic Hub, remote execution, service infrastructure, multi-device coordination, remote authentication, and other non-phone tooling.

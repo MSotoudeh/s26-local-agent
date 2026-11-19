@@ -177,4 +177,4 @@ Security and privacy
 - rhasspy/piper-voices
 - BehnamFekri/offline-tts-android (Persian Piper on sherpa-onnx)
 - karim23657/awesome-Persian-Speech (Persian STT/TTS models and datasets)
-- This repo: S26_MODEL_LAB_BENCHMARK_PROTOCOL, S26_ASR_QUALITY_EVIDENCE_GATE, SMART_FALLBACK, S26_OFFLINE_FA_ASR_LOCAL_LLM_ASSISTANT
+- This repo: [model-lab/benchmark-protocol.md](../model-lab/benchmark-protocol.md), [model-lab/2026-10-15-asr-quality-evidence-gate.md](../model-lab/2026-10-15-asr-quality-evidence-gate.md), [smart-fallback.md](../smart-fallback.md), [android-agent/2026-10-15-offline-fa-asr-local-llm-assistant.md](../android-agent/2026-10-15-offline-fa-asr-local-llm-assistant.md)
