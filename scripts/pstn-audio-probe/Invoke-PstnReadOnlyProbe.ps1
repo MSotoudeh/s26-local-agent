@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [string]$Adb = 'C:\Tools\Android\platform-tools\adb.exe',
-    [string]$Sdk = 'C:\Users\mmsot\AppData\Local\Android\Sdk',
+    [string]$Sdk = (Join-Path $env:LOCALAPPDATA 'Android\Sdk'),
     [string]$Jdk = 'C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot'
 )
 $ErrorActionPreference = 'Stop'

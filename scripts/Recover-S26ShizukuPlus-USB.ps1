@@ -8,7 +8,9 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Serial = 'R5GL82NN2YE',
+  # ADB serial of the phone. Defaults to $env:S26_ADB_SERIAL, or to the single
+  # authorized USB device when exactly one is connected.
+  [string]$Serial = $env:S26_ADB_SERIAL,
   [switch]$Force
 )
 $ErrorActionPreference = 'Stop'
@@ -24,6 +26,13 @@ $adb = $paths | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -Firs
 if (-not $adb) { throw 'adb.exe not found' }
 
 $devices = @(& $adb devices)
+if (-not $Serial) {
+  $authorized = @($devices | Where-Object { $_ -match '^\S+\s+device\b' })
+  if ($authorized.Count -ne 1) {
+    throw 'Pass -Serial (or set S26_ADB_SERIAL) when not exactly one authorized device is connected'
+  }
+  $Serial = ($authorized[0] -split '\s+')[0]
+}
 $match = '^' + [regex]::Escape($Serial) + '\s+device\b'
 if (-not ($devices | Where-Object { $_ -match $match })) {
   throw "Device $Serial is not connected/authorized over USB ADB"

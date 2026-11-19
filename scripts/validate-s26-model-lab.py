@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate S26 Model Lab specifications ONLY. No downloads/device actions.
 
-Usage: python scripts/validate_s26_model_lab.py [--self-test]
+Usage: python scripts/validate-s26-model-lab.py [--self-test]
 """
 from __future__ import annotations
 

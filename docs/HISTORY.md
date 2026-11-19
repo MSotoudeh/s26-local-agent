@@ -1,8 +1,83 @@
-# Experiment and Decision History
+# Project history
+
+## Why it started
+
+On 2026-10-04 the owner set out to answer one question: can a Samsung Galaxy
+S26 Ultra run a fast, private, Persian-speaking assistant that controls the
+phone itself, without an always-on PC, Wi-Fi or cloud dependency? The project
+was set up **feasibility-first**: every
+uncertain primitive is measured on the real phone and gets a GO / HOLD /
+KILL-REPLACE decision before it becomes architecture
+([ADR 0001](adr/0001-feasibility-first.md)).
+
+## Phases
+
+| Dates | Phase | Outcome |
+|---|---|---|
+| 2026-10-04 – 10-05 | **M0 census and raw baseline.** Repository bootstrap, device/host census, raw ADB timings. | ADB transport fast (tens of ms); UIAutomator (~2 s) and screenshots (~1 s) rejected for the main loop. |
+| 2026-10-05 – 10-06 | **M0.5 Mobilerun Portal as lab actuator.** Python `PhoneController` over USB-forwarded HTTP. | Primitives fast (~30 ms) and Persian text input works, but repeated workflows failed (60%, then 13% and 3% with an event-sequence fork). **KILL/REPLACE.** |
+| 2026-10-07 | **Pivot to the native Project IR agent.** An existing Project IR Android app already had Hub connectivity and Shizuku shell; a minimal Accessibility bridge was added. | 20/20 Settings workflows and Persian input parity. Mobilerun removed from phone and repo; Hub → agent → Shizuku/Accessibility becomes the control plane. |
+| 2026-10-13 | **M1/M2 hardening and first on-phone agent.** Strict-offline persistence, four-app perception, automatic Shizuku Binder recovery, Local Text Agent v0/v1 (allowlisted router, action IDs, cancel), offline skill planner, PSTN call-audio research lab. | Bounded GOs; reboot persistence and live cancel stay HOLD. Call audio confirmed feasible only as an isolated no-call lab. |
+| 2026-10-14 | **M4 offline multi-step plans.** `LocalPlanMachine` (1,000 simulated plans, zero side effects), coordinator with write-ahead journal, isolated ART canary on the phone. | Source/simulation GO; live integration HOLD. |
+| 2026-10-15 | **Voice, Assistant and repository split.** Real Settings navigation via a plan; offline Persian Vosk ASR, local Qwen LLM, opt-in Android Assistant role, 16 KB native alignment. On-phone code moved from `project-ir` into this repo with history ([repository-ownership.md](repository-ownership.md)). Model Lab M1/M1b/M2: verified install and A/B of Vosk 0.42/0.5, sherpa-onnx Omnilingual 300M, Whisper base and Qwen3-ASR 0.6B; conservative ASR evidence gate. | This repo becomes canonical for all on-phone work. All four ASR engines run offline on the phone, but one shared WAV is not enough evidence: no ASR is promoted to production. |
+| 2026-10-22 | **ShizukuPlus and health separation.** Agent separates local Binder/shell health from Hub WebSocket health; Hub returned HTTP 401 (auth gate), shell stayed ready. ShizukuPlus boot-persistence trial and capability backlog. | Wi-Fi-off shell runtime verified; autonomous ShizukuPlus cold boot **failed**, so post-reboot privilege still needs USB recovery (`scripts/Recover-S26ShizukuPlus-USB.ps1`). |
+| 2026-11-18 | **Claude bridge plan.** Options for a Persian voice assistant that sends offline-transcribed text to Claude (Termux CLI or API). | Plan only ([plans/termux-claude-code-persian-voice.md](plans/termux-claude-code-persian-voice.md)). |
+| 2026-11-19 | **Public-ready cleanup.** Docs grouped by topic with an index, kebab-case names, standalone JVM test runner, LICENSE/CONTRIBUTING/SECURITY, device serial and user paths removed from current files. | No behavior change. |
+
+## Direction changes
+
+1. **From "adopt an existing phone agent" to "extend our own app"** (2026-10-07).
+   Mobilerun was fast per action but unreliable per workflow; the decisive
+   lesson was that transport speed is not workflow reliability.
+2. **From remote control to on-phone execution** (2026-10-13). The Hub path
+   proved the primitives; the goal shifted to a task loop that runs with no
+   Hub, PC or network.
+3. **From one repo to two** (2026-10-15). `project-ir` keeps the Hub and
+   infrastructure; everything that runs on the phone lives here. The package
+   name `io.projectir.mobile` is kept only to preserve the installed app.
+4. **From single model to Model Lab** (2026-10-15). Instead of betting on one
+   ASR/LLM, models are installed side by side, SHA-verified and compared with
+   receipts before any promotion.
+
+## Previous state vs current state
+
+| | Before (2026-10-05) | Now |
+|---|---|---|
+| Control plane | Host Python adapter → Mobilerun Portal over USB ADB | Native agent app; Accessibility + Shizuku on the phone; Hub optional |
+| Task execution | Host scripts | On-phone allowlisted router and journaled plan machine |
+| Speech | None | Offline Persian ASR (Vosk default; Omnilingual/Whisper/Qwen3 in Model Lab) |
+| Source of truth | Split between `project-ir` worktrees and this repo | This repo for everything on the phone |
+
+## Unmerged lines of work
+
+None in this repository. All feature branches were merged through PRs #1–#8
+on 2026-10-15 and deleted; no `archive/*` tags were needed. Earlier Android
+work happened on `project-ir` branches (`feature/android-agent`,
+`feat/s26-plan-adapter-20261014`, voice and 16 KB worktrees); it was imported
+here with subtree history on 2026-10-15.
+
+## Known unfinished work
+
+- Reboot persistence of privileged shell (Shizuku/ShizukuPlus) without USB.
+- Live cancel/replay and scroll on the device; broader multi-app reliability.
+- ASR quality comparison on a real multi-utterance Persian corpus; no engine is
+  promoted.
+- Local LLM routing, NPU acceleration, TTS, wake word and smart cloud fallback
+  (roadmap M5–M14).
+- The Hub rejected the agent's WebSocket handshake with HTTP 401 on 2026-10-22;
+  fixing the credential is Hub-side work in `project-ir`.
+
+---
+
+## Appendix: detailed experiment narrative (2026-10-04 – 2026-10-14)
+
+The section below is the original day-by-day log, kept verbatim except for
+path redaction. Later days are recorded in the dated files indexed in
+[README.md](README.md).
 
 This document is the canonical narrative of how the S26 Local Agent control-plane architecture evolved. It records successful paths, failed hypotheses, why decisions changed, and which artifacts were retired.
 
-## 2026-10-04 — Repository bootstrap and feasibility contract
+### 2026-10-04 — Repository bootstrap and feasibility contract
 
 The project began with a deliberate feasibility-first rule: uncertain primitives are tested in isolation before they become architecture.
 
@@ -18,7 +93,7 @@ The initial repository defined:
 M0-A established the Ops development environment. ADB was available at:
 `C:\Tools\Android\platform-tools\adb.exe`.
 
-## 2026-10-05 — S26 census and raw ADB baseline
+### 2026-10-05 — S26 census and raw ADB baseline
 
 The S26 Ultra was connected and measured on the real device.
 
@@ -42,17 +117,17 @@ Decision:
 - UIAutomator was rejected for the primary perception loop.
 - screenshots were classified as fallback-only.
 
-## 2026-10-05 — Mobilerun Portal as a lab actuator
+### 2026-10-05 — Mobilerun Portal as a lab actuator
 
 Mobilerun Portal 0.7.25 was tested because it already exposed Android Accessibility state and actions.
 
-### ContentProvider path
+#### ContentProvider path
 
 The ADB ContentProvider interface had roughly one second of fixed overhead even for trivial requests. It was useful for bootstrap/configuration, but not for an interactive control loop.
 
 Decision: reject ContentProvider as the normal high-frequency Mobilerun transport.
 
-### Local HTTP over USB ADB forward
+#### Local HTTP over USB ADB forward
 
 The Portal HTTP server was exposed only through an ADB forward. This removed Wi-Fi dependence and produced much better latency.
 
@@ -70,7 +145,7 @@ A real Settings workflow once measured approximately:
 
 This proved a key architectural point: structured Accessibility control can be fast enough to feel interactive.
 
-### Screenshot measurements
+#### Screenshot measurements
 
 Screenshot performance remained poor:
 - Portal HTTP screenshot: about 734 ms p50 with 5/15 timeouts and about 3 s p95;
@@ -78,7 +153,7 @@ Screenshot performance remained poor:
 
 Decision: keep screenshot and VLM perception out of the normal loop.
 
-### Persian text input
+#### Persian text input
 
 Portal Accessibility text input successfully wrote and re-read the exact mixed string:
 
@@ -88,7 +163,7 @@ The successful request took about 40.2 ms and did not require switching the acti
 
 Decision: UTF-8/Persian text transport is feasible through Accessibility.
 
-### App-launch tail
+#### App-launch tail
 
 Repeatedly foregrounding an app showed a very different distribution from primitive actions:
 - action p50 around 32 ms;
@@ -98,7 +173,7 @@ Repeatedly foregrounding an app showed a very different distribution from primit
 
 Decision: never infer action-transport quality from app launch/settle latency. Heavy action classes need their own verifier and recovery policy.
 
-## 2026-10-06 — Long-run Mobilerun reliability failure
+### 2026-10-06 — Long-run Mobilerun reliability failure
 
 Fast single operations were not enough. Repeated semantic workflows were stress-tested.
 
@@ -114,7 +189,7 @@ Decision:
 - low-level transport was not the main blocker;
 - stock Portal's state/settle behavior was not acceptable as a production dependency.
 
-## 2026-10-06 — Mobilerun Lab event-sequence experiment
+### 2026-10-06 — Mobilerun Lab event-sequence experiment
 
 Before abandoning Portal, one deliberately small source modification was tested.
 
@@ -130,7 +205,7 @@ Supporting build work required:
 - Android Platform 34 for the upstream Portal project;
 - fixing the Lab provider authority to follow the debug application ID.
 
-### Result
+#### Result
 
 The event hypothesis failed decisively.
 
@@ -152,7 +227,7 @@ Decision: **KILL/REPLACE Mobilerun as the production control plane.**
 
 The raw benchmark JSON files under `benchmarks/m05/` are retained as evidence. Portal runtime code is not retained in the current implementation tree.
 
-## 2026-10-07 — Discovery/reconciliation of the existing Project IR Mobile Agent
+### 2026-10-07 — Discovery/reconciliation of the existing Project IR Mobile Agent
 
 Before building another Android daemon, existing Project IR work was audited.
 
@@ -180,7 +255,7 @@ This was the architectural turning point: a second remote-control app was unnece
 
 Decision: extend the existing Project IR Mobile Agent with a minimal semantic UI bridge rather than fork Mobilerun or create another permanent application.
 
-## 2026-10-07 — Native Project IR Accessibility bridge
+### 2026-10-07 — Native Project IR Accessibility bridge
 
 The mobile agent was extended with:
 - `UiAccessibilityService`;
@@ -201,7 +276,7 @@ Security properties:
 - ContentProvider calls are accepted only from the app's own UID or shell UID 2000;
 - Shizuku remains the privileged execution layer.
 
-### Build/lint work
+#### Build/lint work
 
 The bridge initially failed Java compilation because Android's JSONObject API declares checked JSONException. JSON construction was wrapped with a small internal helper and the build passed.
 
@@ -213,7 +288,7 @@ Existing Android-agent lint debt was also fixed rather than baselined away:
 
 Final combined `assembleDebug lintDebug` completed successfully.
 
-### Tree serializer bug
+#### Tree serializer bug
 
 The first custom tree serializer returned only two nodes. The cause was an attempted deduplication key based on bounds/text/class/resource. Samsung exposes several distinct container nodes with identical geometry; dedup skipped a parent before its children were enqueued.
 
@@ -226,7 +301,7 @@ After the fix, the Settings root produced a real tree with `nodeCount=119`, incl
 
 This failure is retained as an important design lesson: UI-tree compaction must never destroy graph reachability.
 
-## 2026-10-07 — Direct on-phone semantic reliability test
+### 2026-10-07 — Direct on-phone semantic reliability test
 
 The final validation path did not use Ops, ADB, or Mobilerun for task execution.
 
@@ -252,7 +327,7 @@ Result:
 
 A transient Project IR backend 502 occurred between batches. Because each batch was clean-started and idempotent, it was treated as control-plane transport noise and the affected batch was rerun rather than counted as a phone failure.
 
-### Persian input parity
+#### Persian input parity
 
 The native bridge then opened Settings search, focused the Samsung search field, wrote:
 
@@ -264,7 +339,7 @@ Result: **PASS**.
 
 This establishes parity for the critical structured primitives that previously justified Mobilerun.
 
-## 2026-10-07 — Mobilerun retirement and dependency cleanup
+### 2026-10-07 — Mobilerun retirement and dependency cleanup
 
 After native bridge parity passed:
 
@@ -284,11 +359,11 @@ Removed from Ops:
 
 JDK 17 was **not** deleted because it became a real Project IR Mobile Agent build dependency. It was moved out of Temp into:
 
-`C:\Users\mmsot\AppData\Local\ProjectIR\toolchains\jdk-17.0.20.1+1`
+`%LOCALAPPDATA%\ProjectIR\toolchains\jdk-17.0.20.1+1`
 
 Shizuku was retained because it is a canonical runtime dependency.
 
-## Current canonical control plane
+### Current canonical control plane
 
 ```text
 ChatGPT
@@ -302,7 +377,7 @@ ChatGPT
 
 Ops + USB ADB remain bootstrap, development, recovery, and APK-install paths only.
 
-## Current gate status
+### Current gate status
 
 - M0 device/runtime census: GO.
 - M0.5 independent remote phone control: GO for feasibility and canonical architecture.
@@ -312,7 +387,7 @@ Ops + USB ADB remain bootstrap, development, recovery, and APK-install paths onl
 - screenshot/VLM primary perception: rejected; fallback only.
 - ASR, NPU routing, local LLM, smart cloud fallback: intentionally not promoted until their own raw benchmarks pass.
 
-## 2026-10-13 — Interrupted-run audit, validation, and publication checkpoint
+### 2026-10-13 — Interrupted-run audit, validation, and publication checkpoint
 
 A previously interrupted Git hygiene step was reconstructed from the actual state on Ops rather than assuming it completed. The working copy was intact. Only the newly selected Android feature worktree and the independent S26 research repository were in scope; the Project IR main branch and other concurrent worktrees were intentionally left untouched.
 
@@ -336,7 +411,7 @@ For the independent `s26-local-agent` repository, retired runtime adapter code a
 
 The next open work is M1 offline/Shizuku endurance and M2 multi-app Accessibility reliability; the 20/20 Settings proof is a feasibility gate, not a claim that all apps or every offline mode work. Shizuku recovery after reboot remains a known limitation on the unrooted phone.
 
-## 2026-10-13 — Live Shizuku binding recovery after publication
+### 2026-10-13 — Live Shizuku binding recovery after publication
 
 A read-only Hub status check after Git publication reported the S26 agent connected but Shizuku unavailable (`shizuku_running=false`, UID -1, permission false). This was investigated rather than assuming that Shizuku itself had stopped.
 
@@ -348,7 +423,7 @@ The phone package inventory continued to show only Project IR Mobile Agent and S
 
 **Lesson / next hardening task:** distinguish Shizuku server process availability from the app's Binder binding state and from last-reported Hub telemetry. If the server is running but shell execution is unavailable, attempt an idempotent rebind and verify with a real direct command before prompting for a new Shizuku bootstrap. Hub status can temporarily lag behind the true recovered state.
 
-## 2026-10-13 — M1 isolated offline operation and M2 four-app perception
+### 2026-10-13 — M1 isolated offline operation and M2 four-app perception
 
 Initial Airplane Mode maintained the native UI provider and Shizuku processes for 12/12 observations, but was deliberately not classified as strict offline because Wi-Fi can stay enabled in Airplane Mode. A stricter trial enforced Wi-Fi=0, mobile data=0, airplane=1 and no IPv4 default route. Local provider and process persistence passed 8/8 samples, with complete radio-settings restoration.
 
@@ -362,7 +437,7 @@ Reboot was intentionally deferred without a validated unattended Shizuku restart
 
 Evidence and interpretation: benchmarks/results/2026-10-13-m1-m2.md and raw benchmarks/m1, benchmarks/m2 and benchmarks/m3.
 
-## 2026-10-13 — Automatic Shizuku UserService Binder recovery (M1 hardening)
+### 2026-10-13 — Automatic Shizuku UserService Binder recovery (M1 hardening)
 
 The Project IR phone agent initially had a lifecycle gap: `ShellBridge` detected a disconnected Shizuku UserService Binder, but did not reliably detach/rebind its stale service connection until the app Activity was reopened. A separate `shizuku_user_service_ready` heartbeat signal was added to distinguish the local UserService Binder from the Shizuku server process.
 
@@ -382,7 +457,7 @@ The app's AgentService is intentionally non-exported; a direct ADB `am start-for
 
 Raw evidence: `benchmarks/m1/20261013-shizuku-user-service-rebind.json` (failed v1) and `...-v2.json`, `...-v2-repeat.json` (verified successful v2).
 
-## 2026-10-13 — First real on-device Local Text Agent (M4, limited v0)
+### 2026-10-13 — First real on-device Local Text Agent (M4, limited v0)
 
 The next architectural goal shifted from externally controlling S26 through Project IR to giving the phone a locally executing task loop, independent of Hub availability.
 
@@ -396,10 +471,10 @@ Three more real local app launches passed with verified foreground packages: Cal
 
 **Decision:** local deterministic text execution can be integrated as a limited v0. This is the first runtime component that performs task interpretation and action on the phone itself, unlike remote Project IR control. It is not yet a general planning agent or voice assistant. More real-app tasks, statistical stress, local models, TTS/ASR, and no-USB runtime still remain.
 
-See `benchmarks/results/2026-10-13-m4-local-text-agent-v0.md` and `project-ir/android-mobile-agent docs/local-text-agent-v0.md`.
+See `benchmarks/results/2026-10-13-m4-local-text-agent-v0.md` and [android-agent/2026-10-13-local-text-agent-v0.md](android-agent/2026-10-13-local-text-agent-v0.md).
 
 An additional real on-device safety check submitted a shell-like unsupported compound command through the Local Text Agent UI. The task runner returned `REJECTED / UNSUPPORTED`. The historical PowerShell harness was retired after the Python UTF-8-byte-decoding benchmark succeeded, while failed JSON evidence was retained. The Project IR Python suite passed 52/52 with the Android-only changes in the feature worktree.
-## 2026-10-13 — Reliable Local Executor v1, bounded device verification
+### 2026-10-13 — Reliable Local Executor v1, bounded device verification
 
 The existing S26 Local Text Agent gained a durable action-identity journal (64
 recent IDs), a synchronous pre-dispatch status/identity record, a UI Cancel
@@ -425,7 +500,7 @@ general autonomous-agent acceptance.
 
 Evidence: benchmarks/results/2026-10-13-m4-reliable-executor-v1.md.
 
-## 2026-10-13 — Replay and Cancel v1b source extension, installation blocked
+### 2026-10-13 — Replay and Cancel v1b source extension, installation blocked
 
 On top of v1 commit `47575d7`, added an optional explicit Action ID UI
 field, duplicate-ID rejection status, and a harmless five-second in-process
@@ -440,7 +515,7 @@ alternate installation method, reboot, uninstall or phone mutation followed.
 The change is **source-only validated** and live Cancel/replay remains HOLD.
 See `benchmarks/results/2026-10-13-m4-replay-cancel-source-hold.md`.
 
-## 2026-10-13 — Offline canonical skill planning and evaluation scaffold
+### 2026-10-13 — Offline canonical skill planning and evaluation scaffold
 
 While user-mediated tests, reboot, and APK deployment remained deferred,
 added a pure on-device planner/skill-registry implementation on the Project IR
@@ -460,7 +535,7 @@ ASR transcript, audio recording, LLM/NPU inference or speed claim resulted.
 No APK installation, phone reboot, user interaction or PSTN source changes
 occurred. See `benchmarks/results/2026-10-13-offline-planner-preview.md`.
 
-## 2026-10-14 — Pure local multi-step machine with fault injection
+### 2026-10-14 — Pure local multi-step machine with fault injection
 
 After auditing the interrupted HTTP 502 operation, verified that the
 previous offline Planner and Persian evaluator had already been committed

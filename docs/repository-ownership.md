@@ -1,5 +1,7 @@
 # Repository ownership, migration ledger, and operational cutover — 2026-10-15
 
+> Note (2026-11-19): file names in this ledger are as of 2026-10-15. Docs were later renamed and grouped; see [README.md](README.md). `scripts/Install-S26Agent-Safe.ps1` was removed as a one-off.
+
 ## Decision
 
 The owner chose `MSotoudeh/s26-local-agent` as the **sole maintained repository for all on-phone code**. The separate `MSotoudeh/project-ir` repository continues to own its generic Hub, remote execution, service infrastructure, multi-device coordination, remote authentication, and other non-phone tooling.
@@ -12,7 +14,7 @@ As of this migration, **new Android phone changes MUST be developed and released
 - Existing source: `MSotoudeh/project-ir`, branch `docs/s26-model-lab-benchmark-roadmap-20261015`, commit `b68d301`, parent on-phone voice/Assistant `205e08c`.
 - Path-scoped history export made with `git subtree split --prefix=android/mobile-agent` and export SHA `2d4d9818205f15909cae642745b0888455b36d47`.
 - Destination preserved Git ancestry of the 48 tracked Android source and Gradle project files by `git subtree add --prefix=android/mobile-agent`; import commit `d8aa376`.
-- Additional phone-only artifacts were migrated to the destination: `android/model-lab/`, all `docs/S26_*`, Android plan and offline skill docs, `scripts/Install-S26Agent-Safe.ps1`, build/bootstrap and on-device canary scripts, `Audit-16k-ELF.py`, model-lab validator, and Persian ASR evaluation script. Their original source commit SHAs remain available in the source repository. This copying does **not** erase source Git history.
+- Additional phone-only artifacts were migrated to the destination: `android/model-lab/`, all `docs/S26_*`, Android plan and offline skill docs, `scripts/Install-S26Agent-Safe.ps1`, build/bootstrap and on-device canary scripts, `scripts/audit-16k-elf.py`, model-lab validator, and Persian ASR evaluation script. Their original source commit SHAs remain available in the source repository. This copying does **not** erase source Git history.
 - All PSTN experiment assets, prior measurements, and preexisting `s26-local-agent` content were retained without replacing or deleting them.
 - Git sources and phone APK do **not** embed model weights, private agent data, ADB owner device identifiers, tokens, login data, or production keystores.
 

@@ -3,14 +3,16 @@
 Never outputs UI snapshots, app tokens, user data or raw transcripts.
 """
 import json
+import os
 import pathlib
 import re
 import subprocess
 import sys
 import unicodedata
 
-ADB = r"C:\Users\mmsot\AppData\Local\Android\Sdk\platform-tools\adb.exe"
-REF = pathlib.Path(r"C:\Users\mmsot\AppData\Local\ProjectIR\models\fa-asr\expanded\vosk-model-small-fa-0.42\test\test.txt")
+LOCALAPPDATA = pathlib.Path(os.environ.get("LOCALAPPDATA", pathlib.Path.home() / "AppData" / "Local"))
+ADB = str(LOCALAPPDATA / "Android" / "Sdk" / "platform-tools" / "adb.exe")
+REF = LOCALAPPDATA / "ProjectIR" / "models" / "fa-asr" / "expanded" / "vosk-model-small-fa-0.42" / "test" / "test.txt"
 
 
 def normalized(s: str) -> str:

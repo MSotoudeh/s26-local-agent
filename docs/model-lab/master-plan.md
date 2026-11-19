@@ -125,7 +125,7 @@ Presetها:
 
 ## 5. بنچمارک منصفانه (نه فقط یک عدد)
 
-**فایل مستقل:** `docs/S26_MODEL_LAB_BENCHMARK_PROTOCOL_20261015.md`، داده‌های قابل تکرار `android/model-lab/scenarios.json`.
+**فایل مستقل:** `docs/model-lab/benchmark-protocol.md`، داده‌های قابل تکرار `android/model-lab/scenarios.json`.
 
 مجموعه آزمون:
 1. ASR: حداقل ۱۰۰ utterance واقعی فارسی (تلفظ مختلف، بدون نویز/با نویز، عدد، انگلیسی در فارسی، فرمان‌های `روشن/خاموش`)؛ WER/CER، *intent accuracy*، false execute، real-time factor و p50/p95. یک فایل صوتی ضبط و به همهٔ مدل‌ها *همان فایل* داده شود، نه ضبط‌های متفاوت؛ اصلاح متن مرجع با تأیید کاربر.

@@ -123,7 +123,7 @@ Phone actions (reuse this repo's Shizuku adapters and plan agent)
 Reliability and offline
 - F16 Local LLM fallback when offline or Claude is unreachable (llama.cpp / MLC with a small multilingual model; reuse S26 local-LLM lab results). Clearly announced as "offline mode".
 - F17 Cloud STT/TTS fallback when local confidence is low (optional, off by default).
-- F18 Smart fallback chain per stage, following docs/SMART_FALLBACK.md.
+- F18 Smart fallback chain per stage, following docs/smart-fallback.md.
 - F19 Health and telemetry: per-stage latency, token usage, cost, error counts, stored locally; optional push to the Project IR hub.
 
 Security and privacy
@@ -177,4 +177,4 @@ Security and privacy
 - rhasspy/piper-voices
 - BehnamFekri/offline-tts-android (Persian Piper on sherpa-onnx)
 - karim23657/awesome-Persian-Speech (Persian STT/TTS models and datasets)
-- This repo: S26_MODEL_LAB_BENCHMARK_PROTOCOL, S26_ASR_QUALITY_EVIDENCE_GATE, SMART_FALLBACK, S26_OFFLINE_FA_ASR_LOCAL_LLM_ASSISTANT
+- This repo: [model-lab/benchmark-protocol.md](../model-lab/benchmark-protocol.md), [model-lab/2026-10-15-asr-quality-evidence-gate.md](../model-lab/2026-10-15-asr-quality-evidence-gate.md), [smart-fallback.md](../smart-fallback.md), [android-agent/2026-10-15-offline-fa-asr-local-llm-assistant.md](../android-agent/2026-10-15-offline-fa-asr-local-llm-assistant.md)

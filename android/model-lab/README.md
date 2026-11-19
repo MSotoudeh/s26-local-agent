@@ -12,18 +12,18 @@ installer and not evidence of installed candidate models.
   backends, all with provider privacy/cost and compatibility gates.
 - `scenarios.json`: 30 public/synthetic *definitions*, no actual
   personally identifiable recordings, screenshots or model results.
-- `../../docs/S26_MODEL_LAB_MASTER_PLAN_20261015.md`: Persian full
+- `../../docs/model-lab/master-plan.md`: Persian full
   system architecture, install/switch/rollback/release milestones.
-- `../../docs/S26_MODEL_LAB_BENCHMARK_PROTOCOL_20261015.md`:
+- `../../docs/model-lab/benchmark-protocol.md`:
   ASR/LLM/VLM/TTS/E2E/heavy evaluation details.
-- `../../scripts/validate_s26_model_lab.py`: validation of all model
+- `../../scripts/validate-s26-model-lab.py`: validation of all model
   entries, providers, schema/permissions, conservative memory and
   storage budget, and six intentional negative safety tests.
 
 Validate (on Ops or any PC with Python 3.10+):
 
 ```powershell
-python scripts/validate_s26_model_lab.py --self-test
+python scripts/validate-s26-model-lab.py --self-test
 git diff --check
 ```
 

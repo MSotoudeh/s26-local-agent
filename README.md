@@ -1,112 +1,103 @@
 # S26 Local Agent
 
-Feasibility-first Android agent project for Samsung Galaxy S26 Ultra.
+A feasibility-first research project to build a fast, mostly offline, Persian-capable assistant that controls a Samsung Galaxy S26 Ultra directly on the phone.
 
-## Goal
+## Status
 
-Build a low-latency, primarily local, Persian-capable assistant that can control Android without requiring an always-on PC or Wi-Fi connection, while retaining optional cloud reasoning and a remote control plane for independent testing.
+**Experimental / active research.** Components are promoted only after passing a measured gate on the real device; most of the roadmap (local LLM routing, NPU, wake word, smart fallback) is still open. See [docs/roadmap.md](docs/roadmap.md) for gate status and [docs/HISTORY.md](docs/HISTORY.md) for how the project got here.
 
-The project is deliberately benchmark-driven. No subsystem becomes a production dependency until it passes a measured acceptance gate on the actual S26 Ultra.
+## What it does
 
-## Core principles
+- **Android agent app** (`android/mobile-agent`, package `io.projectir.mobile`): a native executor that runs on the phone. It offers
+  - an offline, allowlisted Persian/English command router and multi-step plan runtime with a write-ahead journal, bounded action IDs and fail-closed policy;
+  - a native AccessibilityService semantic UI bridge (structured tree, exact-text/resource-ID click, text input) restricted to its own UID and shell UID 2000;
+  - privileged shell execution through a Shizuku UserService;
+  - an opt-in Android Assistant entry point with offline Persian push-to-talk (Vosk) and a local LLM (MediaPipe Qwen);
+  - a **Model Lab** panel that installs SHA-verified offline ASR models (Vosk, sherpa-onnx Omnilingual, Whisper, Qwen3-ASR) and runs same-utterance A/B comparisons with JSON receipts;
+  - an optional outbound WebSocket to the Project IR Hub for remote control.
+- **PSTN audio lab** (`android/pstn-audio-lab`): an isolated, no-call research app for cellular call-audio feasibility.
+- **Host tooling** (`scripts/`): device census, offline/benchmark harnesses, model preparation and evidence scorers.
+- **Evidence** (`benchmarks/`): raw JSON receipts and summarized reports for every milestone.
 
-1. **Fast path before LLM** — native APIs, Shizuku, deterministic parsing, cached workflows, then tiny/local models, then cloud.
-2. **Offline by default** — core actions must work with Wi-Fi and mobile data disabled.
-3. **ADB is not a runtime dependency** — USB ADB is bootstrap/debug/control-plane only. Shizuku is the preferred privileged local transport between reboots.
-4. **Tree before vision** — Accessibility hierarchy is primary perception; screenshots/VLM are fallback.
-5. **Bounded actions** — models select from controller-generated valid actions whenever possible; models should not invent raw taps or shell commands.
-6. **Measured smart fallback** — local/cloud routing is based on latency, confidence, historical success, risk, thermals, and connectivity.
-7. **App-specific knowledge only where it pays** — generic control first; Samsung/app workflows are added only for high-frequency or brittle flows.
-8. **Replaceable components** — each major layer has a primary choice plus one or two realistic alternatives.
-
-## Canonical ownership (since 2026-10-15)
-
-**This repository is the single source of truth for every on-phone component**, including `android/mobile-agent`, `android/pstn-audio-lab`, `android/model-lab`, Persian ASR/TTS, local LLM/VLM, Assistant integration, Android benchmark code, native Android tests, and the Model Lab roadmap. All new on-phone changes must be proposed here, not under `project-ir/android/mobile-agent`.
-
-The Android package remains `io.projectir.mobile` to preserve the installed app signature, data and default Assistant assignment. This package ID is not an indication of Git repository ownership. For source lineage, cross-repo split SHA, migration policy and remaining work, see [Repository ownership and migration](docs/REPOSITORY_OWNERSHIP_20261015.md). For model switching and heavy benchmarks, see [S26 Model Lab](docs/S26_MODEL_LAB_MASTER_PLAN_20261015.md). For the conservative on-phone ASR evidence scorer and the reason no ASR production promotion is justified yet, see [ASR evidence quality gate](docs/S26_ASR_QUALITY_EVIDENCE_GATE_20261015.md).
-
-`MSotoudeh/project-ir` owns the shared Hub, remote transport, coordination, cross-device authentication and infrastructure. It is **not** the canonical source for the S26 Android package going forward.
-
-## Current architecture
-
-The canonical phone-control path is now:
+## How it works
 
 ```text
-ChatGPT -> Project IR -> Project IR Hub -> S26 Mobile Agent
-                                      -> Shizuku shell
-                                      -> native Accessibility bridge
+Voice (Assistant role / side key) or text
+        |
+  offline Persian ASR (Model Lab adapter)  ->  normalization
+        |
+  LocalCommandRouter / LocalSkillRegistry   (deterministic, allowlisted)
+        |
+  LocalPlanCoordinator -> LocalPlanMachine  (journaled, bounded, fail-closed)
+        |
+  AccessibilityService actions  |  Shizuku UserService (UID 2000)
+        |
+  postcondition verification on the live UI tree
 ```
 
-Mobilerun was used for feasibility experiments and then retired after repeated reliability failures. See [Experiment and decision history](docs/HISTORY.md).
+Remote control is a separate, optional path: `ChatGPT -> Project IR Hub -> S26 agent (outbound WebSocket) -> Shizuku / Accessibility`. Core principles: fast path before LLM, offline by default, ADB only for bootstrap, Accessibility tree before vision, bounded actions, measured fallback. Details: [docs/architecture.md](docs/architecture.md), [docs/control-plane.md](docs/control-plane.md), [docs/decisions.md](docs/decisions.md).
 
-See:
-- [Architecture](docs/ARCHITECTURE.md)
-- [Component options](docs/COMPONENT_OPTIONS.md)
-- [Roadmap and gates](docs/ROADMAP.md)
-- [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md)
-- [Control plane](docs/CONTROL_PLANE.md)
-- [Skills and app knowledge](docs/SKILLS.md)
-- [Smart fallback](docs/SMART_FALLBACK.md)
-- [Security and privacy](docs/SECURITY_PRIVACY.md)
-- [M0 device census](docs/M0_DEVICE_CENSUS.md)
-- [Decisions](docs/DECISIONS.md)
-- [Experiment and decision history](docs/HISTORY.md)
+### Canonical ownership (since 2026-10-15)
 
-## Milestones
+This repository is the single source of truth for every on-phone component (`android/mobile-agent`, `android/pstn-audio-lab`, `android/model-lab`, ASR/TTS, local LLM, Assistant integration, Android tests and the Model Lab roadmap). `MSotoudeh/project-ir` owns the shared Hub, remote transport and infrastructure. The package ID stays `io.projectir.mobile` to preserve the installed app's signature, data and Assistant role. See [docs/repository-ownership.md](docs/repository-ownership.md).
 
-| Milestone | Purpose |
-|---|---|
-| M0 | Device/runtime census |
-| M0.5 | Remote phone control plane |
-| M1 | Shizuku + no-Wi-Fi privileged runtime |
-| M2 | Accessibility primitives |
-| M2.5 | Jev / bounded-action bake-off |
-| M3 | Persian ASR benchmark |
-| M4 | Deterministic router |
-| M5 | Tiny local model |
-| M6 | NPU local LLM benchmark |
-| M7 | Samsung/app workflow framework |
-| M8 | Semantic UI navigation |
-| M9 | Generic agent loop |
-| M10 | Local vs Jev vs cloud routing |
-| M11 | Smart fallback |
-| M12 | Persian end-to-end |
-| M13 | Android Assistant integration |
-| M14 | Wake word |
+## Quick start
 
-## Repo layout
+Host-side checks need only Python 3 (verified with 3.14) and a JDK 17+:
+
+```sh
+git clone https://github.com/MSotoudeh/s26-local-agent.git
+cd s26-local-agent
+python -m pip install pytest
+python -m pytest tests/ scripts/ -q -p no:cacheprovider
+python scripts/run-jvm-tests.py
+python scripts/validate-s26-model-lab.py --self-test
+```
+
+Building and installing the APK needs Android SDK API 37, Build Tools 36.0.0 and JDK 21+ (Windows PowerShell):
+
+```powershell
+.\scripts\build-android-agent.ps1
+.\scripts\bootstrap-android-agent.ps1 -ApkPath .\android\mobile-agent\app\build\outputs\apk\debug\app-debug.apk
+```
+
+The ASR runtime AAR is not committed; fetch it with `scripts/Prepare-S26SherpaRuntime.ps1` (SHA-256 pinned). Full device setup: [docs/android-agent/overview.md](docs/android-agent/overview.md).
+
+## Configuration
+
+There is no `.env` file. Configuration is by script parameter or these environment variable names:
+
+- `JAVA_HOME`, `ANDROID_HOME` / `ANDROID_SDK_ROOT`, `GRADLE_USER_HOME` — build toolchain (defaults resolve under `LOCALAPPDATA` / `USERPROFILE`).
+- `S26_ADB_SERIAL` — optional ADB serial for `scripts/Recover-S26ShizukuPlus-USB.ps1`.
+- Hub URL and agent token are read by `bootstrap-android-agent.ps1` from a local `%LOCALAPPDATA%\ProjectIR\config\agent.json` (never committed) and stored encrypted on the phone.
+- Runtime policy example: [config/policy.example.yaml](config/policy.example.yaml).
+
+## Project layout
 
 ```text
-android/mobile-agent/   canonical Android APK source and JVM tests
-android/model-lab/     model catalog, benchmark scenarios and manifests
-android/pstn-audio-lab/ isolated PSTN research
-docs/                 architecture, decisions and experiment contracts
-scripts/              host/device census and later benchmark runners
-config/               example policies and runtime configuration
-benchmarks/m0/        raw M0 evidence
-benchmarks/results/   summarized benchmark reports
+android/mobile-agent/    Android agent app source and standalone JVM tests
+android/model-lab/       Model Lab catalog, providers, scenarios and lock files
+android/pstn-audio-lab/  isolated PSTN call-audio research app
+benchmarks/              raw evidence per milestone (m0..m9, model-lab) and results/ summaries
+config/                  example runtime policy
+docs/                    architecture, decisions, roadmap, history and experiment records (index: docs/README.md)
+scripts/                 build, bootstrap, census, benchmark and model-preparation tools
+tests/                   Python tests for scripts, Model Lab and evidence gates
 ```
 
-## Reference projects
+## Testing
 
-- S26 Local Agent (android/mobile-agent) - canonical Android executor, offline Persian Assistant and Accessibility source.
-- Mobilerun Portal / DroidRun — historical feasibility reference; rejected as a production dependency.
-- A11yPilot — compact Accessibility tree + tool executor + agent loop.
-- Android Use — Android MCP/control-plane reference.
-- Jev Mobile / Jev Android — bounded structured decision loops for mobile control.
-- Shizuku — privileged local Binder bridge.
-- Google AI Edge Gallery / FunctionGemma — small on-device function routing.
-- Qualcomm AI Hub / QAIRT / GenieX — Snapdragon NPU runtime.
-- Rin NPU Agent — Android GenieX/NPU integration reference.
+```sh
+python -m pytest tests/ scripts/ -q -p no:cacheprovider
+python scripts/run-jvm-tests.py
+```
 
-## Success definition
+Device benchmarks under `scripts/` (`m1-*`, `m2-*`, `m4-*`, `Invoke-*`) need a connected, authorized S26 and are never run automatically.
 
-The project is successful only if it is pleasant in real use, not merely technically functional.
+## Contributing
 
-Target examples:
-- simple local action: p50 < 700 ms after end of speech, p95 < 1.2 s;
-- first visible action for common app command: < 1 s;
-- simple-command success: > 98%;
-- multi-step common-task success: > 95%;
-- Persian command interpretation: > 97%;
-- silent wrong side effects: approximately zero.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security issues: [SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE). Third-party models and runtimes (Vosk, sherpa-onnx, Whisper, Qwen, MediaPipe, Shizuku) keep their own licenses and are downloaded, not committed.

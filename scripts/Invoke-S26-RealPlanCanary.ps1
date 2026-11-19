@@ -1,7 +1,7 @@
 param([int]$First=4,[int]$Count=4)
 $ErrorActionPreference='Stop'
 if($First -lt 4 -or $Count -lt 1 -or $Count -gt 8){throw 'BOUNDED_TRIAL_RANGE_REQUIRED'}
-$adb='C:\Users\mmsot\AppData\Local\Android\Sdk\platform-tools\adb.exe'
+$adb=Join-Path $env:LOCALAPPDATA 'Android\Sdk\platform-tools\adb.exe'
 $uri='content://io.projectir.mobile.ui'
 function Action([string]$method,[string]$argument) {
     $out=((& $script:adb shell content call --uri $script:uri --method $method --arg $argument) -join '')

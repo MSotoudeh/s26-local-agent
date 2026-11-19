@@ -96,7 +96,7 @@ Accessibility navigation skill without Wi-Fi/PC/Hub in the execution path.
 - Release remains non-debuggable with matching certificate of installed
   Agent. No signing-key switch, package uninstall or data clear.
 - Pre-update read-only APK backup:
-  `C:\Users\mmsot\AppData\Local\ProjectIR\backups\s26-agent\20261015-before-assist-voice-flow.apk`;
+  `%LOCALAPPDATA%\ProjectIR\backups\s26-agent\20261015-before-assist-voice-flow.apk`;
   SHA-256 `95ec794b8afd2dab01066157fc651ad9cfeff836b1c1be0da6a2b1902d8a55d6`.
 - Data-preserving `adb install -r` returned Android **Success**.
   Agent process, ForegroundService, Assistant role, and runtime

@@ -9,7 +9,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
-    "asr_evidence", ROOT / "scripts/Evaluate-S26AsrEvidence.py")
+    "asr_evidence", ROOT / "scripts/evaluate-s26-asr-evidence.py")
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 REAL = ROOT / "benchmarks/model-lab/20261015-asr-three-way-onphone.json"
