@@ -4,7 +4,13 @@ param(
 
     [string]$DeviceId = "s26",
 
-    [string]$AgentConfigPath = (Join-Path $env:LOCALAPPDATA "ProjectIR\config\agent.json")
+    [string]$HubUrl = "https://project-ir-hub.mmsotude.workers.dev",
+
+    # One-time code for this device (scripts/New-S26EnrollmentCode.ps1). Prompted
+    # for when omitted. Use -SkipEnrollment to update the APK only.
+    [securestring]$EnrollmentCode,
+
+    [switch]$SkipEnrollment
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,15 +18,22 @@ $ErrorActionPreference = "Stop"
 if (-not (Test-Path $ApkPath)) {
     throw "APK not found: $ApkPath"
 }
-if (-not (Test-Path $AgentConfigPath)) {
-    throw "Project IR agent config not found: $AgentConfigPath"
+if ($DeviceId -cnotmatch '^[a-z][a-z0-9-]{2,63}$') {
+    throw "Invalid device ID: $DeviceId"
+}
+if ($HubUrl -notmatch '^https://') {
+    throw "Hub URL must use https"
+}
+$code = $null
+if (-not $SkipEnrollment) {
+    if (-not $EnrollmentCode) { $EnrollmentCode = Read-Host "Enrollment code for '$DeviceId'" -AsSecureString }
+    $code = [System.Net.NetworkCredential]::new('', $EnrollmentCode).Password.Trim()
+    if ($code -cnotmatch "^pir1\.$DeviceId\.[a-f0-9]{64}\.[a-f0-9]{64}$") {
+        throw "Not an enrollment code for device '$DeviceId'"
+    }
 }
 
 $adb = (Get-Command adb -ErrorAction Stop).Source
-$config = Get-Content -Raw $AgentConfigPath | ConvertFrom-Json
-if ([string]::IsNullOrWhiteSpace($config.hub_url) -or [string]::IsNullOrWhiteSpace($config.token)) {
-    throw "Agent config must contain hub_url and token"
-}
 
 $state = (& $adb get-state 2>$null | Out-String).Trim()
 if ($state -ne "device") {
@@ -54,15 +67,21 @@ if ($parts -notcontains $accessibilityService) {
 Start-Sleep -Milliseconds 800
 & $adb shell am force-stop io.projectir.mobile | Out-Null
 
+if ($SkipEnrollment) {
+    & $adb shell am start -W -n io.projectir.mobile/.MainActivity | Out-Null
+    Write-Output "Project IR Mobile Agent updated; the stored credential was kept."
+    return
+}
+
 $remoteDir = "/sdcard/Android/data/io.projectir.mobile/files"
 $remoteBootstrap = "$remoteDir/bootstrap.json"
 $temp = Join-Path $env:TEMP ("project-ir-android-bootstrap-" + [guid]::NewGuid().ToString("N") + ".json")
 
 try {
     $payload = [ordered]@{
-        hub_url = [string]$config.hub_url
+        hub_url = $HubUrl
         device_id = $DeviceId
-        token = [string]$config.token
+        enrollment_code = $code
         autostart = $true
     } | ConvertTo-Json -Compress
 
@@ -79,6 +98,7 @@ finally {
     Remove-Item $temp -Force -ErrorAction SilentlyContinue
 }
 
+# The file holds a one-time code only; the phone generates its own token.
 # MainActivity imports the bootstrap into Android Keystore-backed encrypted storage,
 # deletes the phone-side plaintext file, requests Shizuku authorization, and starts
 # the outbound agent when configuration is ready.

@@ -74,7 +74,9 @@ public final class ShellBridge {
                 new ComponentName(app, ShellUserService.class)
         ).processNameSuffix("project_ir_shell")
                 .daemon(true)
-                .version(1);
+                // Bump when ShellUserService changes: a running daemon keeps its old code.
+                // 2: replies are UTF-8 bytes. 3: a timeout kills the process group.
+                .version(3);
         Shizuku.addBinderReceivedListenerSticky(binderReceived);
         Shizuku.addBinderDeadListener(binderDead);
         ensureBound();

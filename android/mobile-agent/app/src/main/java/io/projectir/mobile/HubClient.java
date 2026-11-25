@@ -1,7 +1,12 @@
 package io.projectir.mobile;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Build;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -16,13 +21,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -34,22 +41,55 @@ public final class HubClient {
         void onState(String state);
     }
 
+    private final ConfigStore store;
     private final ConfigStore.Config config;
+    private final String agentVersion;
     private final StateListener stateListener;
     private final ShellBridge shell;
     private final OkHttpClient http;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final ExecutorService jobs = Executors.newFixedThreadPool(2);
     private final AtomicBoolean stopped = new AtomicBoolean(false);
-    private final AtomicBoolean reconnectScheduled = new AtomicBoolean(false);
-    private final AtomicInteger reconnectSeconds = new AtomicInteger(2);
+    private final ReconnectPolicy reconnect = new ReconnectPolicy();
+    private final ResultOutbox outbox = new ResultOutbox();
+    private final String packageName;
+    private final ConnectivityManager connectivity;
+    private final PowerManager power;
+    /** Keeps the CPU awake while a lost connection is being restored. */
+    private final PowerManager.WakeLock linkLock;
+    private static final long LINK_WAKE_MS = 40_000L;
     private final AtomicLong completed = new AtomicLong(0);
     private final AtomicLong failed = new AtomicLong(0);
 
+    /** Connection that owns the current state; older sockets' callbacks are ignored. */
+    private volatile Listener current;
     private volatile WebSocket socket;
+    // Both are used on the scheduler thread only.
+    private String token;
+    private boolean enrollmentPending;
+    private Network socketNetwork;
+    private ScheduledFuture<?> pendingReconnect;
+    private boolean waitingForAuth;
+
+    private final ConnectivityManager.NetworkCallback networkCallback =
+            new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    onScheduler(() -> networkAvailable(network));
+                }
+            };
 
     public HubClient(Context context, ConfigStore.Config config, StateListener stateListener) {
+        this.store = new ConfigStore(context);
         this.config = config;
+        this.token = config.token;
+        this.enrollmentPending = config.hasPendingEnrollment();
+        this.agentVersion = agentVersion(context);
+        this.packageName = context.getPackageName();
+        this.connectivity = context.getSystemService(ConnectivityManager.class);
+        this.power = context.getSystemService(PowerManager.class);
+        this.linkLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "projectir:link");
+        this.linkLock.setReferenceCounted(false);
         this.stateListener = stateListener;
         this.shell = ShellBridge.get(context.getApplicationContext());
         this.http = new OkHttpClient.Builder()
@@ -69,11 +109,77 @@ public final class HubClient {
             }
         }, 5, 10, TimeUnit.SECONDS);
         scheduler.scheduleWithFixedDelay(this::heartbeat, 20, 20, TimeUnit.SECONDS);
+        try {
+            connectivity.registerDefaultNetworkCallback(networkCallback);
+        } catch (RuntimeException e) {
+            Log.w(TAG, "network callback unavailable; reconnecting on timers only", e);
+        }
+    }
+
+    /**
+     * Called from a wake-up alarm. Timers and pings stop while the CPU sleeps, so
+     * stay awake long enough for a ping to notice a dead connection and for the
+     * reconnect that follows.
+     */
+    public void keepAlive() {
+        linkLock.acquire(LINK_WAKE_MS);
+        onScheduler(() -> {
+            heartbeat();
+            if (current == null && pendingReconnect != null && !waitingForAuth) connectNow();
+        });
+    }
+
+    private void networkAvailable(Network network) {
+        if (stopped.get()) return;
+        boolean connected = current != null;
+        switch (ReconnectPolicy.onNetwork(connected, network.equals(socketNetwork), waitingForAuth)) {
+            case REPLACE:
+                linkLock.acquire(LINK_WAKE_MS);
+                reconnect.networkChanged();
+                WebSocket old = socket;
+                current = null;
+                socket = null;
+                state("network-changed");
+                if (old != null) old.cancel();
+                connectNow();
+                break;
+            case CONNECT:
+                // Nothing is pending before the first attempt, or when no
+                // credential exists: there is nothing to speed up.
+                if (pendingReconnect == null) return;
+                linkLock.acquire(LINK_WAKE_MS);
+                reconnect.networkChanged();
+                connectNow();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void connectNow() {
+        if (pendingReconnect != null) pendingReconnect.cancel(false);
+        pendingReconnect = null;
+        connect();
+    }
+
+    private void onScheduler(Runnable task) {
+        try {
+            scheduler.execute(task);
+        } catch (java.util.concurrent.RejectedExecutionException stopping) {
+            // The client was stopped.
+        }
     }
 
     public void stop() {
         if (!stopped.compareAndSet(false, true)) return;
         state("stopped");
+        try {
+            connectivity.unregisterNetworkCallback(networkCallback);
+        } catch (RuntimeException notRegistered) {
+            // start() was not reached or could not register it.
+        }
+        if (linkLock.isHeld()) linkLock.release();
+        current = null;
         WebSocket local = socket;
         socket = null;
         if (local != null) local.close(1000, "agent stopped");
@@ -85,28 +191,109 @@ public final class HubClient {
 
     private void connect() {
         if (stopped.get()) return;
-        state("connecting");
+        waitingForAuth = false;
         try {
-            String hub = config.hubUrl;
-            String wsBase = hub.startsWith("https://")
-                    ? "wss://" + hub.substring("https://".length())
-                    : "ws://" + hub.substring("http://".length());
-            String url = wsBase + "/agent/connect?device_id="
-                    + URLEncoder.encode(config.deviceId, StandardCharsets.UTF_8.name());
+            if (enrollmentPending && !enroll()) return;
+            if (token.isBlank()) {
+                // Nothing to authenticate with, and only the owner can fix it.
+                state("not-enrolled");
+                return;
+            }
+            state("connecting");
+            String url = "wss://" + config.hubUrl.substring("https://".length())
+                    + "/agent/connect" + deviceQuery();
             Request request = new Request.Builder()
                     .url(url)
-                    .header("Authorization", "Bearer " + config.token)
+                    .header("Authorization", "Bearer " + token)
                     .build();
-            socket = http.newWebSocket(request, new Listener());
+            // Publish the owner before the socket exists: a callback may run
+            // before newWebSocket() returns, and must not be taken for stale.
+            Listener listener = new Listener();
+            socketNetwork = connectivity.getActiveNetwork();
+            current = listener;
+            socket = http.newWebSocket(request, listener);
         } catch (Throwable t) {
+            current = null;
             state("connect-error:" + t.getClass().getSimpleName());
-            scheduleReconnect();
+            scheduleReconnect(0);
         }
     }
 
-    private void send(JSONObject payload) {
+    /**
+     * Register the token generated on this phone with the one-time code.
+     * Returns true when connecting may continue. Codes and tokens are never logged.
+     */
+    private boolean enroll() {
+        state("enrolling");
+        try {
+            int status = post("/agent/enroll", null,
+                    HubEnrollment.requestBody(config.pendingCode, config.pendingToken));
+            HubEnrollment.Outcome outcome = HubEnrollment.classify(status);
+            if (outcome == HubEnrollment.Outcome.VERIFY) {
+                // The code works once. If an earlier reply was lost, the Hub
+                // already knows this token; check before calling it refused.
+                int verified = post("/agent/credential/verify" + deviceQuery(),
+                        config.pendingToken, "");
+                if (verified == 200) outcome = HubEnrollment.Outcome.ENROLLED;
+                else if (!ReconnectPolicy.isAuthFailure(verified)) outcome = HubEnrollment.Outcome.RETRY;
+            }
+            switch (outcome) {
+                case ENROLLED:
+                    if (!store.promotePending(config.pendingToken)) {
+                        throw new IllegalStateException("credential not saved");
+                    }
+                    token = config.pendingToken;
+                    enrollmentPending = false;
+                    return true;
+                case RETRY:
+                    state("enroll-retry:HTTP" + status);
+                    // Slow on purpose: the Hub blocks a device after repeated attempts.
+                    scheduleReconnect(401);
+                    return false;
+                default:
+                    store.discardPending();
+                    enrollmentPending = false;
+                    state("enroll-refused:HTTP" + status);
+                    Log.w(TAG, "enrollment refused: HTTP" + status);
+                    // An older credential may still be valid.
+                    return !token.isBlank();
+            }
+        } catch (Exception e) {
+            state("enroll-error:" + e.getClass().getSimpleName());
+            scheduleReconnect(0);
+            return false;
+        }
+    }
+
+    private int post(String path, String bearer, String json) throws Exception {
+        Request.Builder request = new Request.Builder()
+                .url(config.hubUrl + path)
+                .post(RequestBody.create(json, MediaType.get("application/json; charset=utf-8")));
+        if (bearer != null) request.header("Authorization", "Bearer " + bearer);
+        // The shared client has no read timeout (WebSocket); this call needs one.
+        OkHttpClient bounded = http.newBuilder().callTimeout(20, TimeUnit.SECONDS)
+                .followRedirects(false).build();
+        try (Response response = bounded.newCall(request.build()).execute()) {
+            return response.code();
+        }
+    }
+
+    private String deviceQuery() throws Exception {
+        return "?device_id=" + URLEncoder.encode(config.deviceId, StandardCharsets.UTF_8.name());
+    }
+
+    private static String agentVersion(Context context) {
+        try {
+            return "android-" + context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "android-unknown";
+        }
+    }
+
+    private boolean send(JSONObject payload) {
         WebSocket local = socket;
-        if (local != null) local.send(payload.toString());
+        return local != null && local.send(payload.toString());
     }
 
     private void sendHello() {
@@ -114,7 +301,7 @@ public final class HubClient {
             JSONObject hello = new JSONObject()
                     .put("type", "hello")
                     .put("device_id", config.deviceId)
-                    .put("agent_version", "android-0.1.0")
+                    .put("agent_version", agentVersion)
                     .put("transport", "websocket")
                     .put("concurrency", 2)
                     .put("at", System.currentTimeMillis() / 1000.0)
@@ -143,6 +330,7 @@ public final class HubClient {
                     .put("shizuku_uid", shell.shizukuUid())
                     .put("shizuku_permission", shell.hasPermission())
                     .put("shizuku_user_service_ready", shell.isShellServiceReady())
+                    .put("battery_exempt", power.isIgnoringBatteryOptimizations(packageName))
                     .put("at", System.currentTimeMillis() / 1000.0));
         } catch (Exception e) {
             Log.e(TAG, "heartbeat failed", e);
@@ -165,13 +353,16 @@ public final class HubClient {
         } catch (Exception ignored) {
         }
 
+        // The packet that brought this job may be the only thing keeping the CPU awake.
+        PowerManager.WakeLock jobLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "projectir:job");
+        jobLock.acquire((job.optInt("timeout_seconds", 60) + 30) * 1000L);
         jobs.execute(() -> {
             try {
                 if (!"local_exec".equals(tool)) {
                     throw new IllegalArgumentException("unsupported Android agent tool: " + tool);
                 }
                 JSONObject result = executeLocalExec(args);
-                send(new JSONObject()
+                sendResult(jobId, new JSONObject()
                         .put("type", "result")
                         .put("job_id", jobId)
                         .put("ok", true)
@@ -180,7 +371,7 @@ public final class HubClient {
             } catch (Throwable t) {
                 failed.incrementAndGet();
                 try {
-                    send(new JSONObject()
+                    sendResult(jobId, new JSONObject()
                             .put("type", "result")
                             .put("job_id", jobId)
                             .put("ok", false)
@@ -189,8 +380,15 @@ public final class HubClient {
                                     .put("message", safeMessage(t))));
                 } catch (Exception ignored) {
                 }
+            } finally {
+                if (jobLock.isHeld()) jobLock.release();
             }
         });
+    }
+
+    private void sendResult(String jobId, JSONObject result) {
+        outbox.add(jobId, result.toString(), SystemClock.elapsedRealtime());
+        if (!send(result)) Log.w(TAG, "connection lost; result will be sent after reconnecting");
     }
 
     private JSONObject executeLocalExec(JSONObject args) throws Exception {
@@ -210,14 +408,18 @@ public final class HubClient {
         return shell.exec(command, cwd, Collections.unmodifiableMap(env), timeout);
     }
 
-    private void scheduleReconnect() {
-        if (stopped.get() || !reconnectScheduled.compareAndSet(false, true)) return;
-        int seconds = reconnectSeconds.get();
-        scheduler.schedule(() -> {
-            reconnectScheduled.set(false);
-            if (!stopped.get()) connect();
-        }, seconds, TimeUnit.SECONDS);
-        reconnectSeconds.set(Math.min(30, Math.max(2, seconds * 2)));
+    private void scheduleReconnect(int httpStatus) {
+        // All reconnect state lives on the scheduler thread.
+        onScheduler(() -> {
+            if (stopped.get() || pendingReconnect != null || current != null) return;
+            waitingForAuth = ReconnectPolicy.isAuthFailure(httpStatus);
+            int delay = reconnect.nextDelaySeconds(httpStatus);
+            if (!waitingForAuth) linkLock.acquire(LINK_WAKE_MS);
+            pendingReconnect = scheduler.schedule(() -> {
+                pendingReconnect = null;
+                if (!stopped.get()) connect();
+            }, delay, TimeUnit.SECONDS);
+        });
     }
 
     private void state(String value) {
@@ -235,13 +437,17 @@ public final class HubClient {
     private final class Listener extends WebSocketListener {
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
+            if (current != this) {
+                webSocket.close(1000, "superseded");
+                return;
+            }
             socket = webSocket;
-            reconnectSeconds.set(2);
-            reconnectScheduled.set(false);
+            reconnect.connected();
             state("connected");
             sendHello();
+            for (String result : outbox.pending(SystemClock.elapsedRealtime())) webSocket.send(result);
             shell.ensureBound();
-            scheduler.execute(HubClient.this::heartbeat);
+            if (!stopped.get()) scheduler.execute(HubClient.this::heartbeat);
         }
 
         @Override
@@ -263,17 +469,19 @@ public final class HubClient {
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
-            if (socket != webSocket) return; // Ignore a superseded connection.
+            if (current != this) return; // Ignore a superseded connection.
+            current = null;
             socket = null;
             if (!stopped.get()) {
                 state("disconnected");
-                scheduleReconnect();
+                scheduleReconnect(0);
             }
         }
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            if (socket != webSocket) return; // Stale socket cannot replace current status.
+            if (current != this) return; // Stale socket cannot replace current status.
+            current = null;
             socket = null;
             if (!stopped.get()) {
                 // Report the handshake HTTP status, if present, without ever
@@ -283,7 +491,7 @@ public final class HubClient {
                         : "HTTP" + response.code() + ":" + t.getClass().getSimpleName();
                 Log.w(TAG, "WebSocket connection failure: " + failure);
                 state("network-error:" + failure);
-                scheduleReconnect();
+                scheduleReconnect(response == null ? 0 : response.code());
             }
         }
     }

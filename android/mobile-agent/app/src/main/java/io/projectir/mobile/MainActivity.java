@@ -100,7 +100,9 @@ public final class MainActivity extends Activity {
         }
 
         if (store.load().ready()) {
-            startForegroundService(new Intent(this, AgentService.class));
+            Intent agent = new Intent(this, AgentService.class);
+            if (imported) agent.setAction(AgentService.ACTION_RELOAD);
+            startForegroundService(agent);
         }
 
         if (imported) {
@@ -335,7 +337,7 @@ public final class MainActivity extends Activity {
 
         hub = field("Hub URL");
         device = field("Device ID");
-        token = field("Agent token (leave blank to keep stored token)");
+        token = field("Enrollment code or device token (blank keeps the stored one)");
         token.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         autostart = new CheckBox(this);
         autostart.setText("Auto-start agent after boot");
@@ -344,7 +346,7 @@ public final class MainActivity extends Activity {
         box.addView(hub);
         box.addView(label("Device ID"));
         box.addView(device);
-        box.addView(label("Agent token"));
+        box.addView(label("Hub credential"));
         box.addView(token);
         box.addView(autostart);
 
@@ -366,8 +368,9 @@ public final class MainActivity extends Activity {
 
         Button start = button("Start Project IR agent");
         start.setOnClickListener(v -> {
-            saveConfiguration();
-            startForegroundService(new Intent(this, AgentService.class));
+            if (!saveConfiguration()) return;
+            startForegroundService(new Intent(this, AgentService.class)
+                    .setAction(AgentService.ACTION_RELOAD));
             refreshStatus();
         });
         box.addView(start);
@@ -537,7 +540,7 @@ public final class MainActivity extends Activity {
         refreshStatus();
     }
 
-    private void saveConfiguration() {
+    private boolean saveConfiguration() {
         try {
             store.save(
                     hub.getText().toString(),
@@ -548,8 +551,10 @@ public final class MainActivity extends Activity {
             token.setText("");
             token.setHint("Stored in Android Keystore");
             toast("Configuration saved");
+            return true;
         } catch (Exception e) {
             toast("Save failed: " + e.getMessage());
+            return false;
         }
     }
 
