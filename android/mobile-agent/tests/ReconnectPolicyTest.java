@@ -17,6 +17,20 @@ public final class ReconnectPolicyTest {
         policy.connected();
         verify(policy.nextDelaySeconds(0) == 2, "network reset");
         verify(policy.nextDelaySeconds(403) == 60, "auth reset");
+
+        // A new network must not wait out an old delay, but must not hammer a refused credential either.
+        ReconnectPolicy moved = new ReconnectPolicy();
+        for (int i = 0; i < 5; i++) moved.nextDelaySeconds(0);
+        moved.nextDelaySeconds(401);
+        moved.networkChanged();
+        verify(moved.nextDelaySeconds(0) == 2, "network change resets the network delay");
+        verify(moved.nextDelaySeconds(401) == 120, "network change keeps the auth delay");
+
+        verify(ReconnectPolicy.onNetwork(true, true, false) == ReconnectPolicy.NetworkAction.NONE, "same network");
+        verify(ReconnectPolicy.onNetwork(true, false, false) == ReconnectPolicy.NetworkAction.REPLACE, "moved");
+        verify(ReconnectPolicy.onNetwork(false, true, false) == ReconnectPolicy.NetworkAction.CONNECT, "back");
+        verify(ReconnectPolicy.onNetwork(false, false, false) == ReconnectPolicy.NetworkAction.CONNECT, "new");
+        verify(ReconnectPolicy.onNetwork(false, false, true) == ReconnectPolicy.NetworkAction.NONE, "auth wait");
         System.out.println("RECONNECT_POLICY_PASS=" + count);
     }
 }

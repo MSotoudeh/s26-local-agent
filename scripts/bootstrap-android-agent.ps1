@@ -48,6 +48,9 @@ if ($LASTEXITCODE -ne 0) {
 # Notification permission is independent of Shizuku authorization.
 & $adb shell pm grant io.projectir.mobile android.permission.POST_NOTIFICATIONS 2>$null | Out-Null
 
+# Without this exemption Android cuts the connection while the phone sleeps.
+& $adb shell cmd deviceidle whitelist +io.projectir.mobile | Out-Null
+
 # Enable the Project IR semantic Accessibility bridge while preserving every
 # previously enabled Accessibility service.
 $accessibilityService = "io.projectir.mobile/io.projectir.mobile.UiAccessibilityService"

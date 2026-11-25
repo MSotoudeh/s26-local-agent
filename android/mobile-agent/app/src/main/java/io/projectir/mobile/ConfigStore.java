@@ -75,9 +75,14 @@ public final class ConfigStore {
     /** credentialOrBlank: a one-time enrollment code (pir1....), a device token, or blank to keep. */
     public void save(String hubUrl, String deviceId, String credentialOrBlank, boolean autostart) {
         String device = normalizeDevice(deviceId);
+        String hub = normalizeHub(hubUrl);
         SharedPreferences.Editor editor = prefs.edit()
-                .putString(PREF_HUB, normalizeHub(hubUrl))
+                .putString(PREF_HUB, hub)
                 .putBoolean(PREF_AUTOSTART, autostart);
+        // A token belongs to the Hub that accepted it; never present it to another host.
+        if (!hub.equals(prefs.getString(PREF_HUB, hub))) {
+            editor.remove(PREF_TOKEN).remove(PREF_PENDING);
+        }
         if (HubEnrollment.looksLikeCode(credentialOrBlank)) {
             String code = credentialOrBlank.trim();
             String bound = HubEnrollment.deviceOf(code);

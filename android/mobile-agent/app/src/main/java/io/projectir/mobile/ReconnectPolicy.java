@@ -20,6 +20,23 @@ final class ReconnectPolicy {
         return httpStatus == 401 || httpStatus == 403;
     }
 
+    enum NetworkAction { NONE, CONNECT, REPLACE }
+
+    /**
+     * What to do when a default network becomes available.
+     * A live socket on another network is replaced: it would otherwise stay
+     * "connected" until a ping fails. A refused credential keeps its slow retry.
+     */
+    static NetworkAction onNetwork(boolean connected, boolean sameNetwork, boolean waitingForAuth) {
+        if (connected) return sameNetwork ? NetworkAction.NONE : NetworkAction.REPLACE;
+        return waitingForAuth ? NetworkAction.NONE : NetworkAction.CONNECT;
+    }
+
+    /** The old delay was about the old network; a refused credential stays refused. */
+    synchronized void networkChanged() {
+        network = NETWORK_MIN_SECONDS;
+    }
+
     /** Delay before the next attempt. httpStatus is 0 when there was no response. */
     synchronized int nextDelaySeconds(int httpStatus) {
         int delay;

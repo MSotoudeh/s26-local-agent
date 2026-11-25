@@ -1,5 +1,6 @@
 package io.projectir.mobile;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 
 public final class AgentService extends Service {
     private static final String CHANNEL_ID = "project_ir_agent";
@@ -16,6 +18,10 @@ public final class AgentService extends Service {
 
     /** Reconnect with the saved configuration even if a client is already running. */
     static final String ACTION_RELOAD = "io.projectir.mobile.action.RELOAD";
+
+    /** Wake-up alarm: timers and pings do not run while the CPU sleeps. */
+    private static final String ACTION_KEEP_ALIVE = "io.projectir.mobile.action.KEEP_ALIVE";
+    private static final long KEEP_ALIVE_MS = 9 * 60 * 1000L;
 
     public static volatile String runtimeState = "stopped";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -49,7 +55,24 @@ public final class AgentService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         boolean reload = intent != null && ACTION_RELOAD.equals(intent.getAction());
         if (client == null || reload) startClient();
+        if (client != null) {
+            if (intent != null && ACTION_KEEP_ALIVE.equals(intent.getAction())) client.keepAlive();
+            scheduleKeepAlive();
+        }
         return START_STICKY;
+    }
+
+    private void scheduleKeepAlive() {
+        // Inexact and allowed while idle: no exact-alarm permission needed.
+        getSystemService(AlarmManager.class).setAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + KEEP_ALIVE_MS, keepAliveIntent());
+    }
+
+    private PendingIntent keepAliveIntent() {
+        return PendingIntent.getForegroundService(this, 1,
+                new Intent(this, AgentService.class).setAction(ACTION_KEEP_ALIVE),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private void startClient() {
@@ -69,6 +92,7 @@ public final class AgentService extends Service {
     @Override
     public void onDestroy() {
         mainHandler.removeCallbacks(localHealthPoll);
+        getSystemService(AlarmManager.class).cancel(keepAliveIntent());
         if (client != null) {
             client.stop();
             client = null;

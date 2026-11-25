@@ -6,6 +6,12 @@ Creates a one-time Hub enrollment code for the phone and returns it as a SecureS
 Run by the owner. The Hub's device admin token is asked for at a hidden prompt; it is
 not stored, shown or passed on a command line. Nothing is sent to the phone.
 
+.PARAMETER CopyToClipboard
+For a phone that is not connected to this computer: copies the code instead of returning
+it. Send it to yourself over a private channel and paste it into "Hub credential" in the
+app. It works once and expires; if the phone reports "enroll-refused", someone else used
+it or it expired: issue a new one, which replaces the old credential.
+
 .EXAMPLE
 $code = .\scripts\New-S26EnrollmentCode.ps1
 .\scripts\bootstrap-android-agent.ps1 -ApkPath <apk> -EnrollmentCode $code
@@ -21,7 +27,9 @@ param(
     [ValidateRange(60, 86400)]
     [int]$ExpiresSeconds = 900,
 
-    [securestring]$AdminToken
+    [securestring]$AdminToken,
+
+    [switch]$CopyToClipboard
 )
 $ErrorActionPreference = 'Stop'
 if (-not $AdminToken) { $AdminToken = Read-Host 'Hub device admin token' -AsSecureString }
@@ -38,6 +46,11 @@ $issued = Invoke-RestMethod -Method Post -Uri "$hub/admin/devices/enrollment" -H
     -Body (@{ device_id = $DeviceId; expires_seconds = $ExpiresSeconds } | ConvertTo-Json -Compress)
 if (-not $issued.enrollment_code) { throw 'The Hub returned no enrollment code' }
 Write-Host "Enrollment code issued for '$DeviceId'; it works once and expires in $ExpiresSeconds seconds."
+if ($CopyToClipboard) {
+    Set-Clipboard -Value ([string]$issued.enrollment_code)
+    Write-Host 'Copied to the clipboard.'
+    return
+}
 $secure = [securestring]::new()
 foreach ($ch in ([string]$issued.enrollment_code).ToCharArray()) { $secure.AppendChar($ch) }
 $secure.MakeReadOnly()

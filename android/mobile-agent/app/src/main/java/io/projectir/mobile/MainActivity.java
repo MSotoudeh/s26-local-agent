@@ -573,6 +573,9 @@ public final class MainActivity extends Activity {
                 + "Android: " + Build.VERSION.RELEASE + " / API " + Build.VERSION.SDK_INT + "\n"
                 + permission + "\n"
                 + "Hub config: " + (config.ready() ? "ready" : "incomplete") + "\n"
+                + "Background: " + (getSystemService(android.os.PowerManager.class)
+                        .isIgnoringBatteryOptimizations(getPackageName())
+                        ? "unrestricted" : "battery optimized (unreachable while the phone sleeps)") + "\n"
                 + "Agent: " + AgentService.runtimeState;
         status.setText(text);
     }
