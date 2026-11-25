@@ -35,7 +35,7 @@ Voice (Assistant role / side key) or text
   postcondition verification on the live UI tree
 ```
 
-Remote control is a separate, optional path: `ChatGPT -> Project IR Hub -> S26 agent (outbound WebSocket) -> Shizuku / Accessibility`. Core principles: fast path before LLM, offline by default, ADB only for bootstrap, Accessibility tree before vision, bounded actions, measured fallback. Details: [docs/architecture.md](docs/architecture.md), [docs/control-plane.md](docs/control-plane.md), [docs/decisions.md](docs/decisions.md).
+Remote control is a separate, optional path: `Hub client -> Project IR Hub -> S26 agent (outbound WebSocket) -> Shizuku / Accessibility`. The ChatGPT plugin "M's S26 Ultra" is a different system ([docs/remote-access.md](docs/remote-access.md)). Core principles: fast path before LLM, offline by default, ADB only for bootstrap, Accessibility tree before vision, bounded actions, measured fallback. Details: [docs/architecture.md](docs/architecture.md), [docs/control-plane.md](docs/control-plane.md), [docs/decisions.md](docs/decisions.md).
 
 ### Canonical ownership (since 2026-10-15)
 
@@ -69,7 +69,7 @@ There is no `.env` file. Configuration is by script parameter or these environme
 
 - `JAVA_HOME`, `ANDROID_HOME` / `ANDROID_SDK_ROOT`, `GRADLE_USER_HOME` — build toolchain (defaults resolve under `LOCALAPPDATA` / `USERPROFILE`).
 - `S26_ADB_SERIAL` — optional ADB serial for `scripts/Recover-S26ShizukuPlus-USB.ps1`.
-- Hub URL and agent token are read by `bootstrap-android-agent.ps1` from a local `%LOCALAPPDATA%\ProjectIR\config\agent.json` (never committed) and stored encrypted on the phone.
+- Hub credential: a one-time enrollment code from `New-S26EnrollmentCode.ps1`; the phone generates its own token and stores it encrypted. See [docs/remote-access.md](docs/remote-access.md).
 - Runtime policy example: [config/policy.example.yaml](config/policy.example.yaml).
 
 ## Project layout

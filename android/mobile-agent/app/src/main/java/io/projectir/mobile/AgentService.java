@@ -14,6 +14,9 @@ public final class AgentService extends Service {
     private static final String CHANNEL_ID = "project_ir_agent";
     private static final int NOTIFICATION_ID = 4110;
 
+    /** Reconnect with the saved configuration even if a client is already running. */
+    static final String ACTION_RELOAD = "io.projectir.mobile.action.RELOAD";
+
     public static volatile String runtimeState = "stopped";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Runnable localHealthPoll = new Runnable() {
@@ -44,7 +47,8 @@ public final class AgentService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (client == null) startClient();
+        boolean reload = intent != null && ACTION_RELOAD.equals(intent.getAction());
+        if (client == null || reload) startClient();
         return START_STICKY;
     }
 

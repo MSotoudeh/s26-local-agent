@@ -121,10 +121,12 @@ The local assistant architecture may later operate offline for local-only tasks;
 The Hub agent token is never committed.
 
 Initial provisioning uses a transient app-scoped bootstrap JSON file. The app:
-1. imports the Hub URL, device ID and token;
-2. encrypts the token with an Android Keystore AES-GCM key;
-3. stores only encrypted configuration;
-4. deletes the plaintext bootstrap file.
+1. imports the Hub URL, device ID and a one-time enrollment code;
+2. deletes the plaintext bootstrap file;
+3. generates its own device token and registers it with the code;
+4. stores the token encrypted with an Android Keystore AES-GCM key.
+
+The shared Ops agent token is never copied to the phone. See [../remote-access.md](../remote-access.md).
 
 ## Reboot boundary
 
@@ -139,10 +141,10 @@ This boundary is explicit and should be represented in device status.
 
 ## Build environment
 
-The Android app targets API 37 and requires JDK 17 for the current Gradle/Android toolchain.
+The Android app targets API 37 and requires JDK 21+ (JDK 25 on Ops): MediaPipe 0.10.27 contains Java 21 bytecode.
 
 Canonical Ops toolchain:
-- JDK: `%LOCALAPPDATA%\ProjectIR\toolchains\jdk-17.0.20.1+1`
+- JDK: `C:\Program Files\Eclipse Adoptium\jdk-25.0.4.7-hotspot`
 - Android SDK: `%LOCALAPPDATA%\Android\Sdk`
 - Android platform: API 37
 
@@ -159,14 +161,15 @@ The helper sets process-local `JAVA_HOME`, `ANDROID_HOME` and `ANDROID_SDK_ROOT`
 Install/configure over USB ADB:
 
 ```powershell
-.\scripts\bootstrap-android-agent.ps1 -ApkPath .\android\mobile-agent\app\build\outputs\apk\debug\app-debug.apk
+$code = .\scripts\New-S26EnrollmentCode.ps1
+.\scripts\bootstrap-android-agent.ps1 -ApkPath .\android\mobile-agent\app\build\outputs\apk\debug\app-debug.apk -EnrollmentCode $code
 ```
 
 Bootstrap:
 - installs/updates the APK;
 - preserves existing Accessibility services and adds the Project IR service;
 - stages the transient Hub bootstrap file;
-- launches the app so the secret is imported and deleted;
+- launches the app so the one-time code is imported and deleted;
 - requests/uses existing Shizuku authorization.
 
 ## Verified S26 results — 2026-10-07

@@ -93,7 +93,10 @@ public final class UiAccessibilityService extends AccessibilityService {
             JSONObject item = new JSONObject();
             put(item, "id", id);
             put(item, "parent", record.parentId);
-            put(item, "text", nullable(node.getText()));
+            // Never export password fields, including ones shown in the clear.
+            boolean password = node.isPassword();
+            put(item, "text", password ? "[password]" : nullable(node.getText()));
+            put(item, "password", password);
             put(item, "contentDescription", nullable(node.getContentDescription()));
             put(item, "resourceId", nullable(node.getViewIdResourceName()));
             put(item, "className", nullable(node.getClassName()));

@@ -10,8 +10,9 @@ a device, a Hub endpoint or user data. Expect an acknowledgement within a week.
 ## Secrets and personal data
 
 - Secrets live only in a git-ignored `secrets/` folder or `.env` file, never in
-  tracked files. The agent's Hub token is entered on the phone and stored
-  encrypted with an Android Keystore key; it is never committed.
+  tracked files. The agent's Hub token is generated on the phone and
+  stored encrypted with an Android Keystore key; only a one-time enrollment
+  code is ever transferred, and it is never committed.
 - Do not commit device serial numbers, phone numbers, IMEIs, screen contents,
   audio recordings, message text, contacts or signing keystores.
 - Benchmark evidence under `benchmarks/` must be sanitized before commit

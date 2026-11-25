@@ -74,7 +74,8 @@ public final class ShellBridge {
                 new ComponentName(app, ShellUserService.class)
         ).processNameSuffix("project_ir_shell")
                 .daemon(true)
-                .version(1);
+                // 2: replies are UTF-8 bytes; older daemons must be replaced.
+                .version(2);
         Shizuku.addBinderReceivedListenerSticky(binderReceived);
         Shizuku.addBinderDeadListener(binderDead);
         ensureBound();

@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,6 +52,8 @@ public final class ShellUserService extends IShellService.Stub {
             }
 
             process = builder.start();
+            // No input is ever sent: without EOF, `cat` or `read` would hang to the timeout.
+            process.getOutputStream().close();
             final java.lang.Process p = process;
             Thread outThread = new Thread(() -> stdout.drain(p.getInputStream()), "project-ir-shell-stdout");
             Thread errThread = new Thread(() -> stderr.drain(p.getErrorStream()), "project-ir-shell-stderr");
@@ -79,10 +80,12 @@ public final class ShellUserService extends IShellService.Stub {
             result.put("exit_code", exitCode);
             result.put("timed_out", !completed);
             result.put("duration_ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started));
-            result.put("stdout", stdout.text());
-            result.put("stderr", stderr.text());
-            result.put("stdout_truncated", stdout.truncated.get());
-            result.put("stderr_truncated", stderr.truncated.get());
+            OutputBudget output = OutputBudget.fit(
+                    stdout.text(), stderr.text(), OutputBudget.MAX_JSON_BYTES);
+            result.put("stdout", output.stdout);
+            result.put("stderr", output.stderr);
+            result.put("stdout_truncated", stdout.truncated.get() || output.stdoutCut);
+            result.put("stderr_truncated", stderr.truncated.get() || output.stderrCut);
             return result.toString();
         } catch (Exception e) {
             try {
@@ -93,8 +96,10 @@ public final class ShellUserService extends IShellService.Stub {
                 result.put("exit_code", -1);
                 result.put("timed_out", false);
                 result.put("duration_ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started));
-                result.put("stdout", stdout.text());
-                result.put("stderr", stderr.text());
+                OutputBudget output = OutputBudget.fit(
+                        stdout.text(), stderr.text(), OutputBudget.MAX_JSON_BYTES);
+                result.put("stdout", output.stdout);
+                result.put("stderr", output.stderr);
                 result.put("error_type", e.getClass().getSimpleName());
                 result.put("error_message", String.valueOf(e.getMessage()));
             } catch (Exception ignored) {
@@ -143,7 +148,7 @@ public final class ShellUserService extends IShellService.Stub {
         }
 
         String text() {
-            return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+            return OutputBudget.decode(buffer.toByteArray(), truncated.get());
         }
     }
 }

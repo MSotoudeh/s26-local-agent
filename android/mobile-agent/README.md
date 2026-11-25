@@ -53,15 +53,16 @@ Target validation on the S26:
 ## Security
 
 - Hub traffic is TLS-only.
-- The agent token is stored encrypted with an Android Keystore AES-GCM key.
-- A one-time bootstrap file is imported into encrypted storage and deleted immediately.
-- stdout/stderr are bounded to stay below Binder transaction limits.
+- The phone generates its own Hub token, registers it with a one-time code and stores it encrypted with an Android Keystore AES-GCM key (see `../../docs/remote-access.md`).
+- The bootstrap file holds only that one-time code and is deleted after import.
+- stdout and stderr together are limited to 400 KB (UTF-8, JSON-escaped) to stay below Binder transaction limits; longer output is cut and marked `*_truncated`.
+- Text of password fields is replaced by `[password]` in UI snapshots.
 - the semantic ContentProvider enforces own-UID or shell-UID access.
 - the APK does not listen on a network port.
 
 ## Reboot boundary
 
-The app can restart and reconnect after `BOOT_COMPLETED`, but an unrooted app cannot independently restore Shizuku after reboot. Hub connectivity and native non-Shizuku capabilities can return while shell-privileged execution remains degraded until Shizuku is started again.
+The app can restart and reconnect after `BOOT_COMPLETED` and after an APK update, but an unrooted app cannot independently restore Shizuku after reboot. Hub connectivity and native non-Shizuku capabilities can return while shell-privileged execution remains degraded until Shizuku is started again.
 
 ## Build
 

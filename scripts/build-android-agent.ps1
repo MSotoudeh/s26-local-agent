@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 
 $java = Join-Path $JavaHome "bin\java.exe"
 if (-not (Test-Path $java)) {
-    throw "Project IR Android JDK 17 not found: $JavaHome"
+    throw "JDK 21+ not found: $JavaHome"
 }
 if (-not (Test-Path (Join-Path $AndroidSdk "platforms\android-37.0"))) {
     throw "Android API 37 platform not found under: $AndroidSdk"

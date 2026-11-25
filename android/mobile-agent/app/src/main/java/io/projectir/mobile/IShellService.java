@@ -6,6 +6,8 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+import java.nio.charset.StandardCharsets;
+
 public interface IShellService extends IInterface {
     String exec(String command, String cwd, String envJson, int timeoutSeconds) throws RemoteException;
     void destroy() throws RemoteException;
@@ -47,7 +49,8 @@ public interface IShellService extends IInterface {
                 int timeoutSeconds = data.readInt();
                 String result = exec(command, cwd, envJson, timeoutSeconds);
                 reply.writeNoException();
-                reply.writeString(result);
+                // UTF-8 bytes: writeString would send two bytes per ASCII character.
+                reply.writeByteArray(result.getBytes(StandardCharsets.UTF_8));
                 return true;
             }
             if (code == TRANSACTION_DESTROY) {
@@ -84,7 +87,9 @@ public interface IShellService extends IInterface {
                     data.writeInt(timeoutSeconds);
                     remote.transact(TRANSACTION_EXEC, data, reply, 0);
                     reply.readException();
-                    return reply.readString();
+                    byte[] bytes = reply.createByteArray();
+                    if (bytes == null) throw new RemoteException("empty shell reply");
+                    return new String(bytes, StandardCharsets.UTF_8);
                 } finally {
                     reply.recycle();
                     data.recycle();

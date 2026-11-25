@@ -21,6 +21,7 @@ and [HISTORY.md](HISTORY.md).
 
 | Document | Purpose |
 |---|---|
+| [remote-access.md](remote-access.md) | The two remote paths (DroidBridge plugin, Project IR Hub), enrollment and agent states |
 | [control-plane.md](control-plane.md) | Remote control path through the Project IR Hub |
 | [component-options.md](component-options.md) | Primary and alternative choice per component |
 | [skills.md](skills.md) | Skill and app-specific knowledge strategy |

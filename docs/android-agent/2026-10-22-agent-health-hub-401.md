@@ -1,5 +1,7 @@
 # S26 Local Agent: Binder health and Hub authentication — 2026-10-22
 
+> **Resolved in code 2026-11-25:** the HTTP 401 came from using the shared agent token, which the Hub accepts for `ops` only. The app now enrolls with its own credential; see [../remote-access.md](../remote-access.md). Not yet run on the phone.
+
 ## Scope
 
 Canonical repository: `s26-local-agent` (main). Target `io.projectir.mobile`, Android 17, Galaxy S26 Ultra (no root). User-preserved ShizukuPlus compatibility, ghosting, Dhizuku, firewall and AI features **not modified**. Wi-Fi was kept OFF. No UI interaction, package uninstall, data clear, root, TCP/5555 enablement or reboot in this change.
