@@ -151,7 +151,7 @@ Canonical Ops toolchain:
 Build and lint with:
 
 ```powershell
-.\scripts\build-android-agent.ps1
+.\scripts\build-android-agent.ps1 -Release
 ```
 
 The helper sets process-local `JAVA_HOME`, `ANDROID_HOME` and `ANDROID_SDK_ROOT`; it does not change machine-wide Java settings.

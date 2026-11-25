@@ -57,7 +57,7 @@ python scripts/validate-s26-model-lab.py --self-test
 Building and installing the APK needs Android SDK API 37, Build Tools 36.0.0 and JDK 21+ (Windows PowerShell):
 
 ```powershell
-.\scripts\build-android-agent.ps1
+.\scripts\build-android-agent.ps1 -Release
 .\scripts\bootstrap-android-agent.ps1 -ApkPath .\android\mobile-agent\app\build\outputs\apk\debug\app-debug.apk
 ```
 

@@ -56,6 +56,8 @@ Target validation on the S26:
 - The phone generates its own Hub token, registers it with a one-time code and stores it encrypted with an Android Keystore AES-GCM key (see `../../docs/remote-access.md`).
 - The bootstrap file holds only that one-time code and is deleted after import.
 - stdout and stderr together are limited to 400 KB (UTF-8, JSON-escaped) to stay below Binder transaction limits; longer output is cut and marked `*_truncated`.
+- A command that times out is killed with its whole process group.
+- The Hub token is deleted when the Hub URL changes.
 - Text of password fields is replaced by `[password]` in UI snapshots.
 - the semantic ContentProvider enforces own-UID or shell-UID access.
 - the APK does not listen on a network port.
@@ -76,7 +78,7 @@ Requires:
 On Ops use:
 
 ```powershell
-.\scripts\build-android-agent.ps1
+.\scripts\build-android-agent.ps1 -Release
 ```
 
 The canonical JDK lives under `%LOCALAPPDATA%\ProjectIR\toolchains`; generated build state and `local.properties` stay outside Git.

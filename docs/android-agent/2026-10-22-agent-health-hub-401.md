@@ -1,6 +1,6 @@
 # S26 Local Agent: Binder health and Hub authentication — 2026-10-22
 
-> **Resolved in code 2026-11-25:** the HTTP 401 came from using the shared agent token, which the Hub accepts for `ops` only. The app now enrolls with its own credential; see [../remote-access.md](../remote-access.md). Not yet run on the phone.
+> **Resolved in code 2026-11-25:** the HTTP 401 came from using the shared agent token, which the Hub accepts for `ops` only. The app now enrolls with its own credential; see [../remote-access.md](../remote-access.md). Verified on the phone 2026-11-25 against an isolated Hub; production enrollment is an owner step.
 
 ## Scope
 
