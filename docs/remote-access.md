@@ -94,6 +94,9 @@ the Hub, with the code of this repository:
 
 No battery exemption is needed: a foreground service keeps its network in Doze.
 
+Shizuku+ restarted its server once, when the screen was turned off. Both paths recovered
+without help, but background processes started from the shell were killed with it.
+
 Not covered: a night of real use, Wi-Fi to mobile handover (the same code path as the
 mobile data test, but not run), and reboot. After a reboot Shizuku must be started by
 hand before any shell command works, on both paths.

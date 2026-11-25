@@ -63,6 +63,19 @@ class ProvisioningBehavior(unittest.TestCase):
         self.assertNotIn("admin-secret", result.stdout + result.stderr)
         self.assertNotIn(HEX, result.stdout)
 
+    def test_clipboard_mode_copies_the_code_and_prints_nothing_secret(self):
+        result = run(
+            "function Invoke-RestMethod { param($Method, $Uri, $Headers, $ContentType, $Body) "
+            "if ($Uri -like '*/enrollment') { [pscustomobject]@{ enrollment_code = '" + CODE + "' } } }; "
+            "$global:clip = $null; function Set-Clipboard { param($Value) $global:clip = $Value }; "
+            "$t = ConvertTo-SecureString 'admin-secret' -AsPlainText -Force; "
+            f"$out = & '{ISSUE}' -HubUrl 'https://hub.invalid' -AdminToken $t -CopyToClipboard; "
+            "\"returned=$($null -ne $out) copied=$($global:clip -ceq '" + CODE + "')\"")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("returned=False copied=True", result.stdout)
+        self.assertNotIn(HEX, result.stdout + result.stderr)
+        self.assertNotIn("admin-secret", result.stdout + result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
